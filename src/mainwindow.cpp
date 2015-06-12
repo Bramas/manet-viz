@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     GeometricGraph * gg = new GeometricGraph();
-    if(gg->load("E:/Projects/build/taxi_february.txt"))
+    if(gg->load("/Users/quentinbramas/Downloads/taxi_february.txt"))
     {
         ControlWidget * controlWidget = new ControlWidget();
 

@@ -45,7 +45,7 @@ void ControlWidget::play()
     ui->spinBoxTime->setEnabled(false);
     ui->pushButtonPlay->setText(tr("Stop"));
     _playTimerElapsed.start();
-    _playTimer.start(0);
+    _playTimer.start(1);
 }
 void ControlWidget::stop()
 {
@@ -58,9 +58,9 @@ void ControlWidget::onPlayTimerTimeout()
 {
     _cumulatedTime += ui->spinBoxSpeed->value()*_playTimerElapsed.elapsed()/100.0;
     _playTimerElapsed.start();
-    if(_cumulatedTime >= 1)
+    if(floor(_cumulatedTime) >= 1.0)
     {
-        int add = _cumulatedTime;
+        int add = floor(_cumulatedTime);
         _cumulatedTime -= add;
         ui->spinBoxTime->setValue(ui->spinBoxTime->value()+add);
         emitTimeChanged();
