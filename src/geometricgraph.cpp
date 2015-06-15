@@ -1,29 +1,40 @@
 #include "geometricgraph.h"
-
+#include <iostream>
+#include <memory>
 #include <QFile>
 #include <QTextStream>
 #include <QDebug>
+#include <QtConcurrent>
 
 GeometricGraph::GeometricGraph()
 {
-
+    _loaded = 0;
 }
 GeometricGraph::~GeometricGraph(){
 
 }
+/*
+void GeometricGraph::concurrentLoad(std::unique_ptr<QFile> file)
+{
+
+}*/
 
 bool GeometricGraph::load(QString filename)
 {
-    QFile file(filename);
-    if(!file.open(QFile::ReadOnly | QFile::Text))
+    std::unique_ptr<QFile> file(new QFile(filename));
+    if(!file->open(QFile::ReadOnly | QFile::Text))
     {
         return false;
     }
-    qDebug()<<file.bytesAvailable();
+    qDebug()<<file->bytesAvailable();
     for(int i = 0; i< 100000; ++i)
-    processLine(QString(file.readLine()));
-    qDebug()<<file.bytesAvailable();
-    file.close();
+    {
+        if(!file->atEnd())
+            processLine(QString(file->readLine()));
+    }
+
+    _loaded = file->bytesAvailable() / file->size();
+    //QtConcurrent::run()
     //foreach(mvtime t, _nodesPosition.value(89)->keys())
     //    qDebug()<<t<<" "<<_nodesPosition.value(89)->value(t);
     return true;
@@ -32,8 +43,10 @@ bool GeometricGraph::load(QString filename)
 void GeometricGraph::processLine(QString line)
 {
     QStringList l = line.split(";");
-
-
+    if(l.size() != 3)
+    {
+        return;
+    }
     int id = l.at(0).toInt();
 
     QStringList date = l.at(1).split(" ").at(0).split("-");

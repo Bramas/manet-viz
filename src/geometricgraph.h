@@ -23,6 +23,8 @@ private:
 
     QHash<int, QMap<mvtime, QPointF>* > _nodesPosition;
 
+    qreal _loaded;
+
 };
 
 #endif // GEOMETRICGRAPH_H
