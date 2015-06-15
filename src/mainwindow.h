@@ -7,6 +7,8 @@ namespace Ui {
 class MainWindow;
 }
 
+class AbstractEvolvingGraph;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -14,9 +16,13 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+protected:
+    void closeEvent(QCloseEvent *);
 
 private:
     Ui::MainWindow *ui;
+
+    AbstractEvolvingGraph * _evolvingGraph;
 };
 
 #endif // MAINWINDOW_H

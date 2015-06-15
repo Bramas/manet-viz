@@ -1,42 +1,65 @@
 #include "geometricgraph.h"
 #include <iostream>
 #include <memory>
+#include <ctime>
 #include <QFile>
 #include <QTextStream>
 #include <QDebug>
-#include <QtConcurrent>
 
 GeometricGraph::GeometricGraph()
 {
     _loaded = 0;
+    _forceStop = false;
 }
 GeometricGraph::~GeometricGraph(){
-
+    _forceStop = true;
 }
-/*
-void GeometricGraph::concurrentLoad(std::unique_ptr<QFile> file)
-{
 
-}*/
+bool GeometricGraph::concurrentLoad(QFile * file)
+{
+    while(!file->atEnd())
+    {
+        for(int i = 0; i< 10000; ++i)
+        {
+            if(!file->atEnd())
+                processLine(QString(file->readLine()));
+        }
+        _loaded = 1.0 - file->bytesAvailable() / (qreal)file->size();
+        emit onLoadProgressChanged(_loaded);
+        if(_forceStop)
+        {
+            return false;
+        }
+    }
+
+    file->close();
+    file->deleteLater();
+    return true;
+}
+void GeometricGraph::cancelLoadAndWait()
+{
+    if(!_loadResult.isFinished())
+    {
+        _forceStop = true;
+        _loadResult.waitForFinished();
+    }
+}
 
 bool GeometricGraph::load(QString filename)
 {
-    std::unique_ptr<QFile> file(new QFile(filename));
+    QFile * file = new QFile(filename);
     if(!file->open(QFile::ReadOnly | QFile::Text))
     {
         return false;
     }
-    qDebug()<<file->bytesAvailable();
     for(int i = 0; i< 100000; ++i)
     {
         if(!file->atEnd())
             processLine(QString(file->readLine()));
     }
 
-    _loaded = file->bytesAvailable() / file->size();
-    //QtConcurrent::run()
-    //foreach(mvtime t, _nodesPosition.value(89)->keys())
-    //    qDebug()<<t<<" "<<_nodesPosition.value(89)->value(t);
+    _loaded = 1.0 - file->bytesAvailable() / (qreal)file->size();
+    //_loadResult = QtConcurrent::run(this, &GeometricGraph::concurrentLoad, file);
     return true;
 }
 
@@ -50,9 +73,28 @@ void GeometricGraph::processLine(QString line)
     int id = l.at(0).toInt();
 
     QStringList date = l.at(1).split(" ").at(0).split("-");
-    QStringList time = l.at(1).split(" ").at(1).split("+").at(0).split(":");
+    QStringList time = l.at(1).split(" ").at(1).split(".").at(0).split(":");
 
-    mvtime t = date.at(2).toInt()*3600*24+time.at(0).toInt()*3600+time.at(1).toInt()*60+time.at(2).toInt();
+    struct std::tm origin;
+    origin.tm_year = 2014 - 1900;
+    origin.tm_mon = 2 - 1;
+    origin.tm_mday = 1;
+    origin.tm_hour = 0;
+    origin.tm_min = 0;
+    origin.tm_sec = 0;
+
+    struct std::tm tm;
+    tm.tm_year = date.at(0).toInt() - 1900;
+    tm.tm_mon = date.at(1).toInt() - 1;
+    tm.tm_mday = date.at(2).toInt();
+    tm.tm_hour = time.at(0).toInt();
+    tm.tm_min = time.at(1).toInt();
+    tm.tm_sec = time.at(2).toInt();
+
+    mvtime t = static_cast<mvtime> (std::mktime (&tm)) - static_cast<mvtime> (std::mktime (&origin));
+    //qDebug()<<std::difftime(std::mktime (&tm), std::mktime (&origin));
+    //qDebug()<<l.at(1)<<" => "<<t;//<<static_cast<mvtime> (std::mktime (&origin))<<static_cast<mvtime> (std::mktime (&tm));
+        //date.at(1).toInt()*3600*24*31+date.at(2).toInt()*3600*24+time.at(0).toInt()*3600+time.at(1).toInt()*60+time.at(2).toInt();
 
     QStringList pointPart = l.at(2).split(")").at(0).split("(").at(1).split(" ");
     QPointF p(pointPart.at(0).toDouble(), pointPart.at(1).toDouble());
@@ -73,15 +115,17 @@ Graph GeometricGraph::footprint(mvtime time) const
     {
         NodePositions * nodePos = _nodesPosition.value(id);
         NodePositions::const_iterator up = nodePos->lowerBound(time);
-        QPointF p = up.value();
         if(up != nodePos->constBegin() && abs(up.key() - (up - 1).key()) < 300)
         {
             NodePositions::const_iterator low = up - 1;
-            p = (up.key() - time)*low.value() + (time - low.key())*up.value();
+            QPointF p = (up.key() - time)*low.value() + (time - low.key())*up.value();
             p /= (up.key() - low.key());
             g.addNode(id, p);
         }
-        //qDebug()<<p;
+        else if(up.key() == time)
+        {
+            g.addNode(id, up.value());
+        }
     }
     return g;
 }
