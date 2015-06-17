@@ -4,8 +4,9 @@
 #include <QSpinBox>
 #include <QCloseEvent>
 
-#include "graphviewer.h"
+#include "viewer.h"
 #include "geometricgraph.h"
+#include "graphlayer.h"
 #include "controlwidget.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -19,7 +20,9 @@ MainWindow::MainWindow(QWidget *parent) :
     {
         ControlWidget * controlWidget = new ControlWidget();
 
-        GraphViewer * gw = new GraphViewer(_evolvingGraph);
+        Viewer * gw = new Viewer(this);
+        gw->addLayer(new LoaderLayer(gw, _evolvingGraph));
+        gw->addLayer(new GraphLayer(gw, _evolvingGraph));
         connect(controlWidget, SIGNAL(timeChanged(mvtime)), gw, SLOT(setTime(mvtime)));
         setCentralWidget(gw);
         this->addDockWidget(Qt::LeftDockWidgetArea, controlWidget);

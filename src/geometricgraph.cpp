@@ -59,7 +59,7 @@ bool GeometricGraph::load(QString filename)
     }
 
     _loaded = 1.0 - file->bytesAvailable() / (qreal)file->size();
-    //_loadResult = QtConcurrent::run(this, &GeometricGraph::concurrentLoad, file);
+    _loadResult = QtConcurrent::run(this, &GeometricGraph::concurrentLoad, file);
     return true;
 }
 

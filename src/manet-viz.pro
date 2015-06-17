@@ -19,8 +19,10 @@ SOURCES += main.cpp\
     abstractevolvinggraph.cpp \
     graph.cpp \
     node.cpp \
-    graphviewer.cpp \
-    controlwidget.cpp
+    controlwidget.cpp \
+    abstractlayer.cpp \
+    viewer.cpp \
+    graphlayer.cpp
 
 HEADERS  += mainwindow.h \
     evolvinggraph.h \
@@ -29,8 +31,10 @@ HEADERS  += mainwindow.h \
     graph.h \
     types.h \
     node.h \
-    graphviewer.h \
-    controlwidget.h
+    controlwidget.h \
+    abstractlayer.h \
+    viewer.h \
+    graphlayer.h
 
 FORMS    += mainwindow.ui \
     controlwidget.ui

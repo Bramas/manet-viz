@@ -1,19 +1,28 @@
-#ifndef GRAPHVIEWER_H
-#define GRAPHVIEWER_H
+#ifndef VIEWER_H
+#define VIEWER_H
 
 #include <QWidget>
 
-#include "abstractevolvinggraph.h"
+#include "types.h"
+class AbstractLayer;
 
-class GraphViewer : public QWidget
+class Viewer : public QWidget
 {
     Q_OBJECT
 public:
-    GraphViewer(const AbstractEvolvingGraph * graph);
+    explicit Viewer(QWidget *parent = 0);
+    ~Viewer();
+
     QPointF toLocalCoordinates(QPointF globalCoordinates) const;
+    void addLayer(AbstractLayer * layer, int priority = 100) { _layers.insertMulti(priority, layer); }
+
+    mvtime time() const { return _time; }
+
+signals:
 
 public slots:
     void setTime(mvtime time);
+
 protected:
     void paintEvent(QPaintEvent *);
     void wheelEvent(QWheelEvent *);
@@ -21,13 +30,12 @@ protected:
     void mousePressEvent(QMouseEvent *);
 
 private:
-    const AbstractEvolvingGraph * _evolvingGraph;
 
+    QMap<int, AbstractLayer*> _layers;
     mvtime _time;
     QPoint _lastMousePos;
-    QPointF _beforeTranslate;
     QPointF _afterTranslate;
     qreal _zoom;
 };
 
-#endif // GRAPHVIEWER_H
+#endif // VIEWER_H
