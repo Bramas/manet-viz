@@ -1,7 +1,7 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
-#include <QVector>
+#include <QHash>
 
 #include "node.h"
 
@@ -10,12 +10,14 @@ class Graph
 public:
     Graph();
 
-    const QVector<Node> & nodes() { return _nodes; }
+    const QHash<int, Node> & nodes() { return _nodes; }
 
     void addNode(int id, QPointF point);
 
+    void addEdge(const Node & n1, const Node & n2);
+
 private:
-    QVector<Node> _nodes;
+    QHash<int, Node> _nodes;
 
 
 };

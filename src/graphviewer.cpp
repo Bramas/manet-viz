@@ -55,6 +55,14 @@ void GraphViewer::paintEvent(QPaintEvent *)
     }
 
     painter.setBrush(QBrush(QColor(0,0,0)));
+    foreach(const Node& n1, g.nodes())
+    {
+        foreach(const Node& n2, n1.neighbors())
+        {
+            painter.drawLine(toLocalCoordinates(n1.position()), toLocalCoordinates(n2.position()));
+        }
+    }
+
     foreach(const Node& n, g.nodes())
     {
         painter.drawEllipse(toLocalCoordinates(n.position()), 1,1);

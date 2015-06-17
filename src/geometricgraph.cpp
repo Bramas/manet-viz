@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDebug>
+#include <QVector2D>
 
 GeometricGraph::GeometricGraph()
 {
@@ -21,7 +22,7 @@ bool GeometricGraph::load(QString filename)
     }
     qDebug()<<file.bytesAvailable();
     for(int i = 0; i< 100000; ++i)
-    processLine(QString(file.readLine()));
+        processLine(QString(file.readLine()));
     qDebug()<<file.bytesAvailable();
     file.close();
     //foreach(mvtime t, _nodesPosition.value(89)->keys())
@@ -49,7 +50,6 @@ void GeometricGraph::processLine(QString line)
         _nodesPosition.insert(id, new QMap<mvtime, QPointF>());
     }
     _nodesPosition.value(id)->insert(_nodesPosition.value(id)->constEnd(), t, p);
-
 }
 
 typedef QMap<mvtime, QPointF> NodePositions;
@@ -69,6 +69,18 @@ Graph GeometricGraph::footprint(mvtime time) const
             g.addNode(id, p);
         }
         //qDebug()<<p;
+    }
+
+    foreach(const Node& n1, g.nodes())
+    {
+        foreach(const Node& n2, g.nodes())
+        {
+            QVector2D v1(n1.position());
+            if(v1.distanceToPoint(QVector2D(n2.position())) <= 0.002)
+            {
+                g.addEdge(n1,n2);
+            }
+        }
     }
     return g;
 }
