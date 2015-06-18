@@ -52,7 +52,7 @@ bool GeometricGraph::load(QString filename)
     {
         return false;
     }
-    for(int i = 0; i< 100000; ++i)
+    for(int i = 0; i< 100; ++i)
     {
         if(!file->atEnd())
             processLine(QString(file->readLine()));

@@ -66,3 +66,8 @@ void ControlWidget::onPlayTimerTimeout()
         emitTimeChanged();
     }
 }
+
+void ControlWidget::setLoadProgress(qreal f)
+{
+    ui->progressBarImport->setValue(f*1000);
+}
