@@ -11,6 +11,7 @@ GeometricGraph::GeometricGraph()
 {
     _loaded = 0;
     _forceStop = false;
+    _communicationRange = 1;
 }
 GeometricGraph::~GeometricGraph(){
     _forceStop = true;
@@ -133,7 +134,7 @@ Graph GeometricGraph::footprint(mvtime time) const
         foreach(const Node& n2, g.nodes())
         {
             QVector2D v1(n1.position());
-            if(v1.distanceToPoint(QVector2D(n2.position())) <= 0.002)
+            if(v1.distanceToPoint(QVector2D(n2.position())) <= _communicationRange/1000.0)
             {
                 g.addEdge(n1,n2);
             }
@@ -142,3 +143,7 @@ Graph GeometricGraph::footprint(mvtime time) const
     return g;
 }
 
+void GeometricGraph::setCommunicationRange(qreal range)
+{
+    _communicationRange = range;
+}

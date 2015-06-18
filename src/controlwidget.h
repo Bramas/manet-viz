@@ -24,6 +24,7 @@ public slots:
 
 signals:
     void timeChanged(mvtime);
+    void communicationRangeChanged(qreal);
 
 private slots:
     void emitTimeChanged();
