@@ -29,12 +29,31 @@ ImportDialog::ImportDialog(QString filename, QWidget *parent) :
     connect(ui->comboBoxSep, SIGNAL(currentIndexChanged(int)), this, SLOT(sepChanged(int)));
     connect(ui->comboBoxEscape, SIGNAL(currentIndexChanged(int)), this, SLOT(escapeChanged(int)));
     connect(ui->comboBoxQuote, SIGNAL(currentIndexChanged(int)), this, SLOT(quoteChanged(int)));
+    connect(ui->comboBoxID, SIGNAL(currentIndexChanged(int)), this, SLOT(idChanged(int)));
+    connect(ui->comboBoxTime, SIGNAL(currentIndexChanged(int)), this, SLOT(timeChanged(int)));
+    connect(ui->comboBoxX, SIGNAL(currentIndexChanged(int)), this, SLOT(xChanged(int)));
+    connect(ui->comboBoxY, SIGNAL(currentIndexChanged(int)), this, SLOT(yChanged(int)));
 
     processSampleTrace(10); // TODO: Guess the default variables
     processInputTable();
     processOutputTable();
 
     //    ui->listViewInput->setModel(model = new QStringListModel(this););
+}
+
+QChar ImportDialog::guessSep(QString line)
+{
+    QString commonSep = ";, \t";
+    int maxValue = -1;
+    QChar maxSep;
+    foreach(QChar sep, commonSep) {
+        int c = line.count(sep);
+        if(c > maxValue) {
+            maxValue = c;
+            maxSep = sep;
+        }
+    }
+    return maxSep;
 }
 
 void ImportDialog::processSampleTrace(int nbLines)
@@ -69,16 +88,27 @@ void ImportDialog::processInputTable()
 
 void ImportDialog::processOutputTable()
 {
+    _outputModel->clear();
     CSVParser parser(_quote, _sep, _escape);
-    int i = 0;
-//    if (_heading) {
-//        i++;
-//        file->readLine();
-//    }
-
-    foreach(QString line, _sampleTrace) {
-        QList<QString> fields;
+    int idx = 0;
+    if (_heading) {
+        QStringList fields;
+        QString line = _sampleTrace[idx++];
         parser.parseString(line, fields);
+        int j = 0;
+        foreach (QString field, fields) {
+            QStandardItem * item = new QStandardItem(field);
+            _headers.append(field);
+            _outputModel->setHorizontalHeaderItem(j++,item);
+        }
+    }
+
+    int i = 0;
+    for(; idx<_sampleTrace.count(); ++idx) {
+        QStringList fields;
+        QString line = _sampleTrace[idx];
+        parser.parseString(line, fields);
+
         int j = 0;
         foreach(QString field, fields) {
             QStandardItem * item = new QStandardItem(field);
@@ -152,4 +182,22 @@ void ImportDialog::quoteChanged(int index)
     processOutputTable();
 }
 
+void ImportDialog::idChanged(int index)
+{
 
+}
+
+void ImportDialog::timeChanged(int index)
+{
+
+}
+
+void ImportDialog::xChanged(int index)
+{
+
+}
+
+void ImportDialog::yChanged(int index)
+{
+
+}
