@@ -5,6 +5,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDebug>
+#include <QVector2D>
 
 GeometricGraph::GeometricGraph()
 {
@@ -104,7 +105,6 @@ void GeometricGraph::processLine(QString line)
         _nodesPosition.insert(id, new QMap<mvtime, QPointF>());
     }
     _nodesPosition.value(id)->insert(_nodesPosition.value(id)->constEnd(), t, p);
-
 }
 
 typedef QMap<mvtime, QPointF> NodePositions;
@@ -125,6 +125,18 @@ Graph GeometricGraph::footprint(mvtime time) const
         else if(up.key() == time)
         {
             g.addNode(id, up.value());
+        }
+    }
+
+    foreach(const Node& n1, g.nodes())
+    {
+        foreach(const Node& n2, g.nodes())
+        {
+            QVector2D v1(n1.position());
+            if(v1.distanceToPoint(QVector2D(n2.position())) <= 0.002)
+            {
+                g.addEdge(n1,n2);
+            }
         }
     }
     return g;
