@@ -21,6 +21,8 @@ public:
 
     Graph footprint(mvtime time) const;
 
+    void setCommunicationRange(qreal);
+
 private:
     bool concurrentLoad(QFile *file);
     void processLine(QString line);
@@ -30,6 +32,7 @@ private:
     qreal _loaded;
     bool _forceStop;
     QFuture<bool> _loadResult;
+    qreal _communicationRange;
 
 };
 

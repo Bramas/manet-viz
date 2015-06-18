@@ -19,8 +19,12 @@ public:
     explicit ControlWidget(QWidget *parent = 0);
     ~ControlWidget();
 
+public slots:
+    void setLoadProgress(qreal);
+
 signals:
     void timeChanged(mvtime);
+    void communicationRangeChanged(qreal);
 
 private slots:
     void emitTimeChanged();

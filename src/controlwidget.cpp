@@ -14,6 +14,10 @@ ControlWidget::ControlWidget(QWidget *parent) :
     connect(ui->spinBoxTime, SIGNAL(valueChanged(int)), this, SLOT(emitTimeChanged()));
     connect(&_playTimer, SIGNAL(timeout()), this, SLOT(onPlayTimerTimeout()));
     connect(ui->pushButtonPlay, SIGNAL(clicked(bool)), this, SLOT(togglePlay()));
+    connect(ui->sliderRange, &QSlider::valueChanged, [this](int v)
+        {
+            emit communicationRangeChanged((qreal)v);
+        });
     _playTimerElapsed.start();
 }
 
@@ -65,4 +69,9 @@ void ControlWidget::onPlayTimerTimeout()
         ui->spinBoxTime->setValue(ui->spinBoxTime->value()+add);
         emitTimeChanged();
     }
+}
+
+void ControlWidget::setLoadProgress(qreal f)
+{
+    ui->progressBarImport->setValue(f*1000);
 }

@@ -16,6 +16,14 @@ void GraphLayer::paint(QPainter * painter)
 {
     Graph g = _evolvingGraph->footprint(_parent->time());
     painter->setBrush(QBrush(QColor(0,0,0)));
+
+    foreach(const Node& n1, g.nodes())
+    {
+        foreach(const Node& n2, n1.neighbors())
+        {
+            painter->drawLine(_parent->toLocalCoordinates(n1.position()), _parent->toLocalCoordinates(n2.position()));
+        }
+    }
     foreach(const Node& n, g.nodes())
     {
         painter->drawEllipse(_parent->toLocalCoordinates(n.position()), 1,1);
