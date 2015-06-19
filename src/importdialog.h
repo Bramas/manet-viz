@@ -5,6 +5,7 @@
 #include <QStandardItemModel>
 
 #include "types.h"
+#include "graphloader.h"
 
 namespace Ui {
 class ImportDialog;
@@ -17,9 +18,7 @@ class ImportDialog : public QDialog
 public:
     explicit ImportDialog(QString filename, QWidget *parent = 0);
     ~ImportDialog();
-
-public slots:
-    void accept();
+    GraphLoader createGraphLoader();
 
 private:
     Ui::ImportDialog *ui;
