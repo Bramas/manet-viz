@@ -16,6 +16,9 @@ public:
     explicit ImportDialog(QString filename, QWidget *parent = 0);
     ~ImportDialog();
 
+public slots:
+    void accept();
+
 private:
     Ui::ImportDialog *ui;
     QString _filename;
@@ -23,10 +26,10 @@ private:
     bool _heading = false;
     QString _escape = "\\";
     QString _quote = "\"";
-    int idCol;
-    int timeCol;
-    int xCol;
-    int yCol;
+    int _idCol   = -1;
+    int _timeCol = -1;
+    int _xCol    = -1;
+    int _yCol    = -1;
     QStandardItemModel * _inputModel;
     QStandardItemModel * _outputModel;
     QStringList _sampleTrace;
