@@ -36,10 +36,7 @@ void MainWindow::open()
     // Save the filename path in the app settings
     settings.setValue("defaultTracePath", (QFileInfo(filename).absolutePath()));
 
-    //Test values
-    QList<TraceHeader> headers;
-    headers << IdHeader << TimeHeader << XHeader << YHeader;
-    _graphLoader = new GraphLoader(filename, QRegExp("(\\d+);([^;]+);POINT\\(([^ ]+) ([^ ]+)\\)"), headers);
+    _graphLoader = new GraphLoader(importDialog.createGraphLoader());
     _graphLoader->load();
 
     ControlWidget * controlWidget = new ControlWidget();

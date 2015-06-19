@@ -16,6 +16,16 @@ GraphLoader::GraphLoader(QString filename, QRegExp lineRegex, QList<TraceHeader>
     _evolvingGraph = new GeometricGraph();
 }
 
+GraphLoader::GraphLoader(const GraphLoader &other) :
+    _filename(other._filename),
+    _lineRegex(other._lineRegex),
+    _headers(other._headers)
+{
+    _forceStop = false;
+    _loadProgress = 0;
+    _evolvingGraph = new GeometricGraph();
+}
+
 GraphLoader::~GraphLoader()
 {
 

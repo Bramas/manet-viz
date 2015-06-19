@@ -152,5 +152,5 @@ GraphLoader ImportDialog::createGraphLoader()
         headers.append(convertToTraceHeader(_outputModel->item(0,i)->data(Qt::EditRole).toString()));
     }
 
-    return GraphLoader(_filename, _regEx, headers);
+    return GraphLoader(_filename, QRegExp(_regEx), headers);
 }

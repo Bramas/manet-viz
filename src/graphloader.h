@@ -15,6 +15,7 @@ class GraphLoader : public QObject
     Q_OBJECT
 public:
     explicit GraphLoader(QString filename, QRegExp lineRegex, QList<TraceHeader> headers);
+    GraphLoader(const GraphLoader &other);
     ~GraphLoader();
 
     const AbstractEvolvingGraph *   constEvolvingGraph() const;
