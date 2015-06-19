@@ -12,6 +12,8 @@ GeometricGraph::GeometricGraph()
     _loaded = 0;
     _forceStop = false;
     _communicationRange = 1;
+    _beginTime = MaxTime;
+    _endTime = 0;
 }
 GeometricGraph::~GeometricGraph(){
     _forceStop = true;
@@ -146,4 +148,15 @@ Graph GeometricGraph::footprint(mvtime time) const
 void GeometricGraph::setCommunicationRange(qreal range)
 {
     _communicationRange = range;
+}
+
+void GeometricGraph::addNodePosition(int nodeId, mvtime time, QPointF position)
+{
+    _beginTime = qMin(_beginTime, time);
+    _endTime = qMax(_endTime, time);
+    if(!_nodesPosition.contains(nodeId))
+    {
+        _nodesPosition.insert(nodeId, new QMap<mvtime, QPointF>());
+    }
+    _nodesPosition.value(nodeId)->insert(_nodesPosition.value(nodeId)->constEnd(), time, position);
 }

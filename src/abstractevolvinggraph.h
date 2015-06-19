@@ -20,6 +20,9 @@ public:
 
     virtual Graph footprint(mvtime time) const = 0;
 
+    virtual mvtime beginTime() const = 0;
+    virtual mvtime endTime() const = 0;
+
 signals:
     void onLoadProgressChanged(qreal);
 

@@ -23,6 +23,12 @@ public:
 
     void setCommunicationRange(qreal);
 
+    void addNodePosition(int nodeId, mvtime time, QPointF position);
+
+
+    mvtime beginTime() const { return _beginTime; }
+    mvtime endTime() const { return _endTime; }
+
 private:
     bool concurrentLoad(QFile *file);
     void processLine(QString line);
@@ -33,6 +39,9 @@ private:
     bool _forceStop;
     QFuture<bool> _loadResult;
     qreal _communicationRange;
+
+    mvtime _beginTime;
+    mvtime _endTime;
 
 };
 

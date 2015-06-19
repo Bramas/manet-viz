@@ -14,7 +14,7 @@ GraphLayer::GraphLayer(Viewer *viewer, const AbstractEvolvingGraph * graph) : Ab
 
 void GraphLayer::paint(QPainter * painter)
 {
-    Graph g = _evolvingGraph->footprint(_parent->time());
+    Graph g = _evolvingGraph->footprint(_evolvingGraph->beginTime() + _parent->time());
     painter->setBrush(QBrush(QColor(0,0,0)));
 
     foreach(const Node& n1, g.nodes())

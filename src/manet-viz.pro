@@ -25,7 +25,7 @@ SOURCES += main.cpp\
     graphlayer.cpp \
     importdialog.cpp \
     csvparser.cpp \
-    comboboxdelegate.cpp
+    graphloader.cpp
 
 HEADERS  += mainwindow.h \
     evolvinggraph.h \
@@ -40,7 +40,7 @@ HEADERS  += mainwindow.h \
     graphlayer.h \
     importdialog.h \
     csvparser.h \
-    comboboxdelegate.h
+    graphloader.h
 
 FORMS    += mainwindow.ui \
     controlwidget.ui \

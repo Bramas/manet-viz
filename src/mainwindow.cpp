@@ -9,7 +9,8 @@
 #include "geometricgraph.h"
 #include "graphlayer.h"
 #include "controlwidget.h"
-# include "importdialog.h"
+#include "importdialog.h"
+#include "graphloader.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -17,47 +18,41 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(open()));
-
 }
 
 void MainWindow::open()
 {
-    _evolvingGraph = new GeometricGraph();
 
     QSettings settings;
     QString filename = QFileDialog::getOpenFileName(this,
                                                     "Open a trace",
                                                     settings.value("defaultTracePath", QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)).toString(),
                                                     tr("Trace file (*.csv *.txt);;All files (*.*)"));
-    if(_evolvingGraph->load(filename))
-    {
-        ImportDialog importDialog(filename);
-        int ret = importDialog.exec(); // synchronous
-        if (ret == QDialog::Rejected) {
-            return;
-        }
-
-        //        importDialog.getGraphLoader();
-
-        // Save the filename path in the app settings
-        settings.setValue("defaultTracePath", (QFileInfo(filename).absolutePath()));
-
-        ControlWidget * controlWidget = new ControlWidget();
-
-        Viewer * gw = new Viewer(this);
-        gw->addLayer(new GraphLayer(gw, _evolvingGraph));
-
-        connect(_evolvingGraph, &AbstractEvolvingGraph::onLoadProgressChanged, controlWidget, &ControlWidget::setLoadProgress);
-        connect(controlWidget, SIGNAL(timeChanged(mvtime)), gw, SLOT(setTime(mvtime)));
-        setCentralWidget(gw);
-        connect(controlWidget, &ControlWidget::communicationRangeChanged, dynamic_cast<GeometricGraph*>(_evolvingGraph), &GeometricGraph::setCommunicationRange);
-        this->addDockWidget(Qt::LeftDockWidgetArea, controlWidget);
+    ImportDialog importDialog(filename);
+    int ret = importDialog.exec(); // synchronous
+    if (ret == QDialog::Rejected) {
+        return;
     }
-    else
-    {
-        delete _evolvingGraph;
-        _evolvingGraph = 0;
-    }
+    // Save the filename path in the app settings
+    settings.setValue("defaultTracePath", (QFileInfo(filename).absolutePath()));
+
+    //Test values
+    QList<TraceHeader> headers;
+    headers << IdHeader << TimeHeader << XHeader << YHeader;
+    _graphLoader = new GraphLoader(filename, QRegExp("(\\d+);([^;]+);POINT\\(([^ ]+) ([^ ]+)\\)"), headers);
+    _graphLoader->load();
+
+    ControlWidget * controlWidget = new ControlWidget();
+
+    Viewer * gw = new Viewer(this);
+    const AbstractEvolvingGraph * evg = _graphLoader->constEvolvingGraph();
+    gw->addLayer(new GraphLayer(gw, evg));
+
+    connect(_graphLoader, &GraphLoader::onLoadProgressChanged, controlWidget, &ControlWidget::setLoadProgress);
+    connect(controlWidget, SIGNAL(timeChanged(mvtime)), gw, SLOT(setTime(mvtime)));
+    setCentralWidget(gw);
+    //connect(controlWidget, &ControlWidget::communicationRangeChanged, dynamic_cast<GeometricGraph*>(evg), &GeometricGraph::setCommunicationRange);
+    this->addDockWidget(Qt::LeftDockWidgetArea, controlWidget);
 }
 
 MainWindow::~MainWindow()
@@ -68,10 +63,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent * e)
 {
-    if(_evolvingGraph)
+    if(_graphLoader)
     {
-        _evolvingGraph->cancelLoadAndWait();
-        _evolvingGraph->deleteLater();
+        _graphLoader->cancelLoadAndWait();
+        _graphLoader->deleteLater();
     }
     e->accept();
 }

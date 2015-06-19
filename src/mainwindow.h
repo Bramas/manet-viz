@@ -7,7 +7,7 @@ namespace Ui {
 class MainWindow;
 }
 
-class AbstractEvolvingGraph;
+class GraphLoader;
 
 class MainWindow : public QMainWindow
 {
@@ -26,7 +26,7 @@ protected:
 private:
     Ui::MainWindow *ui;
 
-    AbstractEvolvingGraph * _evolvingGraph;
+    GraphLoader * _graphLoader;
 };
 
 #endif // MAINWINDOW_H
