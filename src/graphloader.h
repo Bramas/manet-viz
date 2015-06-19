@@ -17,7 +17,6 @@ public:
     explicit GraphLoader(QString filename, QRegExp lineRegex, QList<TraceHeader> headers);
     ~GraphLoader();
 
-
     const AbstractEvolvingGraph *   constEvolvingGraph() const;
     AbstractEvolvingGraph *         evolvingGraph() const;
 

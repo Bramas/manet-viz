@@ -20,6 +20,7 @@ SOURCES += main.cpp\
     graph.cpp \
     node.cpp \
     controlwidget.cpp \
+    comboboxdelegate.cpp \
     abstractlayer.cpp \
     viewer.cpp \
     graphlayer.cpp \
@@ -36,6 +37,7 @@ HEADERS  += mainwindow.h \
     node.h \
     controlwidget.h \
     abstractlayer.h \
+    comboboxdelegate.h \
     viewer.h \
     graphlayer.h \
     importdialog.h \

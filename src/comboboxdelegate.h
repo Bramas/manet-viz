@@ -1,18 +1,34 @@
 #ifndef COMBOBOXDELEGATE_H
 #define COMBOBOXDELEGATE_H
 
-#include <QWidget>
+#include <string>
+#include <vector>
 
-class ComboBoxDelegate : public QWidget
+#include <QItemDelegate>
+#include <QComboBox>
+
+class QModelIndex;
+class QWidget;
+class QVariant;
+
+class ComboBoxDelegate : public QItemDelegate
 {
-    Q_OBJECT
+Q_OBJECT
 public:
-    explicit ComboBoxDelegate(QWidget *parent = 0);
-    ~ComboBoxDelegate();
+  ComboBoxDelegate(QObject *parent = 0);
 
-signals:
+  QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+  void setEditorData(QWidget *editor, const QModelIndex &index) const;
+  void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
+  void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+  void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
-public slots:
+private:
+  std::vector<std::string> Items;
+  mutable QComboBox *combo;
+
+private slots:
+  void setData(int val);
+
 };
-
-#endif // COMBOBOXDELEGATE_H
+#endif

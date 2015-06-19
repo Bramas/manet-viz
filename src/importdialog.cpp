@@ -10,6 +10,7 @@
 #include "ComboBoxDelegate.h"
 #include "csvparser.h"
 #include "types.h"
+#include "graphloader.h"
 
 ImportDialog::ImportDialog(QString filename, QWidget *parent) :
     QDialog(parent),
