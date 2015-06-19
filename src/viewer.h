@@ -5,7 +5,7 @@
 #include <QElapsedTimer>
 
 #include "types.h"
-class AbstractLayer;
+class IViewerLayer;
 
 class Viewer : public QWidget
 {
@@ -15,7 +15,7 @@ public:
     ~Viewer();
 
     QPointF toLocalCoordinates(QPointF globalCoordinates) const;
-    void addLayer(AbstractLayer * layer, int priority = 100) { _layers.insertMulti(priority, layer); }
+    void addLayer(IViewerLayer * layer, int priority = 100) { _layers.insertMulti(priority, layer); }
 
     mvtime time() const { return _time; }
 
@@ -32,7 +32,7 @@ protected:
 
 private:
 
-    QMap<int, AbstractLayer*> _layers;
+    QMap<int, IViewerLayer*> _layers;
     mvtime _time;
     QPoint _lastMousePos;
     QPointF _afterTranslate;

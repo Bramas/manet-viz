@@ -4,10 +4,10 @@
 #include <QWidget>
 
 #include "abstractevolvinggraph.h"
-#include "abstractlayer.h"
+#include "iviewerlayer.h"
 class Viewer;
 
-class GraphLayer : public AbstractLayer
+class GraphLayer : public IViewerLayer
 {
 public:
     GraphLayer(Viewer * viewer, const AbstractEvolvingGraph * graph);
@@ -15,7 +15,7 @@ public:
 private:
     const AbstractEvolvingGraph * _evolvingGraph;
 };
-class LoaderLayer : public AbstractLayer
+class LoaderLayer : public IViewerLayer
 {
 public:
     LoaderLayer(Viewer * viewer, const AbstractEvolvingGraph * graph);

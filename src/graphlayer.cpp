@@ -7,7 +7,7 @@
 #include <QImage>
 
 
-GraphLayer::GraphLayer(Viewer *viewer, const AbstractEvolvingGraph * graph) : AbstractLayer(viewer), _evolvingGraph(graph)
+GraphLayer::GraphLayer(Viewer *viewer, const AbstractEvolvingGraph * graph) : IViewerLayer(viewer), _evolvingGraph(graph)
 {
 
 }
@@ -35,7 +35,7 @@ void GraphLayer::paint(QPainter * painter)
     }
 }
 
-LoaderLayer::LoaderLayer(Viewer *viewer, const AbstractEvolvingGraph *graph) : AbstractLayer(viewer), _evolvingGraph(graph)
+LoaderLayer::LoaderLayer(Viewer *viewer, const AbstractEvolvingGraph *graph) : IViewerLayer(viewer), _evolvingGraph(graph)
 {
     QObject::connect(_evolvingGraph, &AbstractEvolvingGraph::onLoadProgressChanged, [this](qreal) { _parent->update(); });
 }

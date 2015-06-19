@@ -42,7 +42,8 @@ HEADERS  += mainwindow.h \
     graphlayer.h \
     importdialog.h \
     csvparser.h \
-    graphloader.h
+    graphloader.h \
+    iviewerlayer.h
 
 FORMS    += mainwindow.ui \
     controlwidget.ui \
