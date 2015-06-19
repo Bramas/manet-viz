@@ -2,6 +2,7 @@
 #define VIEWER_H
 
 #include <QWidget>
+#include <QElapsedTimer>
 
 #include "types.h"
 class AbstractLayer;
@@ -36,6 +37,7 @@ private:
     QPoint _lastMousePos;
     QPointF _afterTranslate;
     qreal _zoom;
+    QElapsedTimer _timeSinceLastFrame;
 };
 
 #endif // VIEWER_H

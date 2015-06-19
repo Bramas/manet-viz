@@ -10,6 +10,7 @@ Viewer::Viewer(QWidget *parent) : QWidget(parent)
     _afterTranslate = QPointF(-83000, -12.35*2000);
     _zoom=2000;
     setMouseTracking(true);
+    _timeSinceLastFrame.start();
 }
 
 Viewer::~Viewer()
@@ -32,8 +33,8 @@ void Viewer::setTime(mvtime time)
 void Viewer::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-
-
+    painter.drawText(QPoint(0,50), QString::number(1000.0/_timeSinceLastFrame.elapsed()));
+    _timeSinceLastFrame.start();
     for(qreal x = 41; x < 43; x += 0.1)
     {
         qreal localX = toLocalCoordinates(QPointF(x,0)).x();
