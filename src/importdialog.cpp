@@ -7,6 +7,7 @@
 #include <QStandardItemModel>
 #include <QCloseEvent>
 
+#include "ComboBoxDelegate.h"
 #include "csvparser.h"
 #include "types.h"
 
@@ -19,6 +20,8 @@ ImportDialog::ImportDialog(QString filename, QWidget *parent) :
     setLayout(ui->mainLayout);
     _inputModel = new QStandardItemModel();
     _outputModel = new QStandardItemModel();
+    ui->tableViewOutput->setModel(_outputModel);
+    ui->listViewInput->setModel(_inputModel);
 
     // Set default values
     ui->buttonBox->button(QDialogButtonBox::Ok)->setText(tr("Import"));
@@ -59,22 +62,21 @@ void ImportDialog::processInputTable()
         QStandardItem * item = new QStandardItem(line);
         _inputModel->appendRow(item);
     }
-
-    ui->listViewInput->setModel(_inputModel);
-    ui->listViewInput->reset();
-    ui->listViewInput->show();
 }
 
 void ImportDialog::processOutputTable()
 {
     // Re-initilize the attributes
     _outputModel->clear();
-    _headers.clear();
+    _headers.clear();    
 
     CSVParser parser(_regEx);
 
+    ComboBoxDelegate * delegate = new ComboBoxDelegate();
+
     int idx = 0;
     if (_heading) {
+        ui->tableViewOutput->horizontalHeader()->setVisible(true);
         QStringList fields;
         QString line = _sampleTrace[idx++];
         parser.parseRegEx(line, fields);
@@ -83,17 +85,20 @@ void ImportDialog::processOutputTable()
             QStandardItem * item = new QStandardItem(field);
             _headers.append(field);
             _outputModel->setHorizontalHeaderItem(j++,item);
+            _outputModel->setItem(0,j,item);
         }
     } else {
+        ui->tableViewOutput->horizontalHeader()->setVisible(false);
         QStringList fields;
         QString line = _sampleTrace[idx];
         parser.parseRegEx(line, fields);
         for(int i = 0; i<fields.count(); ++i)
         {
-            _headers.append(QString(tr("Column %0")).arg(i));
+            QStandardItem * item = new QStandardItem();
+            _outputModel->setItem(0,i,item);
         }
     }
-
+    ui->tableViewOutput->setItemDelegateForRow(0,delegate);
     int i = 0;
     for(; idx<_sampleTrace.count(); ++idx) {
         QStringList fields;
@@ -108,10 +113,6 @@ void ImportDialog::processOutputTable()
         }
         i++;
     }
-
-    ui->tableViewOutput->setModel(_outputModel);
-    ui->tableViewOutput->reset();
-    ui->tableViewOutput->show();
 }
 
 ImportDialog::~ImportDialog()
@@ -129,11 +130,26 @@ void ImportDialog::regExEdited(QString text) {
     processOutputTable();
 }
 
-void ImportDialog::accept()
+TraceHeader ImportDialog::convertToTraceHeader(QString header)
+{
+    if(header == "Id") return IdHeader;
+    if(header == "Time") return TimeHeader;
+    if(header == "X") return XHeader;
+    if(header == "Y") return YHeader;
+    if(header == "TimeStart") return TimeStartHeader;
+    if(header == "TimeEnd") return TimeEndHeader;
+    if(header == "Id2") return Id2Header;
+    if(header == "Property") return PropertyHeader;
+}
+
+GraphLoader ImportDialog::createGraphLoader()
 {
     // Consistency check
+    QList<TraceHeader> headers;
+    for(int i=0; i<_outputModel->columnCount();++i)
+    {
+        headers.append(convertToTraceHeader(_outputModel->item(0,i)->data(Qt::EditRole).toString()));
+    }
 
-    QList<TraceHeader> res;
-    // GraphLoader(filename, _regex, QList<TraceHeader>);
-    QDialog::accept();
+    return GraphLoader(_filename, _regEx, headers);
 }

@@ -5,14 +5,14 @@
 typedef quint64 mvtime;
 
 typedef enum TraceHeader {
-    Id,
-    Time,
-    X,
-    Y,
-    TimeStart,
-    TimeEnd,
-    Id2,
-    Property
+    IdHeader,
+    TimeHeader,
+    XHeader,
+    YHeader,
+    TimeStartHeader,
+    TimeEndHeader,
+    Id2Header,
+    PropertyHeader
 } TraceHeader;
 
 #endif // TYPES_H

@@ -4,6 +4,8 @@
 #include <QDialog>
 #include <QStandardItemModel>
 
+#include "types.h"
+
 namespace Ui {
 class ImportDialog;
 }
@@ -32,10 +34,7 @@ private:
     void processSampleTrace(int);
     void processOutputTable();
     void processInputTable();
-    QString processSepComboBox(int);
-    QString processEscapeComboBox(int);
-    QString processQuoteComboBox(int);
-    QChar guessSep(QString line);
+    TraceHeader convertToTraceHeader(QString header);
 
 private slots:
     void headingChanged();
