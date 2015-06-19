@@ -28,7 +28,6 @@ void MainWindow::open()
                                                     "Open a trace",
                                                     settings.value("defaultTracePath", QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)).toString(),
                                                     tr("Trace file (*.csv *.txt);;All files (*.*)"));
-
     ImportDialog importDialog(filename);
     int ret = importDialog.exec(); // synchronous
     if (ret == QDialog::Rejected) {
