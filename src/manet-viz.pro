@@ -20,7 +20,6 @@ SOURCES += main.cpp\
     graph.cpp \
     node.cpp \
     controlwidget.cpp \
-    abstractlayer.cpp \
     viewer.cpp \
     graphlayer.cpp \
     importdialog.cpp \
@@ -35,12 +34,12 @@ HEADERS  += mainwindow.h \
     types.h \
     node.h \
     controlwidget.h \
-    abstractlayer.h \
     viewer.h \
     graphlayer.h \
     importdialog.h \
     csvparser.h \
-    graphloader.h
+    graphloader.h \
+    iviewerlayer.h
 
 FORMS    += mainwindow.ui \
     controlwidget.ui \

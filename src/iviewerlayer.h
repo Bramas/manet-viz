@@ -6,16 +6,19 @@ class QPainter;
 class Viewer;
 
 
-class AbstractLayer
+class IViewerLayer
 {
 public:
-    AbstractLayer(Viewer * parent)  {
+    IViewerLayer(Viewer * parent)  {
         _parent = (parent);
     }
+    virtual ~IViewerLayer() {}
     virtual void paint(QPainter *) = 0;
 
 protected:
     Viewer * _parent;
 };
+
+Q_DECLARE_INTERFACE(IViewerLayer, "org.manet-viz.IViewerLayer")
 
 #endif // ABSTRACTLAYER_H

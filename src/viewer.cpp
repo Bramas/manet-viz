@@ -1,5 +1,5 @@
 #include "viewer.h"
-#include "abstractlayer.h"
+#include "iviewerlayer.h"
 #include <QPainter>
 #include <QWheelEvent>
 #include <QMouseEvent>
