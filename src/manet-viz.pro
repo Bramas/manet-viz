@@ -24,7 +24,8 @@ SOURCES += main.cpp\
     viewer.cpp \
     graphlayer.cpp \
     importdialog.cpp \
-    csvparser.cpp
+    csvparser.cpp \
+    graphloader.cpp
 
 HEADERS  += mainwindow.h \
     evolvinggraph.h \
@@ -38,7 +39,8 @@ HEADERS  += mainwindow.h \
     viewer.h \
     graphlayer.h \
     importdialog.h \
-    csvparser.h
+    csvparser.h \
+    graphloader.h
 
 FORMS    += mainwindow.ui \
     controlwidget.ui \

@@ -1,18 +1,21 @@
 #ifndef TYPES_H
 #define TYPES_H
 #include <QtCore>
+#include <climits>
 
 typedef quint64 mvtime;
 
+const mvtime MaxTime = std::numeric_limits<mvtime>::max();
+
 typedef enum TraceHeader {
-    Id,
-    Time,
-    X,
-    Y,
-    TimeStart,
-    TimeEnd,
-    Id2,
-    Property
+    IdHeader,
+    TimeHeader,
+    XHeader,
+    YHeader,
+    TimeStartHeader,
+    TimeEndHeader,
+    Id2Header,
+    PropertyHeader
 } TraceHeader;
 
 #endif // TYPES_H

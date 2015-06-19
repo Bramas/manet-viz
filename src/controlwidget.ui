@@ -146,6 +146,9 @@
     <property name="value">
      <number>24</number>
     </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
    </widget>
    <widget class="QLabel" name="label_4">
     <property name="geometry">
