@@ -2,15 +2,14 @@
 #define CSVPARSER_H
 
 #include <QString>
-#include <QList>
+#include <QStringList>
 
 
 class CSVParser
 {
 public:
     CSVParser(QString mQuoteChar, QString mDelimChars, QString mEscapeChar);
-    int parseString(QString &buffer, QList<QString> &fields);
-    QList<QString> parseLine();
+    int parseString(QString &buffer, QStringList &fields);
 private:
     QString _filname;
     QString _mDelimChars;

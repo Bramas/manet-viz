@@ -8,7 +8,7 @@ CSVParser::CSVParser(QString mQuoteChar, QString mDelimChars, QString mEscapeCha
     _mEscapeChar = mEscapeChar;
 }
 
-int CSVParser::parseString(QString &buffer, QList<QString> &fields) {
+int CSVParser::parseString(QString &buffer, QStringList &fields) {
     QString field;             // String in which to accumulate next field
     bool escaped = false;      // Next char is escaped
     bool quoted = false;       // In quotes
@@ -146,8 +146,4 @@ int CSVParser::parseString(QString &buffer, QList<QString> &fields) {
     }
 
     return 1;
-}
-
-QList<QString> CSVParser::parseLine() {
-
 }

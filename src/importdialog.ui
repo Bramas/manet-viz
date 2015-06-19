@@ -244,7 +244,7 @@
           <string>ID</string>
          </property>
         </widget>
-        <widget class="QComboBox" name="comboBoxSepID">
+        <widget class="QComboBox" name="comboBoxID">
          <property name="geometry">
           <rect>
            <x>80</x>
@@ -267,7 +267,7 @@
           <string>Time</string>
          </property>
         </widget>
-        <widget class="QComboBox" name="comboBoxSepTime">
+        <widget class="QComboBox" name="comboBoxTime">
          <property name="geometry">
           <rect>
            <x>80</x>
@@ -290,7 +290,7 @@
           <string>X</string>
          </property>
         </widget>
-        <widget class="QComboBox" name="comboBoxSepX">
+        <widget class="QComboBox" name="comboBoxX">
          <property name="geometry">
           <rect>
            <x>80</x>
@@ -313,7 +313,7 @@
           <string>Y</string>
          </property>
         </widget>
-        <widget class="QComboBox" name="comboBoxSepY">
+        <widget class="QComboBox" name="comboBoxY">
          <property name="geometry">
           <rect>
            <x>80</x>
