@@ -1,11 +1,17 @@
 #include "csvparser.h"
 #include <QDebug>
+#include <QRegExp>
 
 CSVParser::CSVParser(QString mQuoteChar, QString mDelimChars, QString mEscapeChar)
 {
     _mQuoteChar = mQuoteChar;
     _mDelimChars = mDelimChars;
     _mEscapeChar = mEscapeChar;
+}
+
+CSVParser::CSVParser(QString regEx)
+{
+    _regEx = regEx;
 }
 
 int CSVParser::parseString(QString &buffer, QStringList &fields) {
@@ -145,5 +151,23 @@ int CSVParser::parseString(QString &buffer, QStringList &fields) {
       fields.append(field);
     }
 
+    return 1;
+}
+
+int CSVParser::parseRegEx(QString &buffer, QStringList &fields) {
+    QRegExp rx(_regEx);
+
+    if(!rx.isValid()) {
+        return 0;
+    }
+    int pos = rx.indexIn(buffer);
+    if(pos == -1) {
+        return 0;
+    }
+    QStringList list = rx.capturedTexts();
+    qDebug() << buffer << " - " << pos << " - " << list;
+    for(int i=1;i<list.count();++i){
+        fields.append(list[i]);
+    }
     return 1;
 }

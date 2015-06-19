@@ -36,6 +36,9 @@ void MainWindow::open()
         if (ret == QDialog::Rejected) {
             return;
         }
+
+        //        importDialog.getGraphLoader();
+
         // Save the filename path in the app settings
         settings.setValue("defaultTracePath", (QFileInfo(filename).absolutePath()));
 

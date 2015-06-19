@@ -21,15 +21,9 @@ public slots:
 
 private:
     Ui::ImportDialog *ui;
-    QString _filename;
-    QString _sep = ";";
+    QString _filename = "";
+    QString _regEx = "^$";
     bool _heading = false;
-    QString _escape = "\\";
-    QString _quote = "\"";
-    int _idCol   = -1;
-    int _timeCol = -1;
-    int _xCol    = -1;
-    int _yCol    = -1;
     QStandardItemModel * _inputModel;
     QStandardItemModel * _outputModel;
     QStringList _sampleTrace;
@@ -45,13 +39,7 @@ private:
 
 private slots:
     void headingChanged();
-    void sepChanged(int);
-    void escapeChanged(int);
-    void quoteChanged(int);
-    void idChanged(int);
-    void timeChanged(int);
-    void xChanged(int);
-    void yChanged(int);
+    void regExEdited(QString);
 };
 
 #endif // IMPORTDIALOG_H
