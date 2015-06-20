@@ -61,14 +61,14 @@ bool GraphLoader::load()
     {
         return false;
     }
-    for(int i = 0; i< 100; ++i)
+    for(int i = 0; i< 1000; ++i)
     {
         if(!file->atEnd())
             processLine(QString(file->readLine()));
     }
 
     _loadProgress = 1.0 - file->bytesAvailable() / (qreal)file->size();
-    _loadResult = QtConcurrent::run(this, &GraphLoader::concurrentLoad, file);
+    //_loadResult = QtConcurrent::run(this, &GraphLoader::concurrentLoad, file);
     return true;
 }
 

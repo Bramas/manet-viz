@@ -4,13 +4,14 @@
 #include <QSpinBox>
 #include <QCloseEvent>
 #include <QFileDialog>
+#include <QGraphicsView>
 
 #include "viewer.h"
 #include "geometricgraph.h"
-#include "graphlayer.h"
 #include "controlwidget.h"
 #include "importdialog.h"
 #include "graphloader.h"
+#include "graphicsview.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -18,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(open()));
+    _graphLoader = 0;
 }
 
 void MainWindow::open()
@@ -41,13 +43,14 @@ void MainWindow::open()
 
     ControlWidget * controlWidget = new ControlWidget();
 
-    Viewer * gw = new Viewer(this);
     const AbstractEvolvingGraph * evg = _graphLoader->constEvolvingGraph();
-    gw->addLayer(new GraphLayer(gw, evg));
-
+    Viewer * gw = new Viewer(evg);
+    GraphicsView * v = new GraphicsView(gw, this);
+   // gw->addLayer(new GraphLayer(gw, evg));
+    v->scale(2,2);
     connect(_graphLoader, &GraphLoader::onLoadProgressChanged, controlWidget, &ControlWidget::setLoadProgress);
     connect(controlWidget, SIGNAL(timeChanged(mvtime)), gw, SLOT(setTime(mvtime)));
-    setCentralWidget(gw);
+    setCentralWidget(v);
     //connect(controlWidget, &ControlWidget::communicationRangeChanged, dynamic_cast<GeometricGraph*>(evg), &GeometricGraph::setCommunicationRange);
     this->addDockWidget(Qt::LeftDockWidgetArea, controlWidget);
 }

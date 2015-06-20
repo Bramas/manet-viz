@@ -4,7 +4,6 @@
 #include "abstractevolvinggraph.h"
 #include "types.h"
 
-#include <QtConcurrent>
 #include <QMap>
 #include <QHash>
 
@@ -15,9 +14,6 @@ public:
     GeometricGraph();
     ~GeometricGraph();
 
-    bool load(QString filename);
-    qreal loadProgress() const { return _loaded * 100; }
-    void cancelLoadAndWait();
 
     Graph footprint(mvtime time) const;
 
@@ -28,6 +24,7 @@ public:
 
     mvtime beginTime() const { return _beginTime; }
     mvtime endTime() const { return _endTime; }
+
 
 private:
     bool concurrentLoad(QFile *file);

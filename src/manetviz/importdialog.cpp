@@ -36,6 +36,8 @@ ImportDialog::ImportDialog(QString filename, QWidget *parent) :
     processInputTable();
     processOutputTable();
 
+    ui->lineEditRegEx->setText("(\\d+);([^;]+);POINT\\(([^ ]+) ([^ ]+)\\)");
+
     //    ui->listViewInput->setModel(model = new QStringListModel(this););
 }
 
