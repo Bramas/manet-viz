@@ -22,5 +22,4 @@ void GraphicsView::wheelEvent(QWheelEvent * e)
         // Zooming out
          scale(1.0 / scaleFactor, 1.0 / scaleFactor);
     }
-
 }

@@ -32,11 +32,12 @@ ImportDialog::ImportDialog(QString filename, QWidget *parent) :
     connect(ui->checkBoxHeading, SIGNAL(stateChanged(int)), this, SLOT(headingChanged()));
     connect(ui->lineEditRegEx, SIGNAL(textEdited(QString)), this, SLOT(regExEdited(QString)));
 
+    ui->lineEditRegEx->setText("(\\d+);([^;]+);POINT\\(([^ ]+) ([^ ]+)\\)");
+
     processSampleTrace(10); // TODO: Guess the default variables
     processInputTable();
     processOutputTable();
 
-    ui->lineEditRegEx->setText("(\\d+);([^;]+);POINT\\(([^ ]+) ([^ ]+)\\)");
 
     //    ui->listViewInput->setModel(model = new QStringListModel(this););
 }
@@ -76,7 +77,8 @@ void ImportDialog::processOutputTable()
     CSVParser parser(_regEx);
 
     ComboBoxDelegate * delegate = new ComboBoxDelegate();
-
+    QStringList defaultHeaders;
+    defaultHeaders << "Id" << "Time" << "X" << "Y";
     int idx = 0;
     if (_heading) {
         ui->tableViewOutput->horizontalHeader()->setVisible(true);
@@ -84,7 +86,8 @@ void ImportDialog::processOutputTable()
         QString line = _sampleTrace[idx++];
         parser.parseRegEx(line, fields);
         int j = 0;
-        foreach (QString field, fields) {
+        foreach(const QString &field, fields)
+        {
             QStandardItem * item = new QStandardItem(field);
             _headers.append(field);
             _outputModel->setHorizontalHeaderItem(j++,item);
@@ -97,12 +100,18 @@ void ImportDialog::processOutputTable()
         parser.parseRegEx(line, fields);
         for(int i = 0; i<fields.count(); ++i)
         {
-            QStandardItem * item = new QStandardItem();
+            QString field = "";
+            if(idx < defaultHeaders.size())
+            {
+                field = defaultHeaders.at(i);
+            }
+            QStandardItem * item = new QStandardItem(field);
+            item->setData(field, Qt::EditRole);
             _outputModel->setItem(0,i,item);
         }
     }
     ui->tableViewOutput->setItemDelegateForRow(0,delegate);
-    int i = 0;
+    int i = 1;
     for(; idx<_sampleTrace.count(); ++idx) {
         QStringList fields;
         QString line = _sampleTrace[idx];

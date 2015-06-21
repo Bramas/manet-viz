@@ -17,6 +17,7 @@ GraphLoader::GraphLoader(QString filename, QRegExp lineRegex, QList<TraceHeader>
 }
 
 GraphLoader::GraphLoader(const GraphLoader &other) :
+    QObject(0),
     _filename(other._filename),
     _lineRegex(other._lineRegex),
     _headers(other._headers)
@@ -68,7 +69,7 @@ bool GraphLoader::load()
     }
 
     _loadProgress = 1.0 - file->bytesAvailable() / (qreal)file->size();
-    //_loadResult = QtConcurrent::run(this, &GraphLoader::concurrentLoad, file);
+    _loadResult = QtConcurrent::run(this, &GraphLoader::concurrentLoad, file);
     return true;
 }
 

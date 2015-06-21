@@ -14,14 +14,19 @@ public:
     GraphicsNodeItem(QPointF position) : _position(position) { }
     QRectF boundingRect() const
     {
-        return QRectF(_position - QPointF(1,1), _position + QPointF(1,1));
+        return QRectF(_position.x()-1, _position.y()-1,2,2);
     }
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget)
     {
+        painter->setRenderHint(QPainter::Antialiasing);
+        QTransform t = painter->transform().inverted();
+        QPointF point = painter->transform().map(_position);
+        QRectF r(t.map(point - QPointF(0.5,0.5)), t.map(point+QPointF(0.5,0.5)));
         painter->setPen(_pen);
-        painter->drawPoint(_position);
+        painter->setBrush(_pen.brush());
+        painter->drawEllipse(r);
     }
     void setPen(const QPen &p)
     {
@@ -57,7 +62,6 @@ void GraphLayer::paint(mvtime time)
         GraphicsNodeItem * i = new GraphicsNodeItem(n.position());
         i->setPen(p);
         items->addToGroup((QGraphicsItem*)i);
-        qDebug()<<"add Point "<<n.position();
         /*painter->drawEllipse((n.position()), 1,1);
 
         painter->save();

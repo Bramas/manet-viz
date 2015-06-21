@@ -27,7 +27,6 @@ QPointF Viewer::toLocalCoordinates(QPointF globalCoordinates) const
 
 void Viewer::setTime(mvtime time)
 {
-
     _time = time;
 
     foreach(auto layer, _layers)
