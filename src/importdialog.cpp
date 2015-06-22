@@ -70,7 +70,7 @@ void ImportDialog::processSampleTrace(int nbLines)
     for(int i = 0; i < nbLines; ++i)
     {
         if(!file->atEnd()) {
-            _sampleTrace.append(QString(file->readLine()).split(QRegExp("[\r\n]"),QString::SkipEmptyParts));
+            _sampleTrace.append(QString(file->readLine()).split(QRegExp("[\r\n]"),QString::SkipEmptyParts).at(0));
         } else {
             break;
         }

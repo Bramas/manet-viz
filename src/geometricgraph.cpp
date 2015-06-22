@@ -150,6 +150,11 @@ void GeometricGraph::setCommunicationRange(qreal range)
     _communicationRange = range;
 }
 
+qreal GeometricGraph::getCommunicationRange() const
+{
+    return _communicationRange;
+}
+
 void GeometricGraph::addNodePosition(int nodeId, mvtime time, QPointF position)
 {
     _beginTime = qMin(_beginTime, time);

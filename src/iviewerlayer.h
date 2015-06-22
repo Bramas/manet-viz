@@ -1,13 +1,15 @@
 #ifndef ABSTRACTLAYER_H
 #define ABSTRACTLAYER_H
 
+#include <QObject>
 
 class QPainter;
 class Viewer;
 
 
-class IViewerLayer
+class IViewerLayer: public QObject
 {
+    Q_OBJECT
 public:
     IViewerLayer(Viewer * parent)  {
         _parent = (parent);

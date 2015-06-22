@@ -66,7 +66,7 @@ bool GraphLoader::load()
     for(int i = 0; i< 100; ++i)
     {
         if(!file->atEnd())
-            processLine(QString(file->readLine()));
+            processLine(QString(file->readLine()).split(QRegExp("[\r\n]"), QString::SkipEmptyParts).at(0));
     }
 
     _loadProgress = 1.0 - file->bytesAvailable() / (qreal)file->size();
@@ -81,7 +81,7 @@ bool GraphLoader::concurrentLoad(QFile * file)
         for(int i = 0; i< 10000; ++i)
         {
             if(!file->atEnd())
-                processLine(QString(file->readLine()));
+                processLine(QString(file->readLine()).split(QRegExp("[\r\n]"), QString::SkipEmptyParts).at(0));
         }
         _loadProgress = 1.0 - file->bytesAvailable() / (qreal)file->size();
         emit onLoadProgressChanged(_loadProgress);
@@ -165,7 +165,7 @@ void GraphLoader::processLine(QString line)
     QDateTime dt = toDateTime(time, _timeFormat);
     mvtime mvt = dt.toTime_t();
     if(!dt.isValid()) {
-        qWarning() << tr("The time ") << time << tr(" is not matching the given time format ") << _timeFormat;
+        qWarning() << tr("The time ") << time << tr(" does not match the given time format ") << _timeFormat;
         return;
     }
 

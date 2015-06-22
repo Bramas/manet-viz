@@ -9,12 +9,19 @@ class Viewer;
 
 class GraphLayer : public IViewerLayer
 {
+
 public:
     GraphLayer(Viewer * viewer, const AbstractEvolvingGraph * graph);
     void paint(QPainter *);
+    void setDisplayRange(bool);
+    void setDisplayContact(bool);
+
 private:
     const AbstractEvolvingGraph * _evolvingGraph;
+    bool _displayContacts = false;
+    bool _displayRange = false;
 };
+
 class LoaderLayer : public IViewerLayer
 {
 public:

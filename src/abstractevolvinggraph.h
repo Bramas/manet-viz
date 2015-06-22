@@ -23,6 +23,8 @@ public:
     virtual mvtime beginTime() const = 0;
     virtual mvtime endTime() const = 0;
 
+    virtual qreal getCommunicationRange() const = 0;
+
 signals:
     void onLoadProgressChanged(qreal);
 

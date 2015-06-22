@@ -22,9 +22,9 @@ public:
     Graph footprint(mvtime time) const;
 
     void setCommunicationRange(qreal);
+    qreal getCommunicationRange() const;
 
     void addNodePosition(int nodeId, mvtime time, QPointF position);
-
 
     mvtime beginTime() const { return _beginTime; }
     mvtime endTime() const { return _endTime; }

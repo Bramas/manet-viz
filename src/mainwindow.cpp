@@ -43,12 +43,15 @@ void MainWindow::open()
 
     Viewer * gw = new Viewer(this);
     const AbstractEvolvingGraph * evg = _graphLoader->constEvolvingGraph();
-    gw->addLayer(new GraphLayer(gw, evg));
+    IViewerLayer * gl = new GraphLayer(gw, evg);
+    gw->addLayer(gl);
 
     connect(_graphLoader, &GraphLoader::onLoadProgressChanged, controlWidget, &ControlWidget::setLoadProgress);
     connect(controlWidget, SIGNAL(timeChanged(mvtime)), gw, SLOT(setTime(mvtime)));
     setCentralWidget(gw);
-    //connect(controlWidget, &ControlWidget::communicationRangeChanged, dynamic_cast<GeometricGraph*>(evg), &GeometricGraph::setCommunicationRange);
+    connect(controlWidget, &ControlWidget::communicationRangeChanged, dynamic_cast<const GeometricGraph*>(evg), &GeometricGraph::setCommunicationRange);
+    connect(controlWidget, &ControlWidget::contactDisplayChanged, dynamic_cast<GraphLayer*>(gl), &GraphLayer::setDisplayContact);
+    connect(controlWidget, &ControlWidget::rangeDisplayChanged, dynamic_cast<GraphLayer*>(gl), &GraphLayer::setDisplayRange);
     this->addDockWidget(Qt::LeftDockWidgetArea, controlWidget);
 }
 
