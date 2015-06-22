@@ -150,7 +150,7 @@
           </rect>
          </property>
          <property name="text">
-          <string>Format RegEx</string>
+          <string>Trace Format</string>
          </property>
         </widget>
         <widget class="QComboBox" name="comboBoxRegEx">
@@ -158,6 +158,35 @@
           <rect>
            <x>10</x>
            <y>150</y>
+           <width>191</width>
+           <height>26</height>
+          </rect>
+         </property>
+         <property name="editable">
+          <bool>true</bool>
+         </property>
+         <property name="frame">
+          <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_8">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>180</y>
+           <width>101</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Time Format</string>
+         </property>
+        </widget>
+        <widget class="QComboBox" name="comboBoxTimeFormat">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>200</y>
            <width>191</width>
            <height>26</height>
           </rect>

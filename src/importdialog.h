@@ -24,7 +24,10 @@ private:
     Ui::ImportDialog *ui;
     QString _filename = "";
     QString _regEx;
+    QString _timeFormat;
+    QString _timeSample = "";
     QStringList _regExps;
+    QStringList _timeFormats;
     bool _hasHeading = false;
     bool _isMobilityTrace = true;
     bool _isContactTrace = false;
@@ -38,6 +41,9 @@ private:
     void processOutputTable();
     void processInputTable();
     TraceHeader convertToTraceHeader(QString header);
+    bool isTimeFormatValid(QString format);
+    bool isValidRegEx(QString regex);
+    void checkConsistency();
 
 private slots:
     void headingChanged();
@@ -45,7 +51,8 @@ private slots:
     void mobilityChanged();
     void onAccepted();
     void regExEdited(QString);
-    void checkConsistency(QStandardItem *);
+    void timeFormatEdited(QString);
+    void headerChanged(QStandardItem *);
 };
 
 #endif // IMPORTDIALOG_H

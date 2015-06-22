@@ -14,7 +14,7 @@ class GraphLoader : public QObject
 {
     Q_OBJECT
 public:
-    explicit GraphLoader(QString filename, QRegExp lineRegex, QList<TraceHeader> headers);
+    explicit GraphLoader(QString filename, QRegExp lineRegex, QList<TraceHeader> headers, QString timeFormat);
     GraphLoader(const GraphLoader &other);
     ~GraphLoader();
 
@@ -34,8 +34,10 @@ public slots:
 private:
     void processLine(QString line);
     bool concurrentLoad(QFile * file);
+    QDateTime toDateTime(QString dateTime, QString format);
     QString _filename;
     QRegExp _lineRegex;
+    QString _timeFormat;
     QList<TraceHeader> _headers;
 
     QFuture<bool> _loadResult;

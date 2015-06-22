@@ -6,9 +6,10 @@
 #include "abstractevolvinggraph.h"
 #include "geometricgraph.h"
 
-GraphLoader::GraphLoader(QString filename, QRegExp lineRegex, QList<TraceHeader> headers) :
+GraphLoader::GraphLoader(QString filename, QRegExp lineRegex, QList<TraceHeader> headers, QString timeFormat) :
     _filename(filename),
     _lineRegex(lineRegex),
+    _timeFormat(timeFormat),
     _headers(headers)
 {
     _forceStop = false;
@@ -19,6 +20,7 @@ GraphLoader::GraphLoader(QString filename, QRegExp lineRegex, QList<TraceHeader>
 GraphLoader::GraphLoader(const GraphLoader &other) :
     _filename(other._filename),
     _lineRegex(other._lineRegex),
+    _timeFormat(other._timeFormat),
     _headers(other._headers)
 {
     _forceStop = false;
@@ -103,6 +105,23 @@ void GraphLoader::cancelLoadAndWait()
     }
 }
 
+QDateTime GraphLoader::toDateTime(QString dateTime, QString format)
+{
+    QDateTime dt;
+    if(format == "T") {
+        dt = QDateTime::fromTime_t(dateTime.toUInt());
+    } else if(format == "t") {
+        dt = QDateTime::fromMSecsSinceEpoch(dateTime.toLongLong());
+    } else {
+        dt = QDateTime::fromString(dateTime, format);
+    }
+    if(dt.isValid()) {
+        return dt;
+    } else {
+        return QDateTime();
+    }
+}
+
 void GraphLoader::processLine(QString line)
 {
     if(-1 == _lineRegex.indexIn(line))
@@ -143,18 +162,12 @@ void GraphLoader::processLine(QString line)
         }
     }
 
-    QStringList date = time.split(" ").at(0).split("-");
-    QStringList t = time.split(" ").at(1).split(".").at(0).split(":");
-
-    struct std::tm tm;
-    tm.tm_year = date.at(0).toInt() - 1900;
-    tm.tm_mon = date.at(1).toInt() - 1;
-    tm.tm_mday = date.at(2).toInt();
-    tm.tm_hour = t.at(0).toInt();
-    tm.tm_min = t.at(1).toInt();
-    tm.tm_sec = t.at(2).toInt();
-    mvtime mvt = static_cast<mvtime> (std::mktime (&tm));
-
+    QDateTime dt = toDateTime(time, _timeFormat);
+    mvtime mvt = dt.toTime_t();
+    if(!dt.isValid()) {
+        qWarning() << tr("The time ") << time << tr(" is not matching the given time format ") << _timeFormat;
+        return;
+    }
 
     QPointF p(x, y);
     dynamic_cast<GeometricGraph*>(_evolvingGraph)->addNodePosition(id, mvt, p);
