@@ -4,7 +4,7 @@
 #include <ctime>
 
 #include "abstractevolvinggraph.h"
-#include "geometricgraph.h"
+#include "evolvinggraph.h"
 
 GraphLoader::GraphLoader(QString filename, QRegExp lineRegex, QList<TraceHeader> headers) :
     _filename(filename),
@@ -13,7 +13,7 @@ GraphLoader::GraphLoader(QString filename, QRegExp lineRegex, QList<TraceHeader>
 {
     _forceStop = false;
     _loadProgress = 0;
-    _evolvingGraph = new GeometricGraph();
+    _evolvingGraph = new EvolvingGraph();
 }
 
 GraphLoader::GraphLoader(const GraphLoader &other) :
@@ -24,7 +24,7 @@ GraphLoader::GraphLoader(const GraphLoader &other) :
 {
     _forceStop = false;
     _loadProgress = 0;
-    _evolvingGraph = new GeometricGraph();
+    _evolvingGraph = new EvolvingGraph();
 }
 
 GraphLoader::~GraphLoader()
@@ -157,6 +157,9 @@ void GraphLoader::processLine(QString line)
     mvtime mvt = static_cast<mvtime> (std::mktime (&tm));
 
 
-    QPointF p(x, y);
-    dynamic_cast<GeometricGraph*>(_evolvingGraph)->addNodePosition(id, mvt, p);
+    //QPointF p(x, y);
+    QHash<QString, QVariant> props;
+    props.insert("X", x);
+    props.insert("Y", y);
+    _evolvingGraph->addNode(id, mvt, props);
 }

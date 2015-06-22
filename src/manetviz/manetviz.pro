@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui concurrent
+QT       += core gui concurrent opengl
 CONFIG += c++11
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -41,7 +41,8 @@ HEADERS  += mainwindow.h \
     csvparser.h \
     graphloader.h \
     iviewerlayer.h \
-    graphicsview.h
+    graphicsview.h \
+    igraphlayout.h
 
 FORMS    += mainwindow.ui \
     controlwidget.ui \

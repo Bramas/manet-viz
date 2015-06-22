@@ -7,6 +7,7 @@
 #include "types.h"
 #include "viewer.h"
 class IViewerLayer;
+class IGraphLayout;
 class AbstractEvolvingGraph;
 
 class Viewer : public QGraphicsScene
@@ -38,6 +39,7 @@ private:
 
     bool loadPlugin(const AbstractEvolvingGraph *evg);
 
+    IGraphLayout * _layout;
     QMap<int, IViewerLayer*> _layers;
     mvtime _time;
     QPoint _lastMousePos;

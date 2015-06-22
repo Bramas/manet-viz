@@ -5,6 +5,7 @@
 #include <QCloseEvent>
 #include <QFileDialog>
 #include <QGraphicsView>
+#include <QGLWidget>
 
 #include "viewer.h"
 #include "geometricgraph.h"
@@ -46,8 +47,10 @@ void MainWindow::open()
     const AbstractEvolvingGraph * evg = _graphLoader->constEvolvingGraph();
     Viewer * gw = new Viewer(evg);
     GraphicsView * v = new GraphicsView(gw, this);
-   // gw->addLayer(new GraphLayer(gw, evg));
-    v->scale(2,2);
+
+    //to enable OpenGL rendering
+    //v->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
+    v->scale(10,10);
     connect(_graphLoader, &GraphLoader::onLoadProgressChanged, controlWidget, &ControlWidget::setLoadProgress);
     connect(controlWidget, SIGNAL(timeChanged(mvtime)), gw, SLOT(setTime(mvtime)));
     setCentralWidget(v);

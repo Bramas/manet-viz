@@ -1,4 +1,5 @@
 
 TEMPLATE    = subdirs
-SUBDIRS	    = graphlayer
+SUBDIRS	    = graphlayer \
+    LatLngCoordinatesLayout
 

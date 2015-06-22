@@ -1,13 +1,16 @@
 #include "viewer.h"
 #include "iviewerlayer.h"
+#include "igraphlayout.h"
 #include <QPainter>
 #include <QWheelEvent>
 #include <QMouseEvent>
 #include <QImage>
+#include <QGLWidget>
 
 Viewer::Viewer(const AbstractEvolvingGraph * evg)
 {
     _afterTranslate = QPointF(-83000, -12.35*2000);
+    _layout = 0;
     _zoom=2000;
     //setMouseTracking(true);
     _timeSinceLastFrame.start();
@@ -29,10 +32,15 @@ void Viewer::setTime(mvtime time)
 {
     _time = time;
 
+    if(!_layout)
+        return;
+
+    IGraph * graph = new Graph();
+    _layout->footprint(time, graph);
     foreach(auto layer, _layers)
     {
         //painter.save();
-        layer->paint(time);
+        layer->paint(graph);
         //painter.restore();
     }
 
@@ -117,12 +125,20 @@ bool Viewer::loadPlugin(const AbstractEvolvingGraph * evg)
         QObject *plugin = pluginLoader.instance();
         if (plugin) {
             IViewerLayer * layer = qobject_cast<IViewerLayer *>(plugin);
-            qDebug()<<"found one";
-            if (layer)
+            if (layer && fileName == "libGraphlayer.dylib")
             {
+                qDebug()<<fileName<<"IViewerLayer";
                 layer->setEvolvingGraph(evg);
                 layer->setGraphicsScene(this);
                 addLayer(layer);
+                continue;
+            }
+            IGraphLayout * layout = qobject_cast<IGraphLayout *>(plugin);
+            if (layout && fileName == "libLatLngCoordinatesLayout.dylib")
+            {
+                qDebug()<<fileName<<"IGraphLayout";
+                layout->setEvolvingGraph(evg);
+                _layout = layout;
             }
         }
     }

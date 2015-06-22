@@ -18,7 +18,7 @@ class GraphLayer : public QObject, public IViewerLayer
     Q_INTERFACES(IViewerLayer)
 
 public:
-    void paint(mvtime time) Q_DECL_OVERRIDE;
+    void paint(IGraph * graph) Q_DECL_OVERRIDE;
     void setGraphicsScene(QGraphicsScene * scene);
 
 private:

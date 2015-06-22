@@ -2,7 +2,7 @@ TEMPLATE        = lib
 CONFIG         += plugin
 QT             += widgets
 INCLUDEPATH    += ../../manetviz
-TARGET          = $$qtLibraryTarget(graphlayer)
+TARGET          = Graphlayer
 DESTDIR         = ../../manetviz/plugins
 
 HEADERS += \
