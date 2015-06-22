@@ -21,7 +21,6 @@ SOURCES += main.cpp\
     node.cpp \
     controlwidget.cpp \
     comboboxdelegate.cpp \
-    abstractlayer.cpp \
     viewer.cpp \
     graphlayer.cpp \
     importdialog.cpp \

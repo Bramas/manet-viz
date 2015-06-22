@@ -165,7 +165,6 @@ int CSVParser::parseRegEx(QString &buffer, QStringList &fields) {
         return 0;
     }
     QStringList list = rx.capturedTexts();
-    qDebug() << buffer << " - " << pos << " - " << list;
     for(int i=1;i<list.count();++i){
         fields.append(list[i]);
     }

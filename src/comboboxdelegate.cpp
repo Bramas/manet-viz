@@ -3,7 +3,7 @@
 
 ComboBoxDelegate::ComboBoxDelegate(QObject *parent ):QItemDelegate(parent)
 {
-        comboItems << "Id" << "Time" << "X" << "Y" << "TimeStart" << "TimeEnd" << "Id2" << "Property";
+        comboItems << "None" << "Id" << "Time" << "X" << "Y" << "TimeStart" << "TimeEnd" << "Id2" << "Property";
 }
 
 QWidget *ComboBoxDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const

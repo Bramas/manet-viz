@@ -23,8 +23,12 @@ public:
 private:
     Ui::ImportDialog *ui;
     QString _filename = "";
-    QString _regEx = "^$";
-    bool _heading = false;
+    QString _regEx;
+    QStringList _regExps;
+    bool _hasHeading = false;
+    bool _isMobilityTrace = true;
+    bool _isContactTrace = false;
+    QMap<int,TraceHeader> _TraceHeaders;
     QStandardItemModel * _inputModel;
     QStandardItemModel * _outputModel;
     QStringList _sampleTrace;
@@ -37,7 +41,11 @@ private:
 
 private slots:
     void headingChanged();
+    void contactChanged();
+    void mobilityChanged();
+    void onAccepted();
     void regExEdited(QString);
+    void checkConsistency(QStandardItem *);
 };
 
 #endif // IMPORTDIALOG_H

@@ -15,7 +15,8 @@ typedef enum TraceHeader {
     TimeStartHeader,
     TimeEndHeader,
     Id2Header,
-    PropertyHeader
+    PropertyHeader,
+    NoneHeader
 } TraceHeader;
 
 #endif // TYPES_H

@@ -34,7 +34,7 @@ void MainWindow::open()
         return;
     }
     // Save the filename path in the app settings
-    settings.setValue("defaultTracePath", (QFileInfo(filename).absolutePath()));
+    settings.setValue("defaultTracePath", QFileInfo(filename).absolutePath());
 
     _graphLoader = new GraphLoader(importDialog.createGraphLoader());
     _graphLoader->load();
