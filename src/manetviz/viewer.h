@@ -8,6 +8,7 @@
 #include "viewer.h"
 class IViewerLayer;
 class IGraphLayout;
+class IGraphDecorator;
 class AbstractEvolvingGraph;
 
 class Viewer : public QGraphicsScene
@@ -23,6 +24,7 @@ public:
     mvtime time() const { return _time; }
 
     QList<IViewerLayer* > layers() const { return _layers.values(); }
+    QList<IGraphDecorator* > graphDecorators() const { return _graphDecorators.values(); }
 
 
 
@@ -41,8 +43,8 @@ protected:
 
 private:
 
-
     IGraphLayout * _layout;
+    QMap<int, IGraphDecorator *> _graphDecorators;
     QMap<int, IViewerLayer*> _layers;
     mvtime _time;
     QPoint _lastMousePos;

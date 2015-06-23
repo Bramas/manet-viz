@@ -42,7 +42,8 @@ HEADERS  += mainwindow.h \
     iviewerlayer.h \
     graphicsview.h \
     igraphlayout.h \
-    pluginmanager.h
+    pluginmanager.h \
+    igraphdecorator.h
 
 FORMS    += mainwindow.ui \
     controlwidget.ui \

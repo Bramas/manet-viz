@@ -3,25 +3,29 @@
 
 #include <QPointF>
 #include <QVector>
+#include <QHash>
+#include <QVariant>
 
+
+typedef QHash<QString, QVariant> NodeProperties;
 class Graph;
 
 class Node
 {
 public:
-    Node() : _id(0), _position(QPoint(0,0)) { }
+    Node() : _id(-1) { }
 
-    const QPointF & position() const { return _position; }
-    const QVector<Node> & neighbors() const { return _neighbors; }
+    const QVector<int> & neighbors() const { return _neighbors; }
+    const NodeProperties & properties() const {return _properties; }
     int id() const { return _id; }
 
 private:
-    Node(int id, QPointF position) : _id(id), _position(position) { }
+    Node(int id, NodeProperties properties) : _id(id), _properties(properties) { }
     friend class Graph;
 
     int _id;
-    QPointF _position;
-    QVector<Node> _neighbors;
+    NodeProperties _properties;
+    QVector<int> _neighbors;
 };
 
 #endif // NODE_H

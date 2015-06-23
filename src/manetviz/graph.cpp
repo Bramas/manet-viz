@@ -1,18 +1,24 @@
 #include "graph.h"
 
+#include <QDebug>
+
 Graph::Graph()
 {
 
 }
 
-void Graph::addNode(int id, QPointF point)
+void Graph::addNode(int id, NodeProperties properties)
 {
-    _nodes.insert(id, Node(id, point));
+    _nodes.insert(id, Node(id, properties));
 }
 
 
-void Graph::addEdge(const Node & n1, const Node & n2)
+void Graph::addEdge(int n1, int n2)
 {
-    _nodes[n1.id()]._neighbors << n2;
-    _nodes[n2.id()]._neighbors << n1;
+    if(!_nodes.contains(n1) || !_nodes.contains(n2))
+    {
+        return;
+    }
+    _nodes[n1]._neighbors << n2;
+    _nodes[n2]._neighbors << n1;
 }

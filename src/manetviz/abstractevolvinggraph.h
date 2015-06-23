@@ -6,9 +6,9 @@
 
 #include "types.h"
 #include "graph.h"
+#include "node.h"
 
 
-typedef QHash<QString, QVariant> NodeProperties;
 
 class AbstractEvolvingGraph : public QObject
 {

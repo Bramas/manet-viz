@@ -10,8 +10,17 @@ LatLngCoordinatesLayout::LatLngCoordinatesLayout()
 
 void LatLngCoordinatesLayout::footprint(mvtime time, IGraph * graph) const
 {
-    time += _evolvingGraph->beginTime();
+    /*
     foreach(int id, _evolvingGraph->nodes().keys())
+    {
+        auto it = _evolvingGraph->nodes().value(id)->find(time);
+        if(it != _evolvingGraph->nodes().value(id)->end())
+        {
+            graph->addNode(id, it.value());
+        }
+    }*/
+
+  /*  foreach(int id, _evolvingGraph->nodes().keys())
     {
         auto nodeTimeline = _evolvingGraph->nodes().value(id);
         QMap<mvtime, QHash<QString, QVariant> >::const_iterator up = nodeTimeline->lowerBound(time);
@@ -32,8 +41,8 @@ void LatLngCoordinatesLayout::footprint(mvtime time, IGraph * graph) const
         {
             graph->addNode(id, upPoint);
         }
-    }
-
+    }*/
+/*
     foreach(const Node& n1, graph->nodes())
     {
         foreach(const Node& n2, graph->nodes())
@@ -44,5 +53,5 @@ void LatLngCoordinatesLayout::footprint(mvtime time, IGraph * graph) const
                 graph->addEdge(n1,n2);
             }
         }
-    }
+    }*/
 }

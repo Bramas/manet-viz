@@ -1,0 +1,50 @@
+#include "interpolationdecorator.h"
+
+#include <QDebug>
+
+InterpolationDecorator::InterpolationDecorator()
+{
+}
+
+void InterpolationDecorator::setEvolvingGraph(const AbstractEvolvingGraph *evolvingGraph)
+{
+    _evolvingGraph = evolvingGraph;
+}
+
+void InterpolationDecorator::decorateEdges(mvtime time, IGraph *graph)
+{
+
+}
+
+void InterpolationDecorator::decorateNodes(mvtime time, IGraph *graph)
+{
+    foreach(int id, _evolvingGraph->nodes().keys())
+    {
+        auto nodeTimeline = _evolvingGraph->nodes().value(id);
+        QMap<mvtime, NodeProperties>::const_iterator up = nodeTimeline->lowerBound(time);
+        if(up == nodeTimeline->constEnd())
+        {
+            continue;
+        }
+        QPointF upPoint(up.value().value("X").toDouble(), up.value().value("Y").toDouble());
+        if(up != nodeTimeline->constBegin() && up.key() - (up - 1).key() < 300)
+        {
+            QMap<mvtime, NodeProperties >::const_iterator low = up - 1;
+            QPointF lowPoint(low.value().value("X").toDouble(), low.value().value("Y").toDouble());
+            QPointF p = (up.key() - time)*lowPoint + (time - low.key())*upPoint;
+            p /= (up.key() - low.key());
+
+            NodeProperties node;
+            node.insert("X", p.x());
+            node.insert("Y", p.y());
+            graph->addNode(id, node);
+        }
+        else if(up.key() == time)
+        {
+            NodeProperties node;
+            node.insert("X", upPoint.x());
+            node.insert("Y", upPoint.y());
+            graph->addNode(id, node);
+        }
+    }
+}

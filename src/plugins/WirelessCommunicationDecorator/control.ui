@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>GraphLayerControl</class>
- <widget class="QWidget" name="GraphLayerControl">
+ <class>Control</class>
+ <widget class="QWidget" name="Control">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>202</width>
-    <height>50</height>
+    <height>52</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -19,30 +19,30 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QCheckBox" name="displayContactCheckBox">
+  <widget class="QSlider" name="transmissionRangeSlider">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>0</y>
-     <width>151</width>
-     <height>20</height>
+     <x>10</x>
+     <y>30</y>
+     <width>160</width>
+     <height>22</height>
     </rect>
    </property>
-   <property name="text">
-    <string>Display contacts</string>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
    </property>
   </widget>
-  <widget class="QCheckBox" name="displayRangeCheckBox">
+  <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>20</y>
+     <y>10</y>
      <width>151</width>
-     <height>20</height>
+     <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>Display range</string>
+    <string>Transmission range</string>
    </property>
   </widget>
  </widget>

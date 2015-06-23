@@ -31,7 +31,6 @@ public:
 public slots:
     void setDisplayRange(bool);
     void setDisplayContact(bool);
-    void setCommunicationRange(int);
 
 signals:
     void requestUpdate();
@@ -41,7 +40,6 @@ private:
 
     bool _displayContacts;
     bool _displayRange;
-    int _communicationRange;
 
 };
 

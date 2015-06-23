@@ -2,6 +2,7 @@
 #include "ui_controlwidget.h"
 #include "viewer.h"
 #include "iviewerlayer.h"
+#include "igraphdecorator.h"
 
 #include <QSpacerItem>
 
@@ -98,7 +99,19 @@ void ControlWidget::setViewer(Viewer *viewer)
 
     foreach(IViewerLayer * layer, _viewer->layers())
     {
-        ui->verticalLayout->addWidget(layer->createControlWidget());
+        QWidget * w = layer->createControlWidget();
+        if(w)
+        {
+            ui->verticalLayout->addWidget(w);
+        }
+    }
+    foreach(IGraphDecorator * decorator, _viewer->graphDecorators())
+    {
+        QWidget * w = decorator->createControlWidget();
+        if(w)
+        {
+            ui->verticalLayout->addWidget(w);
+        }
     }
     //add vertical Spacer
     ui->verticalLayout->addSpacerItem(new QSpacerItem(20,20,QSizePolicy::Minimum, QSizePolicy::Expanding));

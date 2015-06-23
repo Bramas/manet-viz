@@ -1,6 +1,7 @@
 #include "viewer.h"
 #include "iviewerlayer.h"
 #include "igraphlayout.h"
+#include "igraphdecorator.h"
 #include "pluginmanager.h"
 #include <QPainter>
 #include <QWheelEvent>
@@ -33,7 +34,7 @@ QPointF Viewer::toLocalCoordinates(QPointF globalCoordinates) const
 
 void Viewer::setTime(mvtime time)
 {
-    _time = time;
+    _time = time + _evolvingGraph->beginTime();
     updateLayers();
 }
 void Viewer::updateLayers()
@@ -42,7 +43,19 @@ void Viewer::updateLayers()
         return;
 
     IGraph * graph = new Graph();
+
+
+    foreach(auto decorator, _graphDecorators)
+    {
+        decorator->decorateNodes(_time, graph);
+    }
+    foreach(auto decorator, _graphDecorators)
+    {
+        decorator->decorateEdges(_time, graph);
+    }
+
     _layout->footprint(_time, graph);
+
     foreach(auto layer, _layers)
     {
         layer->paint(graph);
@@ -112,7 +125,7 @@ void Viewer::mousePressEvent(QMouseEvent * e)
 
 void Viewer::addLayer(IViewerLayer *layer, int priority)
 {
-    QObject::connect(layer->getQObject(), SIGNAL(requestUpdate()), this, SLOT(updateLayers()));
+    connect(layer->getQObject(), SIGNAL(requestUpdate()), this, SLOT(updateLayers()));
     _layers.insertMulti(priority, layer);
 }
 
@@ -131,5 +144,11 @@ void Viewer::onPluginsChanged()
          layout->setEvolvingGraph(_evolvingGraph);
          _layout = layout;
          break;
+    }
+    foreach(IGraphDecorator * decorator, PluginManager::getObjects<IGraphDecorator>())
+    {
+         decorator->setEvolvingGraph(_evolvingGraph);
+         _graphDecorators.insertMulti(100, decorator);
+         connect(decorator->getQObject(), SIGNAL(requestUpdate()), this, SLOT(updateLayers()));
     }
 }

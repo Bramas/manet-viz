@@ -53,7 +53,7 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget)
     {
-        painter->setRenderHint(QPainter::Antialiasing);
+        //painter->setRenderHint(QPainter::Antialiasing);
         QLineF line(_p1, _p2);
         painter->setPen(_pen);
         painter->drawLine(line);
@@ -71,7 +71,6 @@ private:
 
 GraphLayer::GraphLayer()
 {
-    _communicationRange = 2;
     _displayContacts = false;
     _displayRange = false;
 }
@@ -88,12 +87,15 @@ void GraphLayer::paint(IGraph * graph)
     QPen p(QColor(255,0,0));
     p.setWidth(1);
     p.setCosmetic(true);
+
     if(_displayContacts) {
         foreach(const Node& n1, graph->nodes())
         {
-            foreach(const Node& n2, n1.neighbors())
+            foreach(int n2, n1.neighbors())
             {
-                GraphicsEdgeItem * line = new GraphicsEdgeItem(n1.position(), (n2.position()));
+                QPointF p1(n1.properties().value("X").toDouble(), n1.properties().value("Y").toDouble());
+                QPointF p2(graph->nodes().value(n2).properties().value("X").toDouble(), graph->nodes().value(n2).properties().value("Y").toDouble());
+                GraphicsEdgeItem * line = new GraphicsEdgeItem(p1, p2);
                 line->setPen(p);
                 items->addToGroup((QGraphicsItem*) line);
             }
@@ -101,23 +103,24 @@ void GraphLayer::paint(IGraph * graph)
     }
     p.setColor(QColor(0,0,0));
     p.setWidthF(4);
-    foreach(const Node& n, graph->nodes())
+    foreach(const Node &n, graph->nodes())
     {
-        GraphicsNodeItem * i = new GraphicsNodeItem(n.position());
+        QPointF position(n.properties().value("X").toDouble(), n.properties().value("Y").toDouble());
+        GraphicsNodeItem * i = new GraphicsNodeItem(position);
         i->setPen(p);
 
         items->addToGroup((QGraphicsItem*)i);
 
-        if(_displayRange) { // TODO: add range
+        /*if(_displayRange) { // TODO: add range
             QPen p2 = p;
             p2.setWidth(0);
             qreal range = _communicationRange / 1000.0;
             QPointF offset(range/2.0, range/2.0);
-            QRectF rect(n.position() - offset, n.position() + offset);
+            QRectF rect(position - offset, position + offset);
             QGraphicsEllipseItem * ellipse = new QGraphicsEllipseItem(rect);
             ellipse->setPen(p2);
             items->addToGroup(ellipse);
-        }
+        }*/
 
     }
 
@@ -142,19 +145,12 @@ void GraphLayer::setDisplayContact(bool state)
     _displayContacts = state;
     emit requestUpdate();
 }
-void GraphLayer::setCommunicationRange(int range)
-{
-    _communicationRange = range;
-    emit requestUpdate();
-}
-
 QWidget* GraphLayer::createControlWidget() const
 {
     QWidget *control = new QWidget();
     Ui::GraphLayerControl  *ui = new Ui::GraphLayerControl();
     ui->setupUi(control);
 
-    connect(ui->transmissionRangeSlider, SIGNAL(valueChanged(int)), this, SLOT(setCommunicationRange(int)));
     connect(ui->displayRangeCheckBox, SIGNAL(toggled(bool)), this, SLOT(setDisplayRange(bool)));
     connect(ui->displayContactCheckBox, SIGNAL(toggled(bool)), this, SLOT(setDisplayContact(bool)));
 
