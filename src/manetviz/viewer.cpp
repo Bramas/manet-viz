@@ -34,17 +34,18 @@ QPointF Viewer::toLocalCoordinates(QPointF globalCoordinates) const
 void Viewer::setTime(mvtime time)
 {
     _time = time;
-
+    updateLayers();
+}
+void Viewer::updateLayers()
+{
     if(!_layout)
         return;
 
     IGraph * graph = new Graph();
-    _layout->footprint(time, graph);
+    _layout->footprint(_time, graph);
     foreach(auto layer, _layers)
     {
-        //painter.save();
         layer->paint(graph);
-        //painter.restore();
     }
 
     update();
@@ -108,6 +109,12 @@ void Viewer::mousePressEvent(QMouseEvent * e)
 }
 
 */
+
+void Viewer::addLayer(IViewerLayer *layer, int priority)
+{
+    QObject::connect(layer->getQObject(), SIGNAL(requestUpdate()), this, SLOT(updateLayers()));
+    _layers.insertMulti(priority, layer);
+}
 
 void Viewer::onPluginsChanged()
 {

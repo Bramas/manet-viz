@@ -14,3 +14,6 @@ SOURCES += \
 DISTFILES += \
     graphlayer.json
 
+FORMS += \
+    graphlayercontrol.ui
+

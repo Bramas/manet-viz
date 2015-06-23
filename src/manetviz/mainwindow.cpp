@@ -45,14 +45,15 @@ void MainWindow::open()
 
     const AbstractEvolvingGraph * evg = _graphLoader->constEvolvingGraph();
 
-    Viewer * gw = new Viewer(evg);
-    GraphicsView * v = new GraphicsView(gw, this);
+    Viewer * viewer = new Viewer(evg);
+    GraphicsView * v = new GraphicsView(viewer, this);
+
+    controlWidget->setViewer(viewer);
 
     //to enable OpenGL rendering
     //v->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
     v->scale(10,10);
     connect(_graphLoader, &GraphLoader::onLoadProgressChanged, controlWidget, &ControlWidget::setLoadProgress);
-    connect(controlWidget, SIGNAL(timeChanged(mvtime)), gw, SLOT(setTime(mvtime)));
 
     setCentralWidget(v);
     this->addDockWidget(Qt::LeftDockWidgetArea, controlWidget);

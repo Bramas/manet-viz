@@ -18,18 +18,30 @@ class GraphLayer : public QObject, public IViewerLayer
     Q_INTERFACES(IViewerLayer)
 
 public:
+    GraphLayer();
     void paint(IGraph * graph) Q_DECL_OVERRIDE;
     void setGraphicsScene(QGraphicsScene * scene);
 
+
+    QWidget* createControlWidget() const;
+
+    QObject* getQObject() { return this; }
+
+
+public slots:
     void setDisplayRange(bool);
     void setDisplayContact(bool);
+    void setCommunicationRange(int);
 
+signals:
+    void requestUpdate();
 
 private:
     QGraphicsItemGroup * items;
 
-    bool _displayContacts = false;
-    bool _displayRange = false;
+    bool _displayContacts;
+    bool _displayRange;
+    int _communicationRange;
 
 };
 

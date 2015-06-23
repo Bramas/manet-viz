@@ -11,6 +11,8 @@ namespace Ui {
 class ControlWidget;
 }
 
+class Viewer;
+
 class ControlWidget : public QDockWidget
 {
     Q_OBJECT
@@ -18,6 +20,8 @@ class ControlWidget : public QDockWidget
 public:
     explicit ControlWidget(QWidget *parent = 0);
     ~ControlWidget();
+
+    void setViewer(Viewer * viewer);
 
 public slots:
     void setLoadProgress(qreal);
@@ -41,6 +45,7 @@ private:
     QElapsedTimer _playTimerElapsed;
     qreal _cumulatedTime;
     bool _isPlaying;
+    Viewer * _viewer;
 };
 
 #endif // CONTROLWIDGET_H

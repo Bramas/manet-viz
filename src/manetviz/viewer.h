@@ -18,9 +18,11 @@ public:
     ~Viewer();
 
     QPointF toLocalCoordinates(QPointF globalCoordinates) const;
-    void addLayer(IViewerLayer * layer, int priority = 100) { _layers.insertMulti(priority, layer); }
+    void addLayer(IViewerLayer * layer, int priority = 100);
 
     mvtime time() const { return _time; }
+
+    QList<IViewerLayer* > layers() const { return _layers.values(); }
 
 
 
@@ -29,6 +31,7 @@ signals:
 public slots:
     void setTime(mvtime time);
     void onPluginsChanged();
+    void updateLayers();
 
 protected:
     /*void paintEvent(QPaintEvent *);

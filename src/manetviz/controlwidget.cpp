@@ -1,5 +1,9 @@
 #include "controlwidget.h"
 #include "ui_controlwidget.h"
+#include "viewer.h"
+#include "iviewerlayer.h"
+
+#include <QSpacerItem>
 
 ControlWidget::ControlWidget(QWidget *parent) :
     QDockWidget(parent),
@@ -8,13 +12,16 @@ ControlWidget::ControlWidget(QWidget *parent) :
     _isPlaying(false)
 {
     ui->setupUi(this);
+    ui->dockWidgetContents->setLayout(ui->verticalLayout);
+
+    _viewer = 0;
 
     ui->spinBoxTime->setMaximum(99999999);
     ui->spinBoxSpeed->setValue(60);
     connect(ui->spinBoxTime, SIGNAL(valueChanged(int)), this, SLOT(emitTimeChanged()));
     connect(&_playTimer, SIGNAL(timeout()), this, SLOT(onPlayTimerTimeout()));
     connect(ui->pushButtonPlay, SIGNAL(clicked(bool)), this, SLOT(togglePlay()));
-    connect(ui->checkBoxContacts, &QCheckBox::stateChanged, [this]
+    /*connect(ui->checkBoxContacts, &QCheckBox::stateChanged, [this]
         {
             emit contactDisplayChanged(ui->checkBoxContacts->isChecked());
         });
@@ -25,7 +32,7 @@ ControlWidget::ControlWidget(QWidget *parent) :
     connect(ui->sliderRange, &QSlider::valueChanged, [this](int v)
         {
             emit communicationRangeChanged((qreal)v);
-        });
+        });*/
     _playTimerElapsed.start();
 }
 
@@ -82,4 +89,17 @@ void ControlWidget::onPlayTimerTimeout()
 void ControlWidget::setLoadProgress(qreal f)
 {
     ui->progressBarImport->setValue(f*1000);
+}
+
+void ControlWidget::setViewer(Viewer *viewer)
+{
+    _viewer = viewer;
+    connect(this, SIGNAL(timeChanged(mvtime)), _viewer, SLOT(setTime(mvtime)));
+
+    foreach(IViewerLayer * layer, _viewer->layers())
+    {
+        ui->verticalLayout->addWidget(layer->createControlWidget());
+    }
+    //add vertical Spacer
+    ui->verticalLayout->addSpacerItem(new QSpacerItem(20,20,QSizePolicy::Minimum, QSizePolicy::Expanding));
 }

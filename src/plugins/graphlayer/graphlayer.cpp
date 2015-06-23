@@ -1,6 +1,6 @@
 #include "graphlayer.h"
 #include "viewer.h"
-
+#include "ui_graphlayercontrol.h"
 #include <QPainter>
 #include <QWheelEvent>
 #include <QMouseEvent>
@@ -69,6 +69,13 @@ private:
     QPointF _p2;
 };
 
+GraphLayer::GraphLayer()
+{
+    _communicationRange = 2;
+    _displayContacts = false;
+    _displayRange = false;
+}
+
 void GraphLayer::paint(IGraph * graph)
 {
     //Graph g = _evolvingGraph->footprint(_evolvingGraph->beginTime() + graph);//_parent->time());
@@ -99,11 +106,18 @@ void GraphLayer::paint(IGraph * graph)
         GraphicsNodeItem * i = new GraphicsNodeItem(n.position());
         i->setPen(p);
 
-        /*if(_displayRange) { // TODO: add range
-            qreal range = _evolvingGraph->getCommunicationRange();
-            painter->drawEllipse(nodeCoords, range, range);
-        }*/
         items->addToGroup((QGraphicsItem*)i);
+
+        if(_displayRange) { // TODO: add range
+            QPen p2 = p;
+            p2.setWidth(0);
+            qreal range = _communicationRange / 1000.0;
+            QPointF offset(range/2.0, range/2.0);
+            QRectF rect(n.position() - offset, n.position() + offset);
+            QGraphicsEllipseItem * ellipse = new QGraphicsEllipseItem(rect);
+            ellipse->setPen(p2);
+            items->addToGroup(ellipse);
+        }
 
     }
 
@@ -120,12 +134,32 @@ void GraphLayer::setGraphicsScene(QGraphicsScene *scene)
 void GraphLayer::setDisplayRange(bool state)
 {
     _displayRange = state;
+    emit requestUpdate();
 }
 
 void GraphLayer::setDisplayContact(bool state)
 {
     _displayContacts = state;
+    emit requestUpdate();
+}
+void GraphLayer::setCommunicationRange(int range)
+{
+    _communicationRange = range;
+    emit requestUpdate();
 }
 
+QWidget* GraphLayer::createControlWidget() const
+{
+    QWidget *control = new QWidget();
+    Ui::GraphLayerControl  *ui = new Ui::GraphLayerControl();
+    ui->setupUi(control);
+
+    connect(ui->transmissionRangeSlider, SIGNAL(valueChanged(int)), this, SLOT(setCommunicationRange(int)));
+    connect(ui->displayRangeCheckBox, SIGNAL(toggled(bool)), this, SLOT(setDisplayRange(bool)));
+    connect(ui->displayContactCheckBox, SIGNAL(toggled(bool)), this, SLOT(setDisplayContact(bool)));
+
+
+    return control;
+}
 
 

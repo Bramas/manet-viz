@@ -18,6 +18,8 @@ public:
     virtual void setEvolvingGraph(const AbstractEvolvingGraph * evolvingGraph) { _evolvingGraph = evolvingGraph; }
     virtual void setGraphicsScene(QGraphicsScene * scene) { _scene = scene; }
     virtual void paint(IGraph * graph) = 0;
+    virtual QWidget * createControlWidget() const = 0;
+    virtual QObject* getQObject() = 0;
 
 protected:
     const AbstractEvolvingGraph * _evolvingGraph;
