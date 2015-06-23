@@ -4,7 +4,7 @@
 #include <ctime>
 
 #include "abstractevolvinggraph.h"
-#include "geometricgraph.h"
+#include "evolvinggraph.h"
 
 GraphLoader::GraphLoader(QString filename, QRegExp lineRegex, QList<TraceHeader> headers, QString timeFormat) :
     _filename(filename),
@@ -14,10 +14,11 @@ GraphLoader::GraphLoader(QString filename, QRegExp lineRegex, QList<TraceHeader>
 {
     _forceStop = false;
     _loadProgress = 0;
-    _evolvingGraph = new GeometricGraph();
+    _evolvingGraph = new EvolvingGraph();
 }
 
 GraphLoader::GraphLoader(const GraphLoader &other) :
+    QObject(0),
     _filename(other._filename),
     _lineRegex(other._lineRegex),
     _timeFormat(other._timeFormat),
@@ -25,7 +26,7 @@ GraphLoader::GraphLoader(const GraphLoader &other) :
 {
     _forceStop = false;
     _loadProgress = 0;
-    _evolvingGraph = new GeometricGraph();
+    _evolvingGraph = new EvolvingGraph();
 }
 
 GraphLoader::~GraphLoader()
@@ -63,14 +64,14 @@ bool GraphLoader::load()
     {
         return false;
     }
-    for(int i = 0; i< 100; ++i)
+    for(int i = 0; i< 1000; ++i)
     {
         if(!file->atEnd())
             processLine(QString(file->readLine()).split(QRegExp("[\r\n]"), QString::SkipEmptyParts).at(0));
     }
 
     _loadProgress = 1.0 - file->bytesAvailable() / (qreal)file->size();
-    _loadResult = QtConcurrent::run(this, &GraphLoader::concurrentLoad, file);
+    //_loadResult = QtConcurrent::run(this, &GraphLoader::concurrentLoad, file);
     return true;
 }
 
@@ -169,6 +170,9 @@ void GraphLoader::processLine(QString line)
         return;
     }
 
-    QPointF p(x, y);
-    dynamic_cast<GeometricGraph*>(_evolvingGraph)->addNodePosition(id, mvt, p);
+    //QPointF p(x, y);
+    QHash<QString, QVariant> props;
+    props.insert("X", x);
+    props.insert("Y", y);
+    _evolvingGraph->addNode(id, mvt, props);
 }
