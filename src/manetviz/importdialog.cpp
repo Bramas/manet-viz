@@ -54,6 +54,10 @@ ImportDialog::ImportDialog(QString filename, QWidget *parent) :
     connect(ui->comboBoxTimeFormat, SIGNAL(editTextChanged(QString)), this, SLOT(timeFormatEdited(QString)));
     connect(_outputModel, SIGNAL(itemChanged(QStandardItem *)), this, SLOT(headerChanged(QStandardItem *)));
 
+
+    // default for test purpose
+    //ui->lineEditRegEx->setText("(\\d+);([^;]+);POINT\\(([^ ]+) ([^ ]+)\\)");
+
     processSampleTrace(10);
     processInputTable();
     processOutputTable();
@@ -96,7 +100,8 @@ void ImportDialog::processOutputTable()
     CSVParser parser(_regEx);
 
     ComboBoxDelegate * delegate = new ComboBoxDelegate();
-
+    QStringList defaultHeaders;
+    defaultHeaders << "Id" << "Time" << "X" << "Y";
     int idx = 0;
     if (_hasHeading) {
         ui->tableViewOutput->horizontalHeader()->setVisible(true);
@@ -104,7 +109,8 @@ void ImportDialog::processOutputTable()
         QString line = _sampleTrace[idx++];
         parser.parseRegEx(line, fields);
         int j = 0;
-        foreach (QString field, fields) {
+        foreach(const QString &field, fields)
+        {
             QStandardItem * item = new QStandardItem(field);
             QStandardItem * emptyItem = new QStandardItem();
             emptyItem->setBackground(QBrush(QColor(237,237,237)));
@@ -118,10 +124,16 @@ void ImportDialog::processOutputTable()
         QStringList fields;
         QString line = _sampleTrace[idx];
         parser.parseRegEx(line, fields);
-        for(int i = 0; i<fields.count(); ++i) {
-            QStandardItem * emptyItem = new QStandardItem();
-            emptyItem->setBackground(QBrush(QColor(237,237,237)));
-            _outputModel->setItem(0,i,emptyItem);
+        for(int i = 0; i<fields.count(); ++i)
+        {
+            QString field = "";
+            if(idx < defaultHeaders.size())
+            {
+                field = defaultHeaders.at(i);
+            }
+            QStandardItem * item = new QStandardItem(field);
+            item->setData(field, Qt::EditRole);
+            _outputModel->setItem(0,i,item);
         }
     }
     ui->tableViewOutput->setItemDelegateForRow(0,delegate);

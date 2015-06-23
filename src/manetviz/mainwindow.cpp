@@ -4,13 +4,14 @@
 #include <QSpinBox>
 #include <QCloseEvent>
 #include <QFileDialog>
+#include <QGraphicsView>
+#include <QGLWidget>
 
 #include "viewer.h"
-#include "geometricgraph.h"
-#include "graphlayer.h"
 #include "controlwidget.h"
 #include "importdialog.h"
 #include "graphloader.h"
+#include "graphicsview.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -18,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(open()));
+    _graphLoader = 0;
 }
 
 void MainWindow::open()
@@ -41,17 +43,18 @@ void MainWindow::open()
 
     ControlWidget * controlWidget = new ControlWidget();
 
-    Viewer * gw = new Viewer(this);
     const AbstractEvolvingGraph * evg = _graphLoader->constEvolvingGraph();
-    IViewerLayer * gl = new GraphLayer(gw, evg);
-    gw->addLayer(gl);
 
+    Viewer * gw = new Viewer(evg);
+    GraphicsView * v = new GraphicsView(gw, this);
+
+    //to enable OpenGL rendering
+    //v->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
+    v->scale(10,10);
     connect(_graphLoader, &GraphLoader::onLoadProgressChanged, controlWidget, &ControlWidget::setLoadProgress);
     connect(controlWidget, SIGNAL(timeChanged(mvtime)), gw, SLOT(setTime(mvtime)));
-    setCentralWidget(gw);
-    connect(controlWidget, &ControlWidget::communicationRangeChanged, dynamic_cast<const GeometricGraph*>(evg), &GeometricGraph::setCommunicationRange);
-    connect(controlWidget, &ControlWidget::contactDisplayChanged, dynamic_cast<GraphLayer*>(gl), &GraphLayer::setDisplayContact);
-    connect(controlWidget, &ControlWidget::rangeDisplayChanged, dynamic_cast<GraphLayer*>(gl), &GraphLayer::setDisplayRange);
+
+    setCentralWidget(v);
     this->addDockWidget(Qt::LeftDockWidgetArea, controlWidget);
 }
 

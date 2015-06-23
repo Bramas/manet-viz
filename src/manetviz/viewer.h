@@ -1,17 +1,20 @@
 #ifndef VIEWER_H
 #define VIEWER_H
 
-#include <QWidget>
+#include <QGraphicsScene>
 #include <QElapsedTimer>
 
 #include "types.h"
+#include "viewer.h"
 class IViewerLayer;
+class IGraphLayout;
+class AbstractEvolvingGraph;
 
-class Viewer : public QWidget
+class Viewer : public QGraphicsScene
 {
     Q_OBJECT
 public:
-    explicit Viewer(QWidget *parent = 0);
+    explicit Viewer(const AbstractEvolvingGraph *evg);
     ~Viewer();
 
     QPointF toLocalCoordinates(QPointF globalCoordinates) const;
@@ -19,19 +22,24 @@ public:
 
     mvtime time() const { return _time; }
 
+
+
 signals:
 
 public slots:
     void setTime(mvtime time);
 
 protected:
-    void paintEvent(QPaintEvent *);
+    /*void paintEvent(QPaintEvent *);
     void wheelEvent(QWheelEvent *);
     void mouseMoveEvent(QMouseEvent *);
-    void mousePressEvent(QMouseEvent *);
+    void mousePressEvent(QMouseEvent *);*/
 
 private:
 
+    bool loadPlugin(const AbstractEvolvingGraph *evg);
+
+    IGraphLayout * _layout;
     QMap<int, IViewerLayer*> _layers;
     mvtime _time;
     QPoint _lastMousePos;
