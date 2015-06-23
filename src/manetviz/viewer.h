@@ -28,6 +28,7 @@ signals:
 
 public slots:
     void setTime(mvtime time);
+    void onPluginsChanged();
 
 protected:
     /*void paintEvent(QPaintEvent *);
@@ -37,7 +38,6 @@ protected:
 
 private:
 
-    bool loadPlugin(const AbstractEvolvingGraph *evg);
 
     IGraphLayout * _layout;
     QMap<int, IViewerLayer*> _layers;
@@ -46,6 +46,7 @@ private:
     QPointF _afterTranslate;
     qreal _zoom;
     QElapsedTimer _timeSinceLastFrame;
+    const AbstractEvolvingGraph * _evolvingGraph;
 };
 
 #endif // VIEWER_H

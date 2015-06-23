@@ -24,7 +24,8 @@ SOURCES += main.cpp\
     importdialog.cpp \
     csvparser.cpp \
     graphloader.cpp \
-    graphicsview.cpp
+    graphicsview.cpp \
+    pluginmanager.cpp
 
 HEADERS  += mainwindow.h \
     evolvinggraph.h \
@@ -40,7 +41,8 @@ HEADERS  += mainwindow.h \
     graphloader.h \
     iviewerlayer.h \
     graphicsview.h \
-    igraphlayout.h
+    igraphlayout.h \
+    pluginmanager.h
 
 FORMS    += mainwindow.ui \
     controlwidget.ui \
