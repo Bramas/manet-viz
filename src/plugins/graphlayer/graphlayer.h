@@ -29,7 +29,6 @@ public:
 
 
 public slots:
-    void setDisplayRange(bool);
     void setDisplayContact(bool);
 
 signals:
@@ -39,7 +38,6 @@ private:
     QGraphicsItemGroup * items;
 
     bool _displayContacts;
-    bool _displayRange;
 
 };
 

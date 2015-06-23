@@ -5,6 +5,8 @@
 #include "abstractevolvinggraph.h"
 #include "node.h"
 
+class QGraphicsItem;
+
 class IGraphDecorator
 {
 public:
@@ -17,7 +19,8 @@ public:
 
     virtual QStringList requiredField() const { return QStringList(); }
 
-    virtual QWidget * createControlWidget() const { return 0; }
+    virtual QWidget*        createControlWidget() const { return 0; }
+    virtual QGraphicsItem*  graphicsNodeChildItem(const Node &n) const { return 0; }
 
     virtual QObject* getQObject() = 0;
 };

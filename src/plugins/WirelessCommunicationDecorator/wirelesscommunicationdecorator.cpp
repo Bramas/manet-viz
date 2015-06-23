@@ -2,6 +2,8 @@
 #include <QWidget>
 #include <QDebug>
 #include <QVector2D>
+#include <QGraphicsEllipseItem>
+#include <QPen>
 
 #include  "ui_control.h"
 
@@ -12,6 +14,7 @@
 WirelessCommunicationDecorator::WirelessCommunicationDecorator()
 {
     _communicationRange = 2;
+    _displayRange = false;
 }
 void WirelessCommunicationDecorator::setEvolvingGraph(const AbstractEvolvingGraph *evolvingGraph)
 {
@@ -48,12 +51,32 @@ void WirelessCommunicationDecorator::setCommunicationRange(int range)
     emit requestUpdate();
 }
 
+void WirelessCommunicationDecorator::setDisplayRange(bool state)
+{
+    _displayRange = state;
+    emit requestUpdate();
+}
+
 QWidget * WirelessCommunicationDecorator::createControlWidget() const
 {
     QWidget * control = new QWidget();
     Ui::Control * ui = new Ui::Control();
     ui->setupUi(control);
 
+    connect(ui->displayRangeCheckBox, SIGNAL(toggled(bool)), this, SLOT(setDisplayRange(bool)));
     connect(ui->transmissionRangeSlider, SIGNAL(valueChanged(int)), this, SLOT(setCommunicationRange(int)));
     return control;
+}
+
+QGraphicsItem*  WirelessCommunicationDecorator::graphicsNodeChildItem(const Node& n) const
+{
+    if(!_displayRange)
+        return 0;
+    qreal radius = _communicationRange / 1000.0;
+    QPointF offset(radius,radius);
+    QPen p;
+    p.setWidth(0);
+    QGraphicsEllipseItem* item = new QGraphicsEllipseItem(QRectF(-offset, offset));
+    item->setPen(p);
+    return item;
 }

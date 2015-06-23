@@ -72,7 +72,6 @@ private:
 GraphLayer::GraphLayer()
 {
     _displayContacts = false;
-    _displayRange = false;
 }
 
 void GraphLayer::paint(IGraph * graph)
@@ -108,20 +107,7 @@ void GraphLayer::paint(IGraph * graph)
         QPointF position(n.properties().value("X").toDouble(), n.properties().value("Y").toDouble());
         GraphicsNodeItem * i = new GraphicsNodeItem(position);
         i->setPen(p);
-
         items->addToGroup((QGraphicsItem*)i);
-
-        /*if(_displayRange) { // TODO: add range
-            QPen p2 = p;
-            p2.setWidth(0);
-            qreal range = _communicationRange / 1000.0;
-            QPointF offset(range/2.0, range/2.0);
-            QRectF rect(position - offset, position + offset);
-            QGraphicsEllipseItem * ellipse = new QGraphicsEllipseItem(rect);
-            ellipse->setPen(p2);
-            items->addToGroup(ellipse);
-        }*/
-
     }
 
     _scene->addItem(items);
@@ -132,12 +118,6 @@ void GraphLayer::setGraphicsScene(QGraphicsScene *scene)
     _scene = scene;
     items = new QGraphicsItemGroup();
     _scene->addItem(items);
-}
-
-void GraphLayer::setDisplayRange(bool state)
-{
-    _displayRange = state;
-    emit requestUpdate();
 }
 
 void GraphLayer::setDisplayContact(bool state)
@@ -151,7 +131,6 @@ QWidget* GraphLayer::createControlWidget() const
     Ui::GraphLayerControl  *ui = new Ui::GraphLayerControl();
     ui->setupUi(control);
 
-    connect(ui->displayRangeCheckBox, SIGNAL(toggled(bool)), this, SLOT(setDisplayRange(bool)));
     connect(ui->displayContactCheckBox, SIGNAL(toggled(bool)), this, SLOT(setDisplayContact(bool)));
 
 
