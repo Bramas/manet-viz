@@ -6,7 +6,7 @@
 #include "abstractevolvinggraph.h"
 #include "evolvinggraph.h"
 
-GraphLoader::GraphLoader(QString filename, QRegExp lineRegex, QList<TraceHeader> headers, QString timeFormat) :
+GraphLoader::GraphLoader(QString filename, QRegExp lineRegex, QList<QString> headers, QString timeFormat) :
     _filename(filename),
     _lineRegex(lineRegex),
     _timeFormat(timeFormat),
@@ -144,22 +144,15 @@ void GraphLoader::processLine(QString line)
     QString time;
     for(int i = 0; i < _headers.size(); ++i)
     {
-        switch(_headers.at(i))
-        {
-        case IdHeader:
+        QString header = _headers.at(i);
+        if(header == "Id") {
             id = capturedText.at(i + 1).toInt();
-            break;
-        case  XHeader:
-            x = capturedText.at(i + 1).toDouble();
-            break;
-        case  YHeader:
-            y = capturedText.at(i + 1).toDouble();
-            break;
-        case  TimeHeader:
+        } else if(header == "Time") {
             time = capturedText.at(i + 1);
-            break;
-        default:
-            break;
+        } else if(header == "X") {
+            x = capturedText.at(i + 1).toDouble();
+        } else if(header == "Y"){
+            y = capturedText.at(i + 1).toDouble();
         }
     }
 

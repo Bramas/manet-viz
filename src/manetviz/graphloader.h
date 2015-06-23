@@ -15,7 +15,7 @@ class GraphLoader : public QObject
 {
     Q_OBJECT
 public:
-    explicit GraphLoader(QString filename, QRegExp lineRegex, QList<TraceHeader> headers, QString timeFormat);
+    explicit GraphLoader(QString filename, QRegExp lineRegex, QList<QString> headers, QString timeFormat);
     GraphLoader(const GraphLoader &other);
     ~GraphLoader();
 
@@ -39,7 +39,7 @@ private:
     QString _filename;
     QRegExp _lineRegex;
     QString _timeFormat;
-    QList<TraceHeader> _headers;
+    QList<QString> _headers;
 
     QFuture<bool> _loadResult;
     qreal _loadProgress;

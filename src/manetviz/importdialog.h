@@ -23,15 +23,16 @@ public:
 private:
     Ui::ImportDialog *ui;
     QString _filename = "";
-    QString _regEx;
-    QString _timeFormat;
-    QString _timeSample = "";
+    QString _regEx = "";
+    QString _timeFormat = "";
+    int _timeCol = -1;
+    bool _isLoading;
     QStringList _regExps;
     QStringList _timeFormats;
     bool _hasHeading = false;
     bool _isMobilityTrace = true;
     bool _isContactTrace = false;
-    QMap<int,TraceHeader> _TraceHeaders;
+    QMap<int,QString> _TraceHeaders;
     QStandardItemModel * _inputModel;
     QStandardItemModel * _outputModel;
     QStringList _sampleTrace;
