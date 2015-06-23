@@ -54,7 +54,6 @@ ImportDialog::ImportDialog(QString filename, QWidget *parent) :
     connect(ui->comboBoxTimeFormat, SIGNAL(editTextChanged(QString)), this, SLOT(timeFormatEdited(QString)));
     connect(_outputModel, SIGNAL(itemChanged(QStandardItem *)), this, SLOT(headerChanged(QStandardItem *)));
 
-
     // default for test purpose
     //ui->lineEditRegEx->setText("(\\d+);([^;]+);POINT\\(([^ ]+) ([^ ]+)\\)");
 
@@ -95,7 +94,8 @@ void ImportDialog::processOutputTable()
     _outputModel->clear();
     _headers.clear();
     _TraceHeaders.clear();
-    _timeSample.clear();
+    _timeCol = -1;
+    _isLoading = true;
 
     CSVParser parser(_regEx);
 
@@ -151,6 +151,9 @@ void ImportDialog::processOutputTable()
         }
         i++;
     }
+
+    _isLoading = false;
+    checkConsistency();
 }
 
 ImportDialog::~ImportDialog()
@@ -177,42 +180,28 @@ void ImportDialog::mobilityChanged()
     checkConsistency();
 }
 
-TraceHeader ImportDialog::convertToTraceHeader(QString header)
-{
-    if(header == "Id") return IdHeader;
-    else if(header == "Time") return TimeHeader;
-    else if(header == "X") return XHeader;
-    else if(header == "Y") return YHeader;
-    else if(header == "TimeStart") return TimeStartHeader;
-    else if(header == "TimeEnd") return TimeEndHeader;
-    else if(header == "Id2") return Id2Header;
-    else if(header == "Property") return PropertyHeader;
-    else return NoneHeader;
-}
-
 void ImportDialog::headerChanged(QStandardItem * item)
 {
     int row = item->row();
     int column = item->column();
 
     if(row == 0) {
-        QString headerText = _outputModel->item(0,column)->data(Qt::EditRole).toString();
-        if(!headerText.isEmpty()) {
+        QString header = _outputModel->item(0,column)->data(Qt::EditRole).toString();
+        if(!header.isEmpty()) {
             // Not default empty value for header
-            TraceHeader header = convertToTraceHeader(headerText);
             _TraceHeaders[column] = header;
-            if(header == TimeHeader) {
-                // Update the time sample used in the time format validity test
-                _timeSample = _outputModel->item(2,column)->data(Qt::EditRole).toString();
+            if(header == "Time") {
+                // Update the time columnw used in the time format validity test
+                _timeCol = column;
             } else {
                 // check whether there is another time header in the current header
-                int idx = _TraceHeaders.values().indexOf(TimeHeader);
+                int idx = _TraceHeaders.values().indexOf("Time");
                 if(idx != -1) {
-                    // Update the time sample to the first index found
-                    _timeSample = _outputModel->item(2,idx)->data(Qt::EditRole).toString();
+                    // Update the time column to the first index found
+                    _timeCol = idx;
                 } else {
-                    // Clear the time sample
-                    _timeSample.clear();
+                    // Clear the time column
+                    _timeCol = -1;
                 }
             }
         }
@@ -239,15 +228,16 @@ void ImportDialog::regExEdited(QString text)
 
 bool ImportDialog::isTimeFormatValid(QString format)
 {
-    if(!_timeSample.isEmpty()) {
+    if(_timeCol != -1) {
         // Check whehter the time format is valid
         QDateTime dt;
+        QString timeSample = _outputModel->item(2,_timeCol)->data(Qt::EditRole).toString();
         if(format == "T") {
-            dt = QDateTime::fromTime_t(_timeSample.toUInt());
+            dt = QDateTime::fromTime_t(timeSample.toUInt());
         } else if(format == "t") {
-            dt = QDateTime::fromMSecsSinceEpoch(_timeSample.toLongLong());
+            dt = QDateTime::fromMSecsSinceEpoch(timeSample.toLongLong());
         } else {
-            dt = QDateTime::fromString(_timeSample, format);
+            dt = QDateTime::fromString(timeSample, format);
         }
         return dt.isValid();
     } else {
@@ -264,30 +254,35 @@ void ImportDialog::checkConsistency()
 {
     // Consistency check
     bool flag = false;
-    // Check with the time format
-    if(_timeFormat.isEmpty()) {
+    // discard if the output table is still loading
+    if(_isLoading) {
         flag = true;
     } else {
-        bool isValid = isTimeFormatValid(_timeFormat);
-        QFont prevFont(ui->comboBoxTimeFormat->font()); // Get previous font
-        if(isValid) {
-            prevFont.setBold(false);
-            ui->comboBoxTimeFormat->setFont(prevFont);
+        // Check with the time format
+        if(_timeFormat.isEmpty()) {
+            flag = true;
         } else {
-            prevFont.setBold(true);
-            ui->comboBoxTimeFormat->setFont(prevFont);
+            bool isValid = isTimeFormatValid(_timeFormat);
+            QFont prevFont(ui->comboBoxTimeFormat->font()); // Get previous font
+            if(isValid) {
+                prevFont.setBold(false);
+                ui->comboBoxTimeFormat->setFont(prevFont);
+            } else {
+                prevFont.setBold(true);
+                ui->comboBoxTimeFormat->setFont(prevFont);
+            }
+            flag = !isValid;
         }
-        flag = !isValid;
-    }
-    // Check whether the fields are well filled
-    if(!(_TraceHeaders.values().count(IdHeader) == 1 && _TraceHeaders.values().count(TimeHeader) == 1)) {
-        flag = true;
-    }
-    if(_isMobilityTrace && !(_TraceHeaders.values().count(XHeader) == 1 && _TraceHeaders.values().count(YHeader) == 1)) {
-        flag = true;
-    }
-    if(_isContactTrace && !(_TraceHeaders.values().count(Id2Header) == 1) && _TraceHeaders.values().count(TimeStartHeader) == 1 && _TraceHeaders.values().count(TimeEndHeader) == 1) {
-        flag = true;
+        // Check whether the fields are well filled
+        if(!(_TraceHeaders.values().count("Id") == 1 && _TraceHeaders.values().count("Time") == 1)) {
+            flag = true;
+        }
+        if(_isMobilityTrace && !(_TraceHeaders.values().count("X") == 1 && _TraceHeaders.values().count("Y") == 1)) {
+            flag = true;
+        }
+        if(_isContactTrace && !(_TraceHeaders.values().count("X2") == 1) && _TraceHeaders.values().count("TimeStart") == 1 && _TraceHeaders.values().count("TimeEnd") == 1) {
+            flag = true;
+        }
     }
 
     // Disable the "import" button
