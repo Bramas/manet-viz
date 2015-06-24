@@ -8,16 +8,11 @@
 class CSVParser
 {
 public:
-    CSVParser(QString mQuoteChar, QString mDelimChars, QString mEscapeChar);
-    CSVParser(QString regEx);
-    int parseString(QString &buffer, QStringList &fields);
-    int parseRegEx(QString &buffer, QStringList &fields);
-private:
-    QString _filname;
-    QString _mDelimChars;
-    QString _mQuoteChar;
-    QString _mEscapeChar;
-    QString _regEx;
+    CSVParser();
+
+    int parseString(QString &buffer, QStringList &fields, QString delimChars, QString quoteChars, QString escapeChars);
+    int parseRegEx(QString &buffer, QStringList &fields, QString regEx);
+    int parseCSV(QString filename, QVector<QMap<QString,QString>> &fields, QString delim, QString quote="\"", QString escape="\\");
 };
 
 #endif // CSVPARSER_H

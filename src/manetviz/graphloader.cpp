@@ -71,7 +71,7 @@ bool GraphLoader::load()
     }
 
     _loadProgress = 1.0 - file->bytesAvailable() / (qreal)file->size();
-    //_loadResult = QtConcurrent::run(this, &GraphLoader::concurrentLoad, file);
+    _loadResult = QtConcurrent::run(this, &GraphLoader::concurrentLoad, file);
     return true;
 }
 

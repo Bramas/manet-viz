@@ -41,7 +41,6 @@ private:
     void processSampleTrace(int);
     void processOutputTable();
     void processInputTable();
-    TraceHeader convertToTraceHeader(QString header);
     bool isTimeFormatValid(QString format);
     bool isValidRegEx(QString regex);
     void checkConsistency();

@@ -1,0 +1,119 @@
+#include "gtfsloader.h"
+#include "csvparser.h"
+#include "evolvinggraph.h"
+
+// TODO: Do a script to get the extension (either .csv or .txt)
+
+GTFSLoader::GTFSLoader(QString folderPath):
+    _folderPath(folderPath),
+    _stopTimesFilePath(folderPath+"/stop_times.csv"),
+    _stopsFilePath(folderPath+"/stops.csv"),
+    _shapesFilePath(folderPath+"/shapes.csv"),
+    _tripsFilePath(folderPath+"/trips.csv")
+{
+    _evolvingGraph = new EvolvingGraph();
+    _trajectories = QMap<QString, Trajectory *>();
+}
+
+GTFSLoader::~GTFSLoader()
+{
+}
+
+AbstractEvolvingGraph * GTFSLoader::evolvingGraph() const
+{
+    return _evolvingGraph;
+}
+
+void GTFSLoader::parseTrips()
+{
+    CSVParser parser = CSVParser();
+    QVector<QMap<QString, QString>> stopList  = QVector<QMap<QString, QString>>();
+    QVector<QMap<QString, QString>> timesList = QVector<QMap<QString, QString>>();
+    QVector<QMap<QString, QString>> tripsList = QVector<QMap<QString, QString>>();
+
+    parser.parseCSV(_stopsFilePath, stopList, ",");
+    parser.parseCSV(_stopTimesFilePath, timesList, ",");
+    parser.parseCSV(_tripsFilePath, tripsList, ",");
+
+    qDebug() << stopList.count() << " / " << timesList.count() << " / " << tripsList.count();
+
+    // get all the trips (trajectories)
+    foreach (auto trip, tripsList) {
+        QString routeId = trip.value("route_id");
+        QString serviceId = trip.value("service_id");
+        QString tripId = trip.value("trip_id");
+        QString tripHeadsign = trip.value("trip_headsign");
+        QString directionId = trip.value("direction_id");
+        QString shapeId = trip.value("shape_id");
+        _trajectories.insert(tripId,
+                             new Trajectory(routeId, serviceId, tripId, tripHeadsign, directionId, shapeId));
+    }
+
+    qDebug() << "trajectories count: " << _trajectories.count();
+
+    // get all the stops
+    QMap<QString,Stop*> stopMap = QMap<QString, Stop*>();
+    foreach (auto stop, stopList) {
+        QString stopId = stop.value("stop_id");
+        QString stopName = stop.value("stop_name");
+        QPointF coord(stop.value("stop_lat").toDouble(), stop.value("stop_lon").toDouble());
+        stopMap.insert(stopId,
+                       new Stop(stopId, stopName, coord));
+    }
+
+    qDebug() << "stopMap " << stopMap.count();
+
+    // TODO snap the trajectory to the corresponding shape
+
+    // initialize all the trajectories
+    mvtime arrivalTime;
+    mvtime departureTime;
+    QString tripId = "";
+    QString stopId = "";
+
+    foreach(auto time, timesList) {
+        tripId = time.value("trip_id");
+        stopId = time.value("stop_id");
+        Stop * stop = stopMap.value(stopId);
+        arrivalTime = toSeconds(time.value("arrival_time"));
+        departureTime = toSeconds(time.value("departure_time"));
+        _trajectories.value(tripId)->addWayPoint(arrivalTime,stop);
+        if(departureTime > arrivalTime) {
+            _trajectories.value(tripId)->addWayPoint(departureTime,stop);
+        }
+    }
+}
+
+mvtime GTFSLoader::toSeconds(QString time)
+{
+    long hours = time.mid(0, 2).toLong();
+    long minutes = time.mid(3, 2).toLong();
+    long seconds = time.mid(6, 2).toLong();
+    return hours * 3600 + minutes * 60 + seconds;
+}
+
+void GTFSLoader::load()
+{
+    qDebug() << "Begin parsing trips";
+    parseTrips();
+    qDebug() << "Trips parsed " << _trajectories.count();
+    qDebug() << "Adding trajectories";
+
+    int id = 0;
+    for(auto trajId: _trajectories.keys())
+    {
+        Trajectory * traj = _trajectories.value(trajId);
+        for(auto mvt: traj->getTrajectory().keys())
+        {
+            WayPoint * stop = traj->getTrajectory().value(mvt);
+            QHash<QString, QVariant> props;
+            props.insert("X", stop->getCoords().x());
+            props.insert("Y", stop->getCoords().y());
+            _evolvingGraph->addNode(id, mvt, props);
+        }
+        id++;
+        delete traj;
+//        if(id > 1000) break;
+    }
+    qDebug() << "Trajectories added " << id;
+}

@@ -1,20 +1,14 @@
 #include "csvparser.h"
 #include <QDebug>
 #include <QRegExp>
+#include <QFile>
 
-CSVParser::CSVParser(QString mQuoteChar, QString mDelimChars, QString mEscapeChar)
+CSVParser::CSVParser()
 {
-    _mQuoteChar = mQuoteChar;
-    _mDelimChars = mDelimChars;
-    _mEscapeChar = mEscapeChar;
+
 }
 
-CSVParser::CSVParser(QString regEx)
-{
-    _regEx = regEx;
-}
-
-int CSVParser::parseString(QString &buffer, QStringList &fields) {
+int CSVParser::parseString(QString &buffer, QStringList &fields, QString delimChars, QString quoteChars, QString escapeChars) {
     QString field;             // String in which to accumulate next field
     bool escaped = false;      // Next char is escaped
     bool quoted = false;       // In quotes
@@ -58,12 +52,12 @@ int CSVParser::parseString(QString &buffer, QStringList &fields) {
 
       bool isQuote = false;
       bool isEscape = false;
-      bool isDelim = _mDelimChars.contains( c );
+      bool isDelim = delimChars.contains( c );
       if ( ! isDelim )
       {
-        bool isQuoteChar = _mQuoteChar.contains( c );
+        bool isQuoteChar = quoteChars.contains( c );
         isQuote = quoted ? c == quoteChar : isQuoteChar;
-        isEscape = _mEscapeChar.contains( c );
+        isEscape = escapeChars.contains( c );
         if ( isQuoteChar && isEscape ) isEscape = isQuote;
       }
 
@@ -154,8 +148,8 @@ int CSVParser::parseString(QString &buffer, QStringList &fields) {
     return 1;
 }
 
-int CSVParser::parseRegEx(QString &buffer, QStringList &fields) {
-    QRegExp rx(_regEx);
+int CSVParser::parseRegEx(QString &buffer, QStringList &fields, QString regEx) {
+    QRegExp rx(regEx);
 
     if(!rx.isValid()) {
         return 0;
@@ -169,4 +163,30 @@ int CSVParser::parseRegEx(QString &buffer, QStringList &fields) {
         fields.append(list[i]);
     }
     return 1;
+}
+
+int CSVParser::parseCSV(QString filename, QVector<QMap<QString,QString>> &fields, QString delim, QString quote, QString escape) {
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly)) {
+        return 1;
+    }
+
+    // The file necessarly has a header
+    QStringList headerLine;
+    QString line = QString(file.readLine()).split(QRegExp("[\r\n]")).at(0);
+    parseString(line,headerLine,delim,quote,escape);
+    while (!file.atEnd()) {
+        line = QString(file.readLine()).split(QRegExp("[\r\n]")).at(0);
+        QStringList values;
+        parseString(line,values,delim,quote,escape);
+        QMap<QString,QString> map = QMap<QString,QString>();
+        for (int i = 0; i < values.length(); i++) {
+            map.insert(headerLine.at(i), values.at(i)); // maps the header with corresponding value
+        }
+        fields.append(map);
+    }
+
+    file.close();
+
+    return 0;
 }

@@ -28,6 +28,7 @@
      <string>Fichier</string>
     </property>
     <addaction name="actionOpen"/>
+    <addaction name="actionOpen_GTFS"/>
    </widget>
    <addaction name="menuOpen"/>
   </widget>
@@ -43,6 +44,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionOpen_GTFS">
+   <property name="text">
+    <string>Open GTFS</string>
    </property>
   </action>
  </widget>
