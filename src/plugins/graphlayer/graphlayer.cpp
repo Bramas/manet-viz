@@ -1,6 +1,6 @@
 #include "graphlayer.h"
 #include "viewer.h"
-
+#include "ui_graphlayercontrol.h"
 #include <QPainter>
 #include <QWheelEvent>
 #include <QMouseEvent>
@@ -53,7 +53,7 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget)
     {
-        painter->setRenderHint(QPainter::Antialiasing);
+        //painter->setRenderHint(QPainter::Antialiasing);
         QLineF line(_p1, _p2);
         painter->setPen(_pen);
         painter->drawLine(line);
@@ -69,6 +69,11 @@ private:
     QPointF _p2;
 };
 
+GraphLayer::GraphLayer()
+{
+    _displayContacts = false;
+}
+
 void GraphLayer::paint(IGraph * graph)
 {
     //Graph g = _evolvingGraph->footprint(_evolvingGraph->beginTime() + graph);//_parent->time());
@@ -81,12 +86,15 @@ void GraphLayer::paint(IGraph * graph)
     QPen p(QColor(255,0,0));
     p.setWidth(1);
     p.setCosmetic(true);
+
     if(_displayContacts) {
         foreach(const Node& n1, graph->nodes())
         {
-            foreach(const Node& n2, n1.neighbors())
+            foreach(int n2, n1.neighbors())
             {
-                GraphicsEdgeItem * line = new GraphicsEdgeItem(n1.position(), (n2.position()));
+                QPointF p1(n1.properties().value("X").toDouble(), n1.properties().value("Y").toDouble());
+                QPointF p2(graph->nodes().value(n2).properties().value("X").toDouble(), graph->nodes().value(n2).properties().value("Y").toDouble());
+                GraphicsEdgeItem * line = new GraphicsEdgeItem(p1, p2);
                 line->setPen(p);
                 items->addToGroup((QGraphicsItem*) line);
             }
@@ -94,17 +102,12 @@ void GraphLayer::paint(IGraph * graph)
     }
     p.setColor(QColor(0,0,0));
     p.setWidthF(4);
-    foreach(const Node& n, graph->nodes())
+    foreach(const Node &n, graph->nodes())
     {
-        GraphicsNodeItem * i = new GraphicsNodeItem(n.position());
+        QPointF position(n.properties().value("X").toDouble(), n.properties().value("Y").toDouble());
+        GraphicsNodeItem * i = new GraphicsNodeItem(position);
         i->setPen(p);
-
-        /*if(_displayRange) { // TODO: add range
-            qreal range = _evolvingGraph->getCommunicationRange();
-            painter->drawEllipse(nodeCoords, range, range);
-        }*/
         items->addToGroup((QGraphicsItem*)i);
-
     }
 
     _scene->addItem(items);
@@ -117,15 +120,21 @@ void GraphLayer::setGraphicsScene(QGraphicsScene *scene)
     _scene->addItem(items);
 }
 
-void GraphLayer::setDisplayRange(bool state)
-{
-    _displayRange = state;
-}
-
 void GraphLayer::setDisplayContact(bool state)
 {
     _displayContacts = state;
+    emit requestUpdate();
 }
+QWidget* GraphLayer::createControlWidget() const
+{
+    QWidget *control = new QWidget();
+    Ui::GraphLayerControl  *ui = new Ui::GraphLayerControl();
+    ui->setupUi(control);
 
+    connect(ui->displayContactCheckBox, SIGNAL(toggled(bool)), this, SLOT(setDisplayContact(bool)));
+
+
+    return control;
+}
 
 

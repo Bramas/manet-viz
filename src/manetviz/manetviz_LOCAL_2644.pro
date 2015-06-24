@@ -25,8 +25,6 @@ SOURCES += main.cpp\
     csvparser.cpp \
     graphloader.cpp \
     graphicsview.cpp \
-    pluginmanager.cpp
-    graphicsview.cpp \
     gtfsloader.cpp
 
 HEADERS  += mainwindow.h \
@@ -43,9 +41,6 @@ HEADERS  += mainwindow.h \
     graphloader.h \
     iviewerlayer.h \
     graphicsview.h \
-    igraphlayout.h \
-    pluginmanager.h \
-    igraphdecorator.h
     igraphlayout.h \
     gtfsloader.h
 

@@ -8,6 +8,7 @@
 #include "viewer.h"
 class IViewerLayer;
 class IGraphLayout;
+class IGraphDecorator;
 class AbstractEvolvingGraph;
 
 class Viewer : public QGraphicsScene
@@ -18,9 +19,12 @@ public:
     ~Viewer();
 
     QPointF toLocalCoordinates(QPointF globalCoordinates) const;
-    void addLayer(IViewerLayer * layer, int priority = 100) { _layers.insertMulti(priority, layer); }
+    void addLayer(IViewerLayer * layer, int priority = 100);
 
     mvtime time() const { return _time; }
+
+    QList<IViewerLayer* > layers() const { return _layers.values(); }
+    QList<IGraphDecorator* > graphDecorators() const { return _graphDecorators.values(); }
 
 
 
@@ -28,6 +32,8 @@ signals:
 
 public slots:
     void setTime(mvtime time);
+    void onPluginsChanged();
+    void updateLayers();
 
 protected:
     /*void paintEvent(QPaintEvent *);
@@ -37,15 +43,15 @@ protected:
 
 private:
 
-    bool loadPlugin(const AbstractEvolvingGraph *evg);
-
     IGraphLayout * _layout;
+    QMap<int, IGraphDecorator *> _graphDecorators;
     QMap<int, IViewerLayer*> _layers;
     mvtime _time;
     QPoint _lastMousePos;
     QPointF _afterTranslate;
     qreal _zoom;
     QElapsedTimer _timeSinceLastFrame;
+    const AbstractEvolvingGraph * _evolvingGraph;
 };
 
 #endif // VIEWER_H

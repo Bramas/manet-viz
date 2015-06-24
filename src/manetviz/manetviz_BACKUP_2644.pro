@@ -25,9 +25,11 @@ SOURCES += main.cpp\
     csvparser.cpp \
     graphloader.cpp \
     graphicsview.cpp \
-    pluginmanager.cpp
-    graphicsview.cpp \
+<<<<<<< HEAD
     gtfsloader.cpp
+=======
+    pluginmanager.cpp
+>>>>>>> e2a8cb4f6b18d90cba7fe9de22c77e44fba5579d
 
 HEADERS  += mainwindow.h \
     evolvinggraph.h \
@@ -44,10 +46,12 @@ HEADERS  += mainwindow.h \
     iviewerlayer.h \
     graphicsview.h \
     igraphlayout.h \
+<<<<<<< HEAD
+    gtfsloader.h
+=======
     pluginmanager.h \
     igraphdecorator.h
-    igraphlayout.h \
-    gtfsloader.h
+>>>>>>> e2a8cb4f6b18d90cba7fe9de22c77e44fba5579d
 
 FORMS    += mainwindow.ui \
     controlwidget.ui \
