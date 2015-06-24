@@ -38,6 +38,7 @@ void GTFSLoader::parseTrips()
     qDebug() << stopList.count() << " / " << timesList.count() << " / " << tripsList.count();
 
     // get all the trips (trajectories)
+    QMap<QString,Trip*> tripsMap = QMap<QString,Trip*>();
     foreach (auto trip, tripsList) {
         QString routeId = trip.value("route_id");
         QString serviceId = trip.value("service_id");
@@ -45,11 +46,11 @@ void GTFSLoader::parseTrips()
         QString tripHeadsign = trip.value("trip_headsign");
         QString directionId = trip.value("direction_id");
         QString shapeId = trip.value("shape_id");
-        _trajectories.insert(tripId,
-                             new Trajectory(routeId, serviceId, tripId, tripHeadsign, directionId, shapeId));
+        tripsMap.insert(tripId,
+                        new Trip(routeId, serviceId, tripId, tripHeadsign, directionId, shapeId));
     }
 
-    qDebug() << "trajectories count: " << _trajectories.count();
+    qDebug() << "trajectories count: " << tripsMap.count();
 
     // get all the stops
     QMap<QString,Stop*> stopMap = QMap<QString, Stop*>();
@@ -77,11 +78,18 @@ void GTFSLoader::parseTrips()
         Stop * stop = stopMap.value(stopId);
         arrivalTime = toSeconds(time.value("arrival_time"));
         departureTime = toSeconds(time.value("departure_time"));
+        if(!_trajectories.contains(tripId)){
+            // Add the trajectory to the Map
+            _trajectories.insert(tripId,
+                                 new Trajectory(*tripsMap.value(tripId)));
+        }
         _trajectories.value(tripId)->addWayPoint(arrivalTime,stop);
         if(departureTime > arrivalTime) {
             _trajectories.value(tripId)->addWayPoint(departureTime,stop);
         }
     }
+
+    qDebug() << "trajectories " << _trajectories.count();
 }
 
 mvtime GTFSLoader::toSeconds(QString time)

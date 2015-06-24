@@ -7,12 +7,12 @@
 #include <QGraphicsView>
 #include <QGLWidget>
 
+#include "graphicsview.h"
 #include "viewer.h"
 #include "controlwidget.h"
 #include "importdialog.h"
 #include "graphloader.h"
 #include "gtfsloader.h"
-#include "graphicsview.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),

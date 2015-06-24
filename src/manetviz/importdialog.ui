@@ -150,7 +150,7 @@
           </rect>
          </property>
          <property name="text">
-          <string>Trace Format</string>
+          <string>Trace format</string>
          </property>
         </widget>
         <widget class="QComboBox" name="comboBoxRegEx">
@@ -179,7 +179,7 @@
           </rect>
          </property>
          <property name="text">
-          <string>Time Format</string>
+          <string>Time format</string>
          </property>
         </widget>
         <widget class="QComboBox" name="comboBoxTimeFormat">
@@ -193,6 +193,58 @@
          </property>
          <property name="editable">
           <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="QComboBox" name="comboBoxInputProj">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>250</y>
+           <width>191</width>
+           <height>26</height>
+          </rect>
+         </property>
+         <property name="editable">
+          <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_9">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>230</y>
+           <width>161</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Input projection format</string>
+         </property>
+        </widget>
+        <widget class="QComboBox" name="comboBoxOutputProj">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>300</y>
+           <width>191</width>
+           <height>26</height>
+          </rect>
+         </property>
+         <property name="editable">
+          <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_10">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>280</y>
+           <width>161</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Output projection format</string>
          </property>
         </widget>
        </widget>

@@ -11,7 +11,6 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = manet-viz
 TEMPLATE = app
 
-
 SOURCES += main.cpp\
         mainwindow.cpp \
     evolvinggraph.cpp \
@@ -51,3 +50,5 @@ HEADERS  += mainwindow.h \
 FORMS    += mainwindow.ui \
     controlwidget.ui \
     importdialog.ui
+
+LIBS += -L/usr/local/lib -lproj

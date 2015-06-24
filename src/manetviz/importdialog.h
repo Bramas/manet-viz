@@ -3,7 +3,9 @@
 
 #include <QDialog>
 #include <QStandardItemModel>
+#include <QComboBox>
 
+#include "/usr/local/include/proj_api.h"
 #include "types.h"
 #include "graphloader.h"
 
@@ -25,10 +27,12 @@ private:
     QString _filename = "";
     QString _regEx = "";
     QString _timeFormat = "";
+    QString _projIn, _projOut;
     int _timeCol = -1;
     bool _isLoading;
     QStringList _regExps;
     QStringList _timeFormats;
+    QStringList _projIns, _projOuts;
     bool _hasHeading = false;
     bool _isMobilityTrace = true;
     bool _isContactTrace = false;
@@ -43,7 +47,9 @@ private:
     void processInputTable();
     bool isTimeFormatValid(QString format);
     bool isValidRegEx(QString regex);
+    bool isValidProj(QString proj);
     void checkConsistency();
+    bool toggleBoldFont(QComboBox * combo, bool isValid);
 
 private slots:
     void headingChanged();
@@ -52,6 +58,8 @@ private slots:
     void onAccepted();
     void regExEdited(QString);
     void timeFormatEdited(QString);
+    void projInEdited(QString);
+    void projOutEdited(QString);
     void headerChanged(QStandardItem *);
 };
 

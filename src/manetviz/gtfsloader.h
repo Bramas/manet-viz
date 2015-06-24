@@ -36,22 +36,52 @@ private:
     QString _name;
 };
 
-class Trajectory
+class Trip
 {
 public:
-    Trajectory():
+    Trip():
         _routeId(""), _serviceId(""), _tripId(""), _tripHeadsign(""), _directionId(""), _shapeId("") {}
-    Trajectory(QString routeId, QString serviceId, QString tripId, QString tripHeadsign, QString directionId, QString shapeId):
+    Trip(QString routeId, QString serviceId, QString tripId, QString tripHeadsign, QString directionId, QString shapeId):
         _routeId(routeId),
         _serviceId(serviceId),
         _tripId(tripId),
         _tripHeadsign(tripHeadsign),
         _directionId(directionId),
-        _shapeId(shapeId),
-        _trajectory(QMap<mvtime, WayPoint*>()) {}
+        _shapeId(shapeId) {}
+    Trip(Trip &t):
+        _routeId(t._routeId),
+        _serviceId(t._serviceId),
+        _tripId(t._tripId),
+        _tripHeadsign(t._tripHeadsign),
+        _directionId(t._directionId),
+        _shapeId(t._shapeId) {}
 
     QString getRouteId() const { return _routeId; }
     QString getServiceId() const { return _serviceId; }
+
+protected:
+    QString _routeId;
+    QString _serviceId;
+    QString _tripId;
+    QString _tripHeadsign;
+    QString _directionId;
+    QString _shapeId;
+
+};
+
+class Trajectory: public Trip
+{
+public:
+    Trajectory():
+        Trip() {}
+
+    Trajectory(QString routeId, QString serviceId, QString tripId, QString tripHeadsign, QString directionId, QString shapeId):
+        Trip(routeId, serviceId, tripId, tripHeadsign, directionId, shapeId),
+        _trajectory(QMap<mvtime, WayPoint*>()) {}
+    Trajectory(Trip t):
+        Trip(t),
+        _trajectory(QMap<mvtime, WayPoint*>()) {}
+
     QMap<mvtime, WayPoint*> getTrajectory() { return _trajectory; }
 
     // returns whether the vehicle is active at timestamp time
@@ -70,14 +100,7 @@ public:
     }
 
 private:
-    QString _routeId;
-    QString _serviceId;
-    QString _tripId;
-    QString _tripHeadsign;
-    QString _directionId;
-    QString _shapeId;
     QMap<mvtime, WayPoint *> _trajectory;
-
 };
 
 class GTFSLoader

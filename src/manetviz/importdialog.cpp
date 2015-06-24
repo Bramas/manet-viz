@@ -46,12 +46,26 @@ ImportDialog::ImportDialog(QString filename, QWidget *parent) :
     }
     _timeFormat = ui->comboBoxTimeFormat->currentText();
 
+    _projIns = settings.value("savedProjIns", QStringList()).toStringList();
+    if(_projIns.count() > 0) {
+        ui->comboBoxInputProj->addItems(_projIns);
+    }
+    _projIn = ui->comboBoxInputProj->currentText();
+
+    _projOuts = settings.value("savedProjOuts", QStringList()).toStringList();
+    if(_projOuts.count() > 0) {
+        ui->comboBoxOutputProj->addItems(_projOuts);
+    }
+    _projOut = ui->comboBoxOutputProj->currentText();
+
     connect(ui->checkBoxHeading, SIGNAL(stateChanged(int)), this, SLOT(headingChanged()));
     connect(ui->checkBoxContact, SIGNAL(stateChanged(int)), this, SLOT(contactChanged()));
     connect(ui->checkBoxMobility, SIGNAL(stateChanged(int)), this, SLOT(mobilityChanged()));
     connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(onAccepted()));
     connect(ui->comboBoxRegEx, SIGNAL(editTextChanged(QString)), this, SLOT(regExEdited(QString)));
     connect(ui->comboBoxTimeFormat, SIGNAL(editTextChanged(QString)), this, SLOT(timeFormatEdited(QString)));
+    connect(ui->comboBoxInputProj, SIGNAL(editTextChanged(QString)), this, SLOT(projInEdited(QString)));
+    connect(ui->comboBoxOutputProj, SIGNAL(editTextChanged(QString)), this, SLOT(projOutEdited(QString)));
     connect(_outputModel, SIGNAL(itemChanged(QStandardItem *)), this, SLOT(headerChanged(QStandardItem *)));
 
     // default for test purpose
@@ -213,17 +227,42 @@ void ImportDialog::headerChanged(QStandardItem * item)
 void ImportDialog::regExEdited(QString text)
 {
     _regEx = text;
-    QFont prevFont(ui->comboBoxRegEx->font()); // Get previous font
-    if(isValidRegEx(text)) {
-        prevFont.setBold(false);
-        ui->comboBoxRegEx->setFont(prevFont);
-    } else {
-        prevFont.setBold(true);
-        ui->comboBoxRegEx->setFont(prevFont);
-    }
-
     processOutputTable();
     checkConsistency();
+}
+
+void ImportDialog::projInEdited(QString text)
+{
+    _projIn = text;
+    checkConsistency();
+}
+
+void ImportDialog::projOutEdited(QString text)
+{
+    _projOut = text;
+    checkConsistency();
+}
+
+bool ImportDialog::isValidProj(QString proj)
+{
+    projPJ pj = pj_init_plus(proj.toStdString().c_str());
+    if(!pj) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+bool ImportDialog::toggleBoldFont(QComboBox * combo, bool isValid) {
+    QFont prevFont(combo->font()); // Get previous font
+    if(isValid) {
+        prevFont.setBold(false);
+        combo->setFont(prevFont);
+    } else {
+        prevFont.setBold(true);
+        combo->setFont(prevFont);
+    }
+    return isValid;
 }
 
 bool ImportDialog::isTimeFormatValid(QString format)
@@ -250,6 +289,7 @@ bool ImportDialog::isValidRegEx(QString regex)
     return QRegExp(regex).isValid();
 }
 
+
 void ImportDialog::checkConsistency()
 {
     // Consistency check
@@ -262,16 +302,13 @@ void ImportDialog::checkConsistency()
         if(_timeFormat.isEmpty()) {
             flag = true;
         } else {
-            bool isValid = isTimeFormatValid(_timeFormat);
-            QFont prevFont(ui->comboBoxTimeFormat->font()); // Get previous font
-            if(isValid) {
-                prevFont.setBold(false);
-                ui->comboBoxTimeFormat->setFont(prevFont);
-            } else {
-                prevFont.setBold(true);
-                ui->comboBoxTimeFormat->setFont(prevFont);
-            }
-            flag = !isValid;
+            flag = !toggleBoldFont(ui->comboBoxTimeFormat, isTimeFormatValid(_timeFormat));
+        }
+        if(!_projIn.isEmpty()) {
+            flag = !toggleBoldFont(ui->comboBoxInputProj, isValidProj(_projIn));
+        }
+        if(!_projOut.isEmpty()) {
+            flag = !toggleBoldFont(ui->comboBoxOutputProj, isValidProj(_projOut));
         }
         // Check whether the fields are well filled
         if(!(_TraceHeaders.values().count("Id") == 1 && _TraceHeaders.values().count("Time") == 1)) {
@@ -328,6 +365,8 @@ void ImportDialog::onAccepted()
     QSettings settings;
     settings.setValue("savedRegExps", _regExps);
     settings.setValue("savedTimeFormats", _timeFormats);
+    settings.setValue("savedProjIns", _projIns);
+    settings.setValue("savedProjOuts", _projOuts);
 }
 
 GraphLoader ImportDialog::createGraphLoader()
