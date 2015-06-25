@@ -27,9 +27,11 @@ private:
     QString _filename = "";
     QString _regEx = "";
     QString _timeFormat = "";
-    QString _projIn, _projOut;
+    QString _projIn = "";
+    QString _projOut = "";
     int _timeCol = -1;
     bool _isLoading;
+    bool _isTimeFormatValid = false, _isProjInValid = true, _isProjOutValid = true, _isRegExValid = false;
     QStringList _regExps;
     QStringList _timeFormats;
     QStringList _projIns, _projOuts;

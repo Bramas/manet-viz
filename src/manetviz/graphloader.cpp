@@ -6,7 +6,7 @@
 #include "abstractevolvinggraph.h"
 #include "evolvinggraph.h"
 
-GraphLoader::GraphLoader(QString filename, QRegExp lineRegex, QList<QString> headers, QString timeFormat) :
+GraphLoader::GraphLoader(QString filename, QRegExp lineRegex, QList<QString> headers, QString timeFormat, QString projIn, QString projOut) :
     _filename(filename),
     _lineRegex(lineRegex),
     _timeFormat(timeFormat),
@@ -15,6 +15,10 @@ GraphLoader::GraphLoader(QString filename, QRegExp lineRegex, QList<QString> hea
     _forceStop = false;
     _loadProgress = 0;
     _evolvingGraph = new EvolvingGraph();
+    if(!projIn.isEmpty() && !projOut.isEmpty()) {
+        _pjIn  = pj_init_plus(projIn.toStdString().c_str());
+        _pjOut = pj_init_plus(projOut.toStdString().c_str());
+    }
 }
 
 GraphLoader::GraphLoader(const GraphLoader &other) :
@@ -27,6 +31,8 @@ GraphLoader::GraphLoader(const GraphLoader &other) :
     _forceStop = false;
     _loadProgress = 0;
     _evolvingGraph = new EvolvingGraph();
+    _pjIn = other._pjIn;
+    _pjOut = other._pjOut;
 }
 
 GraphLoader::~GraphLoader()
@@ -151,6 +157,7 @@ void GraphLoader::processLine(QString line)
             time = capturedText.at(i + 1);
         } else if(header == "X") {
             x = capturedText.at(i + 1).toDouble();
+
         } else if(header == "Y"){
             y = capturedText.at(i + 1).toDouble();
         }
@@ -161,6 +168,11 @@ void GraphLoader::processLine(QString line)
     if(!dt.isValid()) {
         qWarning() << tr("The time ") << time << tr(" does not match the given time format ") << _timeFormat;
         return;
+    }
+
+    // Transformation to projected coordinates
+    if(_pjIn && _pjOut) {
+        pj_transform(_pjIn,_pjOut,1,1,&x,&y,NULL);
     }
 
     //QPointF p(x, y);

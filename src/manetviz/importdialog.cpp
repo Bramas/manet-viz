@@ -227,6 +227,12 @@ void ImportDialog::headerChanged(QStandardItem * item)
 void ImportDialog::regExEdited(QString text)
 {
     _regEx = text;
+    if(!text.isEmpty()) {
+        _isRegExValid = toggleBoldFont(ui->comboBoxRegEx, isValidRegEx(text));
+    } else {
+        _isRegExValid = true;
+    }
+
     processOutputTable();
     checkConsistency();
 }
@@ -234,23 +240,49 @@ void ImportDialog::regExEdited(QString text)
 void ImportDialog::projInEdited(QString text)
 {
     _projIn = text;
+    if(!text.isEmpty()) {
+        _isProjInValid = toggleBoldFont(ui->comboBoxInputProj, isValidProj(text));
+        qDebug() << "ProjIn is not empty - " << _isProjInValid;
+    } else {
+        _isProjInValid = true;
+        qDebug() << "ProjIn is empty - " << _isProjInValid;
+    }
     checkConsistency();
 }
 
 void ImportDialog::projOutEdited(QString text)
 {
     _projOut = text;
+    if(!text.isEmpty()) {
+        _isProjOutValid = toggleBoldFont(ui->comboBoxOutputProj, isValidProj(text));
+        qDebug() << "ProjOut is not empty - " << _isProjOutValid;
+    } else {
+        _isProjOutValid = true;
+        qDebug() << "ProjOut is not empty - " << _isProjOutValid;
+    }
+    checkConsistency();
+}
+
+void ImportDialog::timeFormatEdited(QString text)
+{
+    _timeFormat = text;
+    if(!text.isEmpty()) {
+        _isTimeFormatValid = toggleBoldFont(ui->comboBoxTimeFormat, isTimeFormatValid(_timeFormat));
+    } else {
+        _isTimeFormatValid = false;
+    }
     checkConsistency();
 }
 
 bool ImportDialog::isValidProj(QString proj)
 {
     projPJ pj = pj_init_plus(proj.toStdString().c_str());
+    bool ret = true;
     if(!pj) {
-        return false;
-    } else {
-        return true;
+        ret = false;
     }
+    pj_free(pj);
+    return ret;
 }
 
 bool ImportDialog::toggleBoldFont(QComboBox * combo, bool isValid) {
@@ -271,6 +303,7 @@ bool ImportDialog::isTimeFormatValid(QString format)
         // Check whehter the time format is valid
         QDateTime dt;
         QString timeSample = _outputModel->item(2,_timeCol)->data(Qt::EditRole).toString();
+        qDebug() << timeSample << format;
         if(format == "T") {
             dt = QDateTime::fromTime_t(timeSample.toUInt());
         } else if(format == "t") {
@@ -298,17 +331,13 @@ void ImportDialog::checkConsistency()
     if(_isLoading) {
         flag = true;
     } else {
+        qDebug() << "Time: " << _isTimeFormatValid << "ProjIn" << _isProjInValid << "ProjOut" << _isProjOutValid;
         // Check with the time format
-        if(_timeFormat.isEmpty()) {
+        if((_projIn.isEmpty() && !_projOut.isEmpty()) || (!_projIn.isEmpty() && _projOut.isEmpty())) {
             flag = true;
-        } else {
-            flag = !toggleBoldFont(ui->comboBoxTimeFormat, isTimeFormatValid(_timeFormat));
         }
-        if(!_projIn.isEmpty()) {
-            flag = !toggleBoldFont(ui->comboBoxInputProj, isValidProj(_projIn));
-        }
-        if(!_projOut.isEmpty()) {
-            flag = !toggleBoldFont(ui->comboBoxOutputProj, isValidProj(_projOut));
+        if(!_isProjInValid || !_isProjOutValid || !_isTimeFormatValid) {
+            flag = true;
         }
         // Check whether the fields are well filled
         if(!(_TraceHeaders.values().count("Id") == 1 && _TraceHeaders.values().count("Time") == 1)) {
@@ -324,12 +353,6 @@ void ImportDialog::checkConsistency()
 
     // Disable the "import" button
     ui->buttonBox->button(QDialogButtonBox::Ok)->setDisabled(flag);
-}
-
-void ImportDialog::timeFormatEdited(QString text)
-{
-    _timeFormat = text;
-    checkConsistency();
 }
 
 void ImportDialog::onAccepted()
@@ -372,5 +395,5 @@ void ImportDialog::onAccepted()
 GraphLoader ImportDialog::createGraphLoader()
 {
     QRegExp regEx(ui->comboBoxRegEx->currentText());
-    return GraphLoader(_filename, regEx, _TraceHeaders.values(), _timeFormat);
+    return GraphLoader(_filename, regEx, _TraceHeaders.values(), _timeFormat, _projIn, _projOut);
 }

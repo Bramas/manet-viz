@@ -6,7 +6,7 @@
 #include <QtConcurrent>
 #include <QFile>
 
-
+#include "/usr/local/include/proj_api.h"
 #include "types.h"
 
 class AbstractEvolvingGraph;
@@ -15,7 +15,7 @@ class GraphLoader : public QObject
 {
     Q_OBJECT
 public:
-    explicit GraphLoader(QString filename, QRegExp lineRegex, QList<QString> headers, QString timeFormat);
+    explicit GraphLoader(QString filename, QRegExp lineRegex, QList<QString> headers, QString timeFormat, QString projIn, QString projOut);
     GraphLoader(const GraphLoader &other);
     ~GraphLoader();
 
@@ -39,6 +39,8 @@ private:
     QString _filename;
     QRegExp _lineRegex;
     QString _timeFormat;
+    projPJ _pjIn;
+    projPJ _pjOut;
     QList<QString> _headers;
 
     QFuture<bool> _loadResult;
