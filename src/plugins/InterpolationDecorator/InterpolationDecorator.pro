@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 CONFIG += c++11
-QT       -= gui
+QT       += widgets
 DESTDIR         = ../../manetviz/plugins
 
 

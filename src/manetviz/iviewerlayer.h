@@ -5,6 +5,8 @@
 #include <QGraphicsScene>
 
 #include "viewer.h"
+#include "node.h"
+#include "graphicsitems.h"
 class QPainter;
 class AbstractEvolvingGraph;
 class IGraph;
@@ -19,6 +21,8 @@ public:
     virtual void setGraphicsScene(QGraphicsScene * scene) { _scene = scene; }
     virtual void paint(IGraph * graph) = 0;
     virtual QWidget * createControlWidget() const = 0;
+    virtual void decoratesGraphicsEdge(GraphicsEdgeItem * edge) const { return; }
+    virtual void decoratesGraphicsNode(GraphicsNodeItem * node) const { return; }
     virtual QObject* getQObject() = 0;
 
 protected:

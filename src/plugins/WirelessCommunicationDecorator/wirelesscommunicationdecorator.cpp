@@ -25,6 +25,8 @@ void WirelessCommunicationDecorator::decorateNodes(mvtime time, IGraph *graph)
 {
 
 }
+const QString X = "X";
+const QString Y = "Y";
 
 void WirelessCommunicationDecorator::decorateEdges(mvtime time, IGraph *graph)
 {
@@ -34,8 +36,8 @@ void WirelessCommunicationDecorator::decorateEdges(mvtime time, IGraph *graph)
         {
             if(n1.id() != n2.id())
             {
-                QVector2D p1(n1.properties().value("X").toDouble(), n1.properties().value("Y").toDouble());
-                QVector2D p2(n2.properties().value("X").toDouble(), n2.properties().value("Y").toDouble());
+                QVector2D p1(n1.properties().value(X).toDouble(), n1.properties().value(Y).toDouble());
+                QVector2D p2(n2.properties().value(X).toDouble(), n2.properties().value(Y).toDouble());
                 if(p1.distanceToPoint(p2) <= _communicationRange / 1000.0)
                 {
                     graph->addEdge(n1.id(),n2.id());
@@ -68,15 +70,15 @@ QWidget * WirelessCommunicationDecorator::createControlWidget() const
     return control;
 }
 
-QGraphicsItem*  WirelessCommunicationDecorator::graphicsNodeChildItem(const Node& n) const
+void  WirelessCommunicationDecorator::decoratesGraphicsNode(GraphicsNodeItem * node) const
 {
     if(!_displayRange)
-        return 0;
+        return ;
     qreal radius = _communicationRange / 1000.0;
     QPointF offset(radius,radius);
     QPen p;
     p.setWidth(0);
     QGraphicsEllipseItem* item = new QGraphicsEllipseItem(QRectF(-offset, offset));
     item->setPen(p);
-    return item;
+    item->setParentItem(node);
 }

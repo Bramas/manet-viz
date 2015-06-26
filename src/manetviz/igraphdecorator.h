@@ -4,6 +4,7 @@
 #include <QPointF>
 #include "abstractevolvinggraph.h"
 #include "node.h"
+#include "graphicsitems.h"
 
 class QGraphicsItem;
 
@@ -20,7 +21,8 @@ public:
     virtual QStringList requiredField() const { return QStringList(); }
 
     virtual QWidget*        createControlWidget() const { return 0; }
-    virtual QGraphicsItem*  graphicsNodeChildItem(const Node &n) const { return 0; }
+    virtual void decoratesGraphicsEdge(GraphicsEdgeItem * edge) const { return; }
+    virtual void decoratesGraphicsNode(GraphicsNodeItem * node) const { return; }
 
     virtual QObject* getQObject() = 0;
 };

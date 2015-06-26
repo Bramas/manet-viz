@@ -45,7 +45,8 @@ HEADERS  += mainwindow.h \
     pluginmanager.h \
     igraphdecorator.h \
     igraphlayout.h \
-    gtfsloader.h
+    gtfsloader.h \
+    graphicsitems.h
 
 FORMS    += mainwindow.ui \
     controlwidget.ui \

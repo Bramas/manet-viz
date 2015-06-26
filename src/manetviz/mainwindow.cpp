@@ -77,10 +77,11 @@ void MainWindow::openGTFS()
     ControlWidget * controlWidget = new ControlWidget();
 
     AbstractEvolvingGraph * evg = _gtfsLoader->evolvingGraph();
-    Viewer * gw = new Viewer(evg);
-    GraphicsView * v = new GraphicsView(gw, this);
+    Viewer * viewer = new Viewer(evg);
+    GraphicsView * v = new GraphicsView(viewer, this);
     v->scale(10,10);
-    connect(controlWidget, SIGNAL(timeChanged(mvtime)), gw, SLOT(setTime(mvtime)));
+    controlWidget->setViewer(viewer);
+    connect(controlWidget, SIGNAL(timeChanged(mvtime)), viewer, SLOT(setTime(mvtime)));
     setCentralWidget(v);
     this->addDockWidget(Qt::LeftDockWidgetArea, controlWidget);
 }

@@ -83,7 +83,6 @@ void ControlWidget::onPlayTimerTimeout()
         int add = floor(_cumulatedTime);
         _cumulatedTime -= add;
         ui->spinBoxTime->setValue(ui->spinBoxTime->value()+add);
-        emitTimeChanged();
     }
 }
 

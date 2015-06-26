@@ -26,9 +26,9 @@ void InterpolationDecorator::decorateNodes(mvtime time, IGraph *graph)
         {
             continue;
         }
-        QPointF upPoint(up.value().value("X").toDouble(), up.value().value("Y").toDouble());
         if(up != nodeTimeline->constBegin() && up.key() - (up - 1).key() < 300)
         {
+            QPointF upPoint(up.value().value("X").toDouble(), up.value().value("Y").toDouble());
             QMap<mvtime, NodeProperties >::const_iterator low = up - 1;
             QPointF lowPoint(low.value().value("X").toDouble(), low.value().value("Y").toDouble());
             QPointF p = (up.key() - time)*lowPoint + (time - low.key())*upPoint;
@@ -41,6 +41,7 @@ void InterpolationDecorator::decorateNodes(mvtime time, IGraph *graph)
         }
         else if(up.key() == time)
         {
+            QPointF upPoint(up.value().value("X").toDouble(), up.value().value("Y").toDouble());
             NodeProperties node;
             node.insert("X", upPoint.x());
             node.insert("Y", upPoint.y());

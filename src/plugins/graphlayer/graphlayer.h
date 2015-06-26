@@ -25,6 +25,9 @@ public:
 
     QWidget* createControlWidget() const;
 
+    QGraphicsItem*  graphicsNodeChildItem(const Node &n) const { return 0; }
+    void decoratesGraphicsEdge(GraphicsEdgeItem * node) const;
+
     QObject* getQObject() { return this; }
 
 

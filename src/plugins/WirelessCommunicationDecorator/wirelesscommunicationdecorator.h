@@ -29,7 +29,7 @@ public:
     QObject * getQObject() { return this; }
 
     QWidget * createControlWidget() const;
-    QGraphicsItem*  graphicsNodeChildItem(const Node &n) const;
+    void  decoratesGraphicsNode(GraphicsNodeItem * node) const;
 public slots:
     void setCommunicationRange(int);
     void setDisplayRange(bool);
