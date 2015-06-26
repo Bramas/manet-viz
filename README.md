@@ -26,6 +26,28 @@ Since we want to work with distances and spatial operations, we use a projected 
 +proj=utm +zone=33 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs
 ```
 
+To add a new plugin uder QT:
+Right click on Plugin directory > Add new Subproject > Library > C++ Library > Fill the name > Requires `QtWidget`,`QtGui`,`QtCore` > Create the files you need to implement the decorator
+Add in the `*.pro` file:
+```
+INCLUDEPATH    += ../../manetviz
+DESTDIR         = ../../manetviz/plugins
+```
+
+In the `<plugin_name>.h` file, add:
+```c++
+#include <QObject>
+#include "<plugin_name>.h"
+```
+
+Create a new file in the plugin directory of the name: `<plugin_name>.json` that includes:
+```
+{
+"name" : "<plugin_name>",
+"version" : "0.0.1",
+"dependencies" : []
+}
+```
 
 [1]:	http://crawdad.cs.dartmouth.edu/roma/taxi/ "Crawdad roma/taxi dataset"
 [2]: http://spatialreference.org/ref/epsg/wgs-84/ "ESPG:4326"
