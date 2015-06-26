@@ -58,22 +58,26 @@ ImportDialog::ImportDialog(QString filename, QWidget *parent) :
     }
     _projOut = ui->comboBoxOutputProj->currentText();
 
-    connect(ui->checkBoxHeading, SIGNAL(stateChanged(int)), this, SLOT(headingChanged()));
-    connect(ui->checkBoxContact, SIGNAL(stateChanged(int)), this, SLOT(contactChanged()));
-    connect(ui->checkBoxMobility, SIGNAL(stateChanged(int)), this, SLOT(mobilityChanged()));
-    connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(onAccepted()));
-    connect(ui->comboBoxRegEx, SIGNAL(editTextChanged(QString)), this, SLOT(regExEdited(QString)));
-    connect(ui->comboBoxTimeFormat, SIGNAL(editTextChanged(QString)), this, SLOT(timeFormatEdited(QString)));
-    connect(ui->comboBoxInputProj, SIGNAL(editTextChanged(QString)), this, SLOT(projInEdited(QString)));
-    connect(ui->comboBoxOutputProj, SIGNAL(editTextChanged(QString)), this, SLOT(projOutEdited(QString)));
-    connect(_outputModel, SIGNAL(itemChanged(QStandardItem *)), this, SLOT(headerChanged(QStandardItem *)));
-
     // default for test purpose
     //ui->lineEditRegEx->setText("(\\d+);([^;]+);POINT\\(([^ ]+) ([^ ]+)\\)");
 
+    connect(ui->checkBoxHeading,  SIGNAL(stateChanged(int)), this, SLOT(headingChanged()));
+    connect(ui->checkBoxContact,  SIGNAL(stateChanged(int)), this, SLOT(contactChanged()));
+    connect(ui->checkBoxMobility, SIGNAL(stateChanged(int)), this, SLOT(mobilityChanged()));
+    connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(onAccepted()));
+    connect(ui->comboBoxRegEx,      SIGNAL(editTextChanged(QString)), this, SLOT(regExEdited(QString)));
+    connect(ui->comboBoxTimeFormat, SIGNAL(editTextChanged(QString)), this, SLOT(timeFormatEdited(QString)));
+    connect(ui->comboBoxInputProj,  SIGNAL(editTextChanged(QString)), this, SLOT(projInEdited(QString)));
+    connect(ui->comboBoxOutputProj, SIGNAL(editTextChanged(QString)), this, SLOT(projOutEdited(QString)));
+    connect(_outputModel, SIGNAL(itemChanged(QStandardItem *)), this, SLOT(headerChanged(QStandardItem *)));
+
     processSampleTrace(10);
     processInputTable();
-    processOutputTable();
+
+    regExEdited(_regEx);
+    timeFormatEdited(_timeFormat);
+    projInEdited(_projIn);
+    projOutEdited(_projOut);
 }
 
 void ImportDialog::processSampleTrace(int nbLines)
@@ -271,6 +275,7 @@ void ImportDialog::timeFormatEdited(QString text)
     } else {
         _isTimeFormatValid = false;
     }
+    qDebug() << "time format is valid" << _isTimeFormatValid;
     checkConsistency();
 }
 
@@ -366,7 +371,7 @@ void ImportDialog::onAccepted()
         if(idx != -1) {
             _regExps.removeAt(idx);
         }
-        _regExps.push_front(ui->comboBoxRegEx->currentText());
+        _regExps.push_front(regEx);
         if(_regExps.count() > 5) {
             _regExps.removeLast();
         }
@@ -379,9 +384,35 @@ void ImportDialog::onAccepted()
         if(idx != -1) {
             _timeFormats.removeAt(idx);
         }
-        _timeFormats.push_front(ui->comboBoxTimeFormat->currentText());
+        _timeFormats.push_front(timeFormat);
         if(_timeFormats.count() > 5) {
             _timeFormats.removeLast();
+        }
+    }
+
+    // Do the same for the input projection
+    if(!ui->comboBoxInputProj->currentText().isEmpty()){
+        QString projIn = ui->comboBoxInputProj->currentText();
+        int idx = _projIns.indexOf(projIn);
+        if(idx != -1) {
+            _projIns.removeAt(idx);
+        }
+        _projIns.push_front(projIn);
+        if(_projIns.count() > 5) {
+            _projIns.removeLast();
+        }
+    }
+
+    // Do the same for the output projection
+    if(!ui->comboBoxOutputProj->currentText().isEmpty()){
+        QString projOut = ui->comboBoxOutputProj->currentText();
+        int idx = _projIn.indexOf(projOut);
+        if(idx != -1) {
+            _projOuts.removeAt(idx);
+        }
+        _projOuts.push_front(projOut);
+        if(_projOuts.count() > 5) {
+            _projOuts.removeLast();
         }
     }
 
