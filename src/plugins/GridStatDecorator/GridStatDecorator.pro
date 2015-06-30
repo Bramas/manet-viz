@@ -6,6 +6,7 @@
 
 TARGET = GridStatDecorator
 TEMPLATE = lib
+QT       += widgets
 INCLUDEPATH    += ../../manetviz
 DESTDIR         = ../../manetviz/plugins
 

@@ -146,7 +146,7 @@ void GraphLoader::processLine(QString line)
     }
 
     int id = 0;
-    qreal x = 0, y = 0;
+    double lat = 0, lon = 0, x = 0, y = 0;
     QString time;
     for(int i = 0; i < _headers.size(); ++i)
     {
@@ -155,11 +155,11 @@ void GraphLoader::processLine(QString line)
             id = capturedText.at(i + 1).toInt();
         } else if(header == "Time") {
             time = capturedText.at(i + 1);
-        } else if(header == "X") {
-            x = capturedText.at(i + 1).toDouble();
+        } else if(header == X) {
+            lat = capturedText.at(i + 1).toDouble();
 
-        } else if(header == "Y"){
-            y = capturedText.at(i + 1).toDouble();
+        } else if(header == Y){
+            lon = capturedText.at(i + 1).toDouble();
         }
     }
 
@@ -170,14 +170,15 @@ void GraphLoader::processLine(QString line)
         return;
     }
 
-    // Transformation to projected coordinates
+    // Transformation of the lat/lon coordinates to projected coordinates
     if(_pjIn && _pjOut) {
-        pj_transform(_pjIn,_pjOut,1,1,&x,&y,NULL);
+        x = lon * DEG_TO_RAD;
+        y = lat * DEG_TO_RAD;
+        pj_transform(_pjIn, _pjOut, 1, 1, &x, &y, NULL);
     }
 
-    //QPointF p(x, y);
     QHash<QString, QVariant> props;
-    props.insert("X", x);
-    props.insert("Y", y);
+    props.insert(X, x);
+    props.insert(Y, y);
     _evolvingGraph->addNode(id, mvt, props);
 }

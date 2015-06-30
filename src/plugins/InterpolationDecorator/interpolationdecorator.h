@@ -28,6 +28,8 @@ public:
 
     QObject * getQObject() { return this; }
 
+    virtual QString toString() const { return "InterpolationDecorator"; }
+
 
 private:
     const AbstractEvolvingGraph * _evolvingGraph;

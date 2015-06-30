@@ -26,8 +26,6 @@ public:
     QList<IViewerLayer* > layers() const { return _layers.values(); }
     QList<IGraphDecorator* > graphDecorators() const { return _graphDecorators.values(); }
 
-
-
 signals:
 
 public slots:
@@ -52,6 +50,7 @@ private:
     qreal _zoom;
     QElapsedTimer _timeSinceLastFrame;
     const AbstractEvolvingGraph * _evolvingGraph;
+    QGraphicsItemGroup * _items;
 };
 
 #endif // VIEWER_H

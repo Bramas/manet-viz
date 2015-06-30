@@ -24,18 +24,27 @@
     <rect>
      <x>10</x>
      <y>30</y>
-     <width>160</width>
+     <width>151</width>
      <height>22</height>
     </rect>
    </property>
+   <property name="maximum">
+    <number>500</number>
+   </property>
+   <property name="sliderPosition">
+    <number>100</number>
+   </property>
    <property name="orientation">
     <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="tickPosition">
+    <enum>QSlider::NoTicks</enum>
    </property>
   </widget>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>10</x>
      <y>10</y>
      <width>151</width>
      <height>16</height>
@@ -56,6 +65,19 @@
    </property>
    <property name="text">
     <string>Display range</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelTransmissionRange">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>30</y>
+     <width>31</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
    </property>
   </widget>
  </widget>

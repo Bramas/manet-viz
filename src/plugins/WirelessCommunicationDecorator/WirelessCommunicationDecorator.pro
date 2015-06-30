@@ -26,5 +26,5 @@ unix {
 DISTFILES += \
     wirelesscommunicationdecorator.json
 
-FORMS += \
-    control.ui
+FORMS += control.ui
+

@@ -5,6 +5,9 @@
 #include <QReadWriteLock>
 #include <QPluginLoader>
 #include <QStringList>
+#include <QString>
+#include <QMap>
+#include <QDebug>
 
 class PluginManager : public QObject
 {
@@ -12,7 +15,6 @@ class PluginManager : public QObject
 public:
     static PluginManager instance;
     ~PluginManager();
-
 
     static QReadWriteLock *listLock();
     static QList<QObject *> allObjects();
@@ -26,13 +28,14 @@ public:
             if (result)
                 results += result;
         }
+        qDebug() << results.size();
         return results;
     }
 
     static void loadPlugins();
     static QStringList pluginPaths();
     static void setPluginPaths(const QStringList &paths);
-
+    static QObject * getPlugin(QString name);
 
     enum PluginState { Invalid, Loaded, Initialized, Running, Stopped, Deleted};
 
@@ -43,10 +46,10 @@ public slots:
 
 private:
     explicit PluginManager(QObject *parent = 0);
-    static QStringList loadFilenames();
+    static QList<QPair<QString,QString> > loadFilenames();
 
 
-    QList<QObject *> _allObjects;
+    QList<QPair<QString, QObject *> > _allObjects;
     mutable QReadWriteLock _listLock;
     QStringList _pluginPath;
 };

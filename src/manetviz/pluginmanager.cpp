@@ -3,6 +3,7 @@
 #include <QDir>
 #include <QSet>
 #include <QDebug>
+#include <QJsonArray>
 
 PluginManager PluginManager::instance;
 
@@ -24,28 +25,45 @@ QReadWriteLock * PluginManager::listLock()
 
 QList<QObject *> PluginManager::allObjects()
 {
-    return instance._allObjects;
+    QList<QObject *> ret;
+    foreach(auto o, instance._allObjects) {
+        ret.append(o.second);
+    }
+
+    return ret;
+}
+
+QObject * PluginManager::getPlugin(QString name){
+    foreach(auto o, instance._allObjects) {
+        if(o.first == name)
+            return o.second;
+    }
+    return NULL;
 }
 
 void PluginManager::loadPlugins()
 {
-    QStringList pluginFilenames = loadFilenames();
+    QList<QPair<QString,QString> > pluginFilenames = loadFilenames();
 
-    foreach (const QString & filename, pluginFilenames) {
-        QPluginLoader loader(filename);
+    foreach (auto filename, pluginFilenames) {
+        QPluginLoader loader(filename.second);
         if(!loader.load())
         {
-            qWarning()<<"Unable to laod plugin: "<<filename;
+            qWarning()<<"Unable to laod plugin: "<<filename.first;
             continue;
         }
-        instance._allObjects << loader.instance();
+        qDebug() << "Load " << filename.first;
+        instance._allObjects.append(qMakePair(filename.first, loader.instance()));
     }
 }
 
-QStringList PluginManager::loadFilenames()
+QList<QPair<QString,QString> > PluginManager::loadFilenames()
 {
-    QSet<QString> pluginNames;
-    QStringList filenames;
+    QSet<QString> loadedPlugins;
+    QMap<QString, QString> pluginNames;
+    QMap<QString,QStringList*> dependancyStack;
+    QList<QPair<QString,QString>> filenames;
+
     foreach(const QString &path, pluginPaths())
     {
         QDir pluginsDir(path);
@@ -54,6 +72,8 @@ QStringList PluginManager::loadFilenames()
             QPluginLoader loader(pluginsDir.absoluteFilePath(filename));
             QJsonObject meta = loader.metaData();
             QString name = meta.value("MetaData").toObject().value("name").toString();
+
+
             if(name.isEmpty() || pluginNames.contains(name))
             {
                 if(name.isEmpty())
@@ -62,12 +82,58 @@ QStringList PluginManager::loadFilenames()
                 }
                 else
                 {
-                    qDebug()<<"Duplicate plugin: "<<name;
+                    qDebug()<<"Duplicate plugin: " << name;
                 }
                 continue;
             }
-            pluginNames.insert(name);
-            filenames << pluginsDir.absoluteFilePath(filename);
+
+            // Add the plugin in the dependancy stack
+            dependancyStack.insert(name, new QStringList());
+            pluginNames.insert(name,pluginsDir.absoluteFilePath(filename));
+
+            // Add dependancies
+            QStringList dependancyList = meta.value("MetaData").toObject().value("dependencies").toVariant().toStringList();
+            foreach(QString dep, dependancyList) {
+                if(!loadedPlugins.contains(dep)) {
+                    dependancyStack.value(name)->push_back(dep);
+                }
+            }
+
+            // finally add the plugin that satisfies all dependancies
+            if(dependancyStack.value(name)->size() == 0) {
+                // Add the plugin
+                dependancyStack.remove(name);
+                loadedPlugins.insert(name);
+                filenames << qMakePair(name,pluginNames.value(name));
+//                filenames << pluginNames.value(name);
+            }
+        }
+    }
+
+    // Check the dependancies for non-loaded plugins
+    while (!dependancyStack.isEmpty())
+    {
+        // check if the current pluging satisfies the dependancies
+        for(auto i = dependancyStack.begin(); i != dependancyStack.end();) {
+            QString name = i.key();
+            QStringList * depList = dependancyStack.value(name);
+            QMutableListIterator<QString> j(*depList);
+            while (j.hasNext()) {
+                QString dep = j.next();
+                if(pluginNames.contains(dep)) {
+                    // delete the dependancy in the list
+                    j.remove();
+                }
+            }
+            if(depList->isEmpty()) {
+                // delete the plugin from the stack (increment the iterator) and load the plugin
+                i = dependancyStack.erase(i);
+                loadedPlugins.insert(name);
+                filenames << qMakePair(name,pluginNames.value(name));
+//                filenames << pluginNames.value(name);
+            } else {
+                ++i;
+            }
         }
     }
 

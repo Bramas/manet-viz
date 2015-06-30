@@ -13,7 +13,6 @@ GraphLayer::GraphLayer()
 
 void GraphLayer::paint(IGraph * graph)
 {
-    return;
     //Graph g = _evolvingGraph->footprint(_evolvingGraph->beginTime() + graph);//_parent->time());
 
     _scene->removeItem(items);
@@ -30,8 +29,8 @@ void GraphLayer::paint(IGraph * graph)
         {
             foreach(int n2, n1.neighbors())
             {
-                QPointF p1(n1.properties().value("X").toDouble(), n1.properties().value("Y").toDouble());
-                QPointF p2(graph->nodes().value(n2).properties().value("X").toDouble(), graph->nodes().value(n2).properties().value("Y").toDouble());
+                QPointF p1(n1.properties().value(X).toDouble(), n1.properties().value(Y).toDouble());
+                QPointF p2(graph->nodes().value(n2).properties().value(X).toDouble(), graph->nodes().value(n2).properties().value(Y).toDouble());
                 GraphicsEdgeItem * line = new GraphicsEdgeItem(p1, p2);
                 line->setPen(p);
                 items->addToGroup((QGraphicsItem*) line);
@@ -42,7 +41,7 @@ void GraphLayer::paint(IGraph * graph)
     p.setWidthF(4);
     foreach(const Node &n, graph->nodes())
     {
-        QPointF position(n.properties().value("X").toDouble(), n.properties().value("Y").toDouble());
+        QPointF position(n.properties().value(X).toDouble(), n.properties().value(Y).toDouble());
         GraphicsNodeItem * i = new GraphicsNodeItem(position);
         i->setPen(p);
         items->addToGroup((QGraphicsItem*)i);
@@ -70,7 +69,6 @@ QWidget* GraphLayer::createControlWidget() const
     ui->setupUi(control);
 
     connect(ui->displayContactCheckBox, SIGNAL(toggled(bool)), this, SLOT(setDisplayContact(bool)));
-
 
     return control;
 }

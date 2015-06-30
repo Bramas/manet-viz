@@ -24,6 +24,7 @@ public:
     virtual void decoratesGraphicsEdge(GraphicsEdgeItem * edge) const { return; }
     virtual void decoratesGraphicsNode(GraphicsNodeItem * node) const { return; }
     virtual QObject* getQObject() = 0;
+    virtual QString toString() const { return ""; }
 
 protected:
     const AbstractEvolvingGraph * _evolvingGraph;

@@ -5,15 +5,13 @@
 #include <QGraphicsEllipseItem>
 #include <QPen>
 
-#include  "ui_control.h"
-
-
 #include "graph.h"
 #include "types.h"
 
-WirelessCommunicationDecorator::WirelessCommunicationDecorator()
+WirelessCommunicationDecorator::WirelessCommunicationDecorator():
+    ui(new Ui::Control)
 {
-    _communicationRange = 2;
+    _communicationRange = 100;
     _displayRange = false;
 }
 void WirelessCommunicationDecorator::setEvolvingGraph(const AbstractEvolvingGraph *evolvingGraph)
@@ -25,8 +23,6 @@ void WirelessCommunicationDecorator::decorateNodes(mvtime time, IGraph *graph)
 {
 
 }
-const QString X = "X";
-const QString Y = "Y";
 
 void WirelessCommunicationDecorator::decorateEdges(mvtime time, IGraph *graph)
 {
@@ -38,7 +34,7 @@ void WirelessCommunicationDecorator::decorateEdges(mvtime time, IGraph *graph)
             {
                 QVector2D p1(n1.properties().value(X).toDouble(), n1.properties().value(Y).toDouble());
                 QVector2D p2(n2.properties().value(X).toDouble(), n2.properties().value(Y).toDouble());
-                if(p1.distanceToPoint(p2) <= _communicationRange / 1000.0)
+                if(p1.distanceToPoint(p2) <= _communicationRange)
                 {
                     graph->addEdge(n1.id(),n2.id());
                 }
@@ -50,7 +46,9 @@ void WirelessCommunicationDecorator::decorateEdges(mvtime time, IGraph *graph)
 void WirelessCommunicationDecorator::setCommunicationRange(int range)
 {
     _communicationRange = range;
+    ui->labelTransmissionRange->setText(QString::number(range));
     emit requestUpdate();
+    emit transmissionRangeChanged(range);
 }
 
 void WirelessCommunicationDecorator::setDisplayRange(bool state)
@@ -62,9 +60,8 @@ void WirelessCommunicationDecorator::setDisplayRange(bool state)
 QWidget * WirelessCommunicationDecorator::createControlWidget() const
 {
     QWidget * control = new QWidget();
-    Ui::Control * ui = new Ui::Control();
     ui->setupUi(control);
-
+    ui->labelTransmissionRange->setText(QString::number(_communicationRange));
     connect(ui->displayRangeCheckBox, SIGNAL(toggled(bool)), this, SLOT(setDisplayRange(bool)));
     connect(ui->transmissionRangeSlider, SIGNAL(valueChanged(int)), this, SLOT(setCommunicationRange(int)));
     return control;
@@ -74,7 +71,7 @@ void  WirelessCommunicationDecorator::decoratesGraphicsNode(GraphicsNodeItem * n
 {
     if(!_displayRange)
         return ;
-    qreal radius = _communicationRange / 1000.0;
+    qreal radius = _communicationRange;
     QPointF offset(radius,radius);
     QPen p;
     p.setWidth(0);

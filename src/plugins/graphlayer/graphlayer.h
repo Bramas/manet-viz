@@ -22,13 +22,13 @@ public:
     void paint(IGraph * graph) Q_DECL_OVERRIDE;
     void setGraphicsScene(QGraphicsScene * scene);
 
-
     QWidget* createControlWidget() const;
 
     QGraphicsItem*  graphicsNodeChildItem(const Node &n) const { return 0; }
     void decoratesGraphicsEdge(GraphicsEdgeItem * node) const;
 
     QObject* getQObject() { return this; }
+    virtual QString toString() const { return "GraphLayer"; }
 
 
 public slots:

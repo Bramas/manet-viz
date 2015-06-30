@@ -5,6 +5,7 @@
 
 #include <QObject>
 
+#include  "ui_control.h"
 #include "igraphdecorator.h"
 #include "types.h"
 #include "graph.h"
@@ -30,16 +31,21 @@ public:
 
     QWidget * createControlWidget() const;
     void  decoratesGraphicsNode(GraphicsNodeItem * node) const;
+    QString toString() const { return "WirelessCommunicationDecorator"; }
+
 public slots:
     void setCommunicationRange(int);
     void setDisplayRange(bool);
 
 signals:
     void requestUpdate();
+    void transmissionRangeChanged(int);
+
 private:
     const AbstractEvolvingGraph * _evolvingGraph;
-
+    Ui::Control *ui;
     bool _displayRange;
     int _communicationRange;
+
 };
 #endif // WIRELESSCOMMUNICATIONDECORATOR_H

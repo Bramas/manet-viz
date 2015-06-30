@@ -25,9 +25,9 @@ public:
     virtual void decoratesGraphicsNode(GraphicsNodeItem * node) const { return; }
 
     virtual QObject* getQObject() = 0;
+
+    virtual QString toString() const { return ""; }
 };
-
-
 
 QT_BEGIN_NAMESPACE
 

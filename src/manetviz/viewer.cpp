@@ -10,9 +10,7 @@
 #include <QGLWidget>
 #include <QGraphicsItem>
 #include <QPointF>
-
-
-
+#include <QDebug>
 
 Viewer::Viewer(const AbstractEvolvingGraph * evg)
 {
@@ -61,11 +59,16 @@ void Viewer::updateLayers()
 
     _layout->footprint(_time, graph);
 
+//    this->clear();
 
-    this->clear();
+    if(this->items().contains(_items)) {
+        this->removeItem(_items);
+        delete _items;
+    }
 
+    _items = new QGraphicsItemGroup();
 
-    QGraphicsItemGroup * items = new QGraphicsItemGroup();
+    // set pen to display edges
     QPen p(QColor(255,0,0));
     p.setWidth(1);
     p.setCosmetic(true);
@@ -76,8 +79,8 @@ void Viewer::updateLayers()
         {
             if(n1.id() < n2)
             {
-                QPointF p1(n1.properties().value("X").toDouble(), n1.properties().value("Y").toDouble());
-                QPointF p2(graph->nodes().value(n2).properties().value("X").toDouble(), graph->nodes().value(n2).properties().value("Y").toDouble());
+                QPointF p1(n1.properties().value(X).toDouble(), n1.properties().value(Y).toDouble());
+                QPointF p2(graph->nodes().value(n2).properties().value(X).toDouble(), graph->nodes().value(n2).properties().value(Y).toDouble());
                 QPointF middle = (p1 + p2) / 2.0;
                 GraphicsEdgeItem * edge = new GraphicsEdgeItem(p1 - middle, p2 - middle);
                 edge->setPen(p);
@@ -92,16 +95,18 @@ void Viewer::updateLayers()
                     layer->decoratesGraphicsEdge(edge);
                 }
 
-                items->addToGroup(edge);
+                _items->addToGroup(edge);
             }
         }
     }
+
+    // Set pen to dsiplay nodes
     p.setColor(QColor(0,0,0));
     p.setWidthF(4);
 
     foreach(const Node &n, graph->nodes())
     {
-        QPointF position(n.properties().value("X").toDouble(), n.properties().value("Y").toDouble());
+        QPointF position(n.properties().value(X).toDouble(), n.properties().value(Y).toDouble());
         GraphicsNodeItem * node = new GraphicsNodeItem();
         node->setPen(p);
         node->setPos(position);
@@ -113,16 +118,15 @@ void Viewer::updateLayers()
         {
             layer->decoratesGraphicsNode(node);
         }
-        items->addToGroup(node);
+        _items->addToGroup(node);
     }
-    this->addItem(items);
+    this->addItem(_items);
     update();
 
     foreach(auto layer, _layers)
     {
         layer->paint(graph);
     }
-
     update();
 }
 
@@ -198,8 +202,8 @@ void Viewer::onPluginsChanged()
         layer->setEvolvingGraph(_evolvingGraph);
         layer->setGraphicsScene(this);
         addLayer(layer);
-        continue;
-    }
+        qDebug() << "layer" << layer->toString();
+   }
 
     foreach(IGraphLayout * layout, PluginManager::getObjects<IGraphLayout>())
     {
@@ -211,6 +215,7 @@ void Viewer::onPluginsChanged()
     {
          decorator->setEvolvingGraph(_evolvingGraph);
          _graphDecorators.insertMulti(100, decorator);
+         qDebug() << "decorator" << decorator->toString();
          connect(decorator->getQObject(), SIGNAL(requestUpdate()), this, SLOT(updateLayers()));
     }
 }
