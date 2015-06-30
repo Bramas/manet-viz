@@ -42,19 +42,20 @@ void Viewer::setTime(mvtime time)
 }
 void Viewer::updateLayers()
 {
-    if(!_layout)
+    if(!_layout) {
+        qDebug() << "no layout";
         return;
-
+    }
     IGraph * graph = new Graph();
 
 
-    foreach(auto decorator, _graphDecorators)
+    foreach(auto layer, _layers)
     {
-        decorator->decorateNodes(_time, graph);
+        layer->decorateNodes(_time, graph);
     }
-    foreach(auto decorator, _graphDecorators)
+    foreach(auto layer, _layers)
     {
-        decorator->decorateEdges(_time, graph);
+        layer->decorateEdges(_time, graph);
     }
 
     _layout->footprint(_time, graph);
@@ -86,10 +87,6 @@ void Viewer::updateLayers()
                 edge->setPen(p);
                 edge->setPos(middle);
 
-                foreach(auto decorator, _graphDecorators)
-                {
-                    decorator->decoratesGraphicsEdge(edge);
-                }
                 foreach(auto layer, _layers)
                 {
                     layer->decoratesGraphicsEdge(edge);
@@ -110,10 +107,6 @@ void Viewer::updateLayers()
         GraphicsNodeItem * node = new GraphicsNodeItem();
         node->setPen(p);
         node->setPos(position);
-        foreach(auto decorator, _graphDecorators)
-        {
-            decorator->decoratesGraphicsNode(node);
-        }
         foreach(auto layer, _layers)
         {
             layer->decoratesGraphicsNode(node);
@@ -203,6 +196,7 @@ void Viewer::onPluginsChanged()
         layer->setGraphicsScene(this);
         addLayer(layer);
         qDebug() << "layer" << layer->toString();
+        connect(layer->getQObject(), SIGNAL(requestUpdate()), this, SLOT(updateLayers()));
    }
 
     foreach(IGraphLayout * layout, PluginManager::getObjects<IGraphLayout>())
@@ -210,12 +204,5 @@ void Viewer::onPluginsChanged()
          layout->setEvolvingGraph(_evolvingGraph);
          _layout = layout;
          break;
-    }
-    foreach(IGraphDecorator * decorator, PluginManager::getObjects<IGraphDecorator>())
-    {
-         decorator->setEvolvingGraph(_evolvingGraph);
-         _graphDecorators.insertMulti(100, decorator);
-         qDebug() << "decorator" << decorator->toString();
-         connect(decorator->getQObject(), SIGNAL(requestUpdate()), this, SLOT(updateLayers()));
     }
 }

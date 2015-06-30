@@ -1,5 +1,6 @@
 {
 "name" : "GridStatDecorator",
 "version" : "0.0.1",
-"dependencies" : ["InterpolationDecorator", "WirelessCommunicationDecorator"]
+"dependencies" : ["InterpolationDecorator"],
+"active" : "false"
 }

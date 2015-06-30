@@ -31,7 +31,6 @@ void GridStatDecorator::setEvolvingGraph(const AbstractEvolvingGraph *evolvingGr
     QPointF topLeft(MaxDist,MaxDist);
     QPointF bottomRight(-MaxDist,-MaxDist);
 
-
     foreach(auto id, _evolvingGraph->nodes().keys()) {
         auto nodeTimeline = _evolvingGraph->nodes().value(id);
         for(auto it = nodeTimeline->begin(); it != nodeTimeline->end(); ++it) {
@@ -64,26 +63,6 @@ void GridStatDecorator::setEvolvingGraph(const AbstractEvolvingGraph *evolvingGr
     // binning algorithm
     // real-time collision detection
     // hexgrid http://www.redblobgames.com/ || http://www.redblobgames.com/grids/hexagons/implementation.html
-
-}
-
-void GridStatDecorator::decorateEdges(mvtime time, IGraph *graph)
-{
-
-}
-
-void GridStatDecorator::decorateNodes(mvtime time, IGraph *graph)
-{
-
-}
-
-QWidget* GridStatDecorator::createControlWidget() const
-{
-    return NULL;
-}
-
-void GridStatDecorator::paint(IGraph * graph)
-{
 
 }
 

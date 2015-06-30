@@ -5,9 +5,6 @@
 #include <QGraphicsEllipseItem>
 #include <QPen>
 
-#include "graph.h"
-#include "types.h"
-
 WirelessCommunicationDecorator::WirelessCommunicationDecorator():
     ui(new Ui::Control)
 {

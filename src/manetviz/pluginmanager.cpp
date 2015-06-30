@@ -72,15 +72,18 @@ QList<QPair<QString,QString> > PluginManager::loadFilenames()
             QPluginLoader loader(pluginsDir.absoluteFilePath(filename));
             QJsonObject meta = loader.metaData();
             QString name = meta.value("MetaData").toObject().value("name").toString();
+            bool active = meta.value("MetaData").toObject().value("active").toVariant().toBool();
 
-
-            if(name.isEmpty() || pluginNames.contains(name))
+            if(!active || name.isEmpty() || pluginNames.contains(name))
             {
-                if(name.isEmpty())
+                if (!active) {
+                    qDebug()<<"Plugin non active: " << name;
+                }
+                else if(name.isEmpty())
                 {
                     qDebug()<<pluginsDir.absoluteFilePath(filename)<<" has empty plugin name: "<<name;
                 }
-                else
+                else if(pluginNames.contains(name))
                 {
                     qDebug()<<"Duplicate plugin: " << name;
                 }

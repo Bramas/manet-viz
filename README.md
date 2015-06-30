@@ -1,7 +1,7 @@
 # manet-viz
 manet vizualizer
 
-# Import a trace
+## Import a trace
 The following example is given with the Crowdad roma/taxi dataset available [here][1].
 The traces are of the following format:
 ```
@@ -26,7 +26,9 @@ Since we want to work with distances and spatial operations, we use a projected 
 +proj=utm +zone=33 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs
 ```
 
-To add a new plugin uder QT:
+## Add a plugin
+
+To add a new plugin under QT:
 Right click on Plugin directory > Add new Subproject > Library > C++ Library > Fill the name > Requires `QtWidget`,`QtGui`,`QtCore` > Create the files you need to implement the decorator
 Add in the `*.pro` file:
 ```

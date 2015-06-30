@@ -1,28 +1,29 @@
-#ifndef WIRELESSCOMMUNICATIONDECORATOR_H
-#define WIRELESSCOMMUNICATIONDECORATOR_H
+#ifndef WCOMDECORATOR_H
+#define WCOMDECORATOR_H
 
-#include "wirelesscommunicationdecorator_global.h"
+#include "wcomdecorator_global.h"
 
 #include <QObject>
+#include <QMultiHash>
 
 #include  "ui_control.h"
 #include "iviewerlayer.h"
 #include "types.h"
 #include "graph.h"
 
-class AbstractEvolvingGraph;
-
-class WIRELESSCOMMUNICATIONDECORATORSHARED_EXPORT WirelessCommunicationDecorator : public QObject, public IViewerLayer
+class WCOMDECORATORSHARED_EXPORT WComDecorator: public QObject, public IViewerLayer
 {
 
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.manet-viz.IViewerLayer" FILE "wirelesscommunicationdecorator.json")
+    Q_PLUGIN_METADATA(IID "org.manet-viz.IViewerLayer" FILE "wcomdecorator.json")
     Q_INTERFACES(IViewerLayer)
 
 public:
-    WirelessCommunicationDecorator();
-
+    WComDecorator();
     void setEvolvingGraph(const AbstractEvolvingGraph * evolvingGraph);
+
+    virtual void paint(IGraph * graph);
+    void setGraphicsScene(QGraphicsScene * scene);
 
     virtual void decorateEdges(mvtime time, IGraph *graph);
     virtual void decorateNodes(mvtime time, IGraph *graph);
@@ -31,7 +32,7 @@ public:
 
     QWidget * createControlWidget() const;
     void  decoratesGraphicsNode(GraphicsNodeItem * node) const;
-    QString toString() const { return "WirelessCommunicationDecorator"; }
+    QString toString() const { return "WComDecorator"; }
 
 public slots:
     void setCommunicationRange(int);
@@ -42,10 +43,18 @@ signals:
     void transmissionRangeChanged(int);
 
 private:
+    QList<QPointF> getNeighborCells(double x, double y);
+
     const AbstractEvolvingGraph * _evolvingGraph;
     Ui::Control *ui;
     bool _displayRange;
     int _communicationRange;
+    QMultiHash<QPointF,Node> _grid;
+    int _cellSize;
+    QList<QGraphicsItem*> _gridGroupItems;
+    QPen _pen;
+    QRectF _oldSceneRect;
 
 };
-#endif // WIRELESSCOMMUNICATIONDECORATOR_H
+
+#endif // WCOMDECORATOR_H

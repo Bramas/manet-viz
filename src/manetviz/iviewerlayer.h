@@ -6,7 +6,9 @@
 
 #include "viewer.h"
 #include "node.h"
+#include "abstractevolvinggraph.h"
 #include "graphicsitems.h"
+
 class QPainter;
 class AbstractEvolvingGraph;
 class IGraph;
@@ -19,10 +21,17 @@ public:
 
     virtual void setEvolvingGraph(const AbstractEvolvingGraph * evolvingGraph) { _evolvingGraph = evolvingGraph; }
     virtual void setGraphicsScene(QGraphicsScene * scene) { _scene = scene; }
-    virtual void paint(IGraph * graph) = 0;
-    virtual QWidget * createControlWidget() const = 0;
+    virtual void paint(IGraph * graph) { return; }
+
+    virtual void decorateEdges(mvtime time, IGraph *graph) { return; }
+    virtual void decorateNodes(mvtime time, IGraph *graph) { return; }
+
+    virtual QStringList requiredField() const { return QStringList(); }
+
+    virtual QWidget * createControlWidget() const { return NULL; }
     virtual void decoratesGraphicsEdge(GraphicsEdgeItem * edge) const { return; }
     virtual void decoratesGraphicsNode(GraphicsNodeItem * node) const { return; }
+
     virtual QObject* getQObject() = 0;
     virtual QString toString() const { return ""; }
 

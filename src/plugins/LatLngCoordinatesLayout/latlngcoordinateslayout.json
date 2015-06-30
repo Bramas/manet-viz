@@ -1,5 +1,6 @@
 {
 "name" : "LatLngCoordinatesLayout",
 "version" : "0.0.1",
-"dependencies" : []
+"dependencies" : [],
+"active" : "true"
 }

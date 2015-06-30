@@ -5,30 +5,23 @@
 #include <QList>
 #include <QPen>
 
-#include "igraphdecorator.h"
 #include "iviewerlayer.h"
 #include "pluginmanager.h"
 #include "gridstatdecorator_global.h"
 #include "types.h"
 #include "graph.h"
 
-class GRIDSTATDECORATORSHARED_EXPORT GridStatDecorator: public QObject, public IViewerLayer, public IGraphDecorator
+class GRIDSTATDECORATORSHARED_EXPORT GridStatDecorator: public QObject, public IViewerLayer
 {
 
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.manet-viz.IGraphDecorator" FILE "gridstatdecorator.json")
-    Q_INTERFACES(IGraphDecorator)
+    Q_PLUGIN_METADATA(IID "org.manet-viz.IViewerLayer" FILE "gridstatdecorator.json")
     Q_INTERFACES(IViewerLayer)
 
 public:
     GridStatDecorator();
     void setEvolvingGraph(const AbstractEvolvingGraph * evolvingGraph);
-    virtual void decorateEdges(mvtime time, IGraph *graph);
-    virtual void decorateNodes(mvtime time, IGraph *graph);
-
-    virtual void paint(IGraph * graph);
     void setGraphicsScene(QGraphicsScene * scene);
-    virtual QWidget * createControlWidget() const;
 
     QObject * getQObject() { return this; }
     virtual QString toString() const { return "GridStatDecorator"; }

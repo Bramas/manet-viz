@@ -246,10 +246,8 @@ void ImportDialog::projInEdited(QString text)
     _projIn = text;
     if(!text.isEmpty()) {
         _isProjInValid = toggleBoldFont(ui->comboBoxInputProj, isValidProj(text));
-        qDebug() << "ProjIn is not empty - " << _isProjInValid;
     } else {
         _isProjInValid = true;
-        qDebug() << "ProjIn is empty - " << _isProjInValid;
     }
     checkConsistency();
 }
@@ -259,10 +257,8 @@ void ImportDialog::projOutEdited(QString text)
     _projOut = text;
     if(!text.isEmpty()) {
         _isProjOutValid = toggleBoldFont(ui->comboBoxOutputProj, isValidProj(text));
-        qDebug() << "ProjOut is not empty - " << _isProjOutValid;
     } else {
         _isProjOutValid = true;
-        qDebug() << "ProjOut is not empty - " << _isProjOutValid;
     }
     checkConsistency();
 }
@@ -275,7 +271,6 @@ void ImportDialog::timeFormatEdited(QString text)
     } else {
         _isTimeFormatValid = false;
     }
-    qDebug() << "time format is valid" << _isTimeFormatValid;
     checkConsistency();
 }
 
@@ -308,7 +303,6 @@ bool ImportDialog::isTimeFormatValid(QString format)
         // Check whehter the time format is valid
         QDateTime dt;
         QString timeSample = _outputModel->item(2,_timeCol)->data(Qt::EditRole).toString();
-        qDebug() << timeSample << format;
         if(format == "T") {
             dt = QDateTime::fromTime_t(timeSample.toUInt());
         } else if(format == "t") {
@@ -336,7 +330,6 @@ void ImportDialog::checkConsistency()
     if(_isLoading) {
         flag = true;
     } else {
-        qDebug() << "Time: " << _isTimeFormatValid << "ProjIn" << _isProjInValid << "ProjOut" << _isProjOutValid;
         // Check with the time format
         if((_projIn.isEmpty() && !_projOut.isEmpty()) || (!_projIn.isEmpty() && _projOut.isEmpty())) {
             flag = true;

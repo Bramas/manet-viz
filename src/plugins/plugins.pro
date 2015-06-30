@@ -4,5 +4,6 @@ SUBDIRS	    = graphlayer \
     LatLngCoordinatesLayout \
     InterpolationDecorator \
     WirelessCommunicationDecorator \
-    GridStatDecorator
+    GridStatDecorator \
+    WComDecorator
 

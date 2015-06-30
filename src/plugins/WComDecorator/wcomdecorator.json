@@ -1,6 +1,6 @@
 {
-"name" : "WirelessCommunicationDecorator",
+"name" : "WComDecorator",
 "version" : "0.0.1",
 "dependencies" : ["InterpolationDecorator"],
-"active" : "false"
+"active" : "true"
 }

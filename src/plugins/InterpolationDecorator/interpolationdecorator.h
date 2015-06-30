@@ -4,27 +4,26 @@
 #include "interpolationdecorator_global.h"
 #include <QObject>
 
-#include "igraphdecorator.h"
+#include "iviewerlayer.h"
 #include "types.h"
 #include "graph.h"
 
 class AbstractEvolvingGraph;
 
-class INTERPOLATIONDECORATORSHARED_EXPORT InterpolationDecorator : public QObject, public IGraphDecorator
+class INTERPOLATIONDECORATORSHARED_EXPORT InterpolationDecorator : public QObject, public IViewerLayer
 {
 
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.manet-viz.IGraphDecorator" FILE "interpolationdecorator.json")
-    Q_INTERFACES(IGraphDecorator)
+    Q_PLUGIN_METADATA(IID "org.manet-viz.IViewerLayer" FILE "interpolationdecorator.json")
+    Q_INTERFACES(IViewerLayer)
 
 public:
     InterpolationDecorator();
 
     void setEvolvingGraph(const AbstractEvolvingGraph * evolvingGraph);
 
-    virtual void decorateEdges(mvtime time, IGraph *graph);
-    virtual void decorateNodes(mvtime time, IGraph *graph);
-
+    void decorateEdges(mvtime time, IGraph *graph);
+    void decorateNodes(mvtime time, IGraph *graph);
 
     QObject * getQObject() { return this; }
 
