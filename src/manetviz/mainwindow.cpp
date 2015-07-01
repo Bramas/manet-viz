@@ -13,6 +13,7 @@
 #include "importdialog.h"
 #include "graphloader.h"
 #include "gtfsloader.h"
+#include "gtfsdialog.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -68,10 +69,16 @@ void MainWindow::openGTFS()
                                                     settings.value("defaultGTFSDiretory", QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)).toString(),
                                                     QFileDialog::ShowDirsOnly
                                                     | QFileDialog::DontResolveSymlinks);
+    GTFSDialog importDialog(dir);
+    int ret = importDialog.exec(); // synchronous
+    if (ret == QDialog::Rejected) {
+        return;
+    }
+
     // Save the directory path in the app settings
     settings.setValue("defaultGTFSDiretory", dir);
 
-    _gtfsLoader = new GTFSLoader(dir);
+    _gtfsLoader = new GTFSLoader(importDialog.createGTFSLoader());
     _gtfsLoader->load();
 
     ControlWidget * controlWidget = new ControlWidget();

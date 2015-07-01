@@ -44,13 +44,20 @@ signals:
 
 private:
     QList<QPointF> getNeighborCells(double x, double y);
+    void increaseCellCount(QPointF cell, mvtime time);
+    void deleteObsoleteCells(mvtime time);
+    QColor selectCellColor(int cellCount);
+    QList<double> getJenksBreaks(QList<double> sListDouble, int sClassCount);
 
     const AbstractEvolvingGraph * _evolvingGraph;
     Ui::Control *ui;
     bool _displayRange;
     int _communicationRange;
     QMultiHash<QPointF,Node> _grid;
+    QHash<QPointF,QHash<mvtime,int> > _gridCount;
+    mvtime _timeWindow;
     int _cellSize;
+    QHash<QPointF,int> _contactCount;
     QList<QGraphicsItem*> _gridGroupItems;
     QPen _pen;
     QRectF _oldSceneRect;

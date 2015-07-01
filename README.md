@@ -29,7 +29,7 @@ Since we want to work with distances and spatial operations, we use a projected 
 ## Add a plugin
 
 To add a new plugin under QT:
-Right click on Plugin directory > Add new Subproject > Library > C++ Library > Fill the name > Requires `QtWidget`,`QtGui`,`QtCore` > Create the files you need to implement the decorator
+Right click on Plugin directory > Add new Subproject > Library > C++ Library > Fill the name > Requires `QtWidgets`,`QtGui`,`QtCore` > Create the files you need to implement the decorator
 Add in the `*.pro` file:
 ```
 INCLUDEPATH    += ../../manetviz
@@ -39,7 +39,21 @@ DESTDIR         = ../../manetviz/plugins
 In the `<plugin_name>.h` file, add:
 ```c++
 #include <QObject>
-#include "<plugin_name>.h"
+#include "<interface_name>.h"
+```
+
+Make the plugin inherit from the interface (eg. `IViewerLayer`):
+
+```c++
+class <plugin_name>: public QObject, public IViewerLayer
+{
+  Q_OBJECT
+  Q_PLUGIN_METADATA(IID "org.manet-viz.<interface_name>" FILE "<plugin_name>.json")
+  Q_INTERFACES(<interface_name>)
+
+public:
+  <plugin_name>(); // constructor
+};
 ```
 
 Create a new file in the plugin directory of the name: `<plugin_name>.json` that includes:

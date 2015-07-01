@@ -15,6 +15,29 @@ GTFSLoader::GTFSLoader(QString folderPath):
     _trajectories = QMap<QString, Trajectory *>();
 }
 
+GTFSLoader::GTFSLoader(QString folderPath, QString projIn, QString projOut):
+    GTFSLoader(folderPath)
+{
+    if(!projIn.isEmpty() && !projOut.isEmpty()) {
+        _pjIn  = pj_init_plus(projIn.toStdString().c_str());
+        _pjOut = pj_init_plus(projOut.toStdString().c_str());
+    }
+}
+
+GTFSLoader::GTFSLoader(const GTFSLoader &other) :
+    _folderPath(other._folderPath),
+    _stopTimesFilePath(other._stopTimesFilePath),
+    _stopsFilePath(other._stopsFilePath),
+    _shapesFilePath(other._shapesFilePath),
+    _tripsFilePath(other._tripsFilePath)
+{
+    _evolvingGraph = new EvolvingGraph();
+    _trajectories = QMap<QString, Trajectory *>();
+    _pjIn = other._pjIn;
+    _pjOut = other._pjOut;
+}
+
+
 GTFSLoader::~GTFSLoader()
 {
 }
@@ -57,7 +80,21 @@ void GTFSLoader::parseTrips()
     foreach (auto stop, stopList) {
         QString stopId = stop.value("stop_id");
         QString stopName = stop.value("stop_name");
-        QPointF coord(stop.value("stop_lat").toDouble(), stop.value("stop_lon").toDouble());
+        double lat = stop.value("stop_lat").toDouble();
+        double lon = stop.value("stop_lon").toDouble();
+        double x=0, y=0;
+
+        // Transformation of the lat/lon coordinates to projected coordinates
+        if(_pjIn && _pjOut) {
+            x = lon * DEG_TO_RAD;
+            y = lat * DEG_TO_RAD;
+            pj_transform(_pjIn, _pjOut, 1, 1, &x, &y, NULL);
+        } else {
+            x = lon;
+            y = lat;
+        }
+
+        QPointF coord(x, y);
         stopMap.insert(stopId,
                        new Stop(stopId, stopName, coord));
     }
@@ -115,8 +152,8 @@ void GTFSLoader::load()
         {
             WayPoint * stop = traj->getTrajectory().value(mvt);
             QHash<QString, QVariant> props;
-            props.insert("X", stop->getCoords().x());
-            props.insert("Y", stop->getCoords().y());
+            props.insert(X, stop->getCoords().x());
+            props.insert(Y, stop->getCoords().y());
             _evolvingGraph->addNode(id, mvt, props);
         }
         id++;

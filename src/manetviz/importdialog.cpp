@@ -399,7 +399,7 @@ void ImportDialog::onAccepted()
     // Do the same for the output projection
     if(!ui->comboBoxOutputProj->currentText().isEmpty()){
         QString projOut = ui->comboBoxOutputProj->currentText();
-        int idx = _projIn.indexOf(projOut);
+        int idx = _projOuts.indexOf(projOut);
         if(idx != -1) {
             _projOuts.removeAt(idx);
         }
@@ -414,6 +414,8 @@ void ImportDialog::onAccepted()
     settings.setValue("savedTimeFormats", _timeFormats);
     settings.setValue("savedProjIns", _projIns);
     settings.setValue("savedProjOuts", _projOuts);
+
+    QDialog::accept();
 }
 
 GraphLoader ImportDialog::createGraphLoader()

@@ -37,7 +37,6 @@ GraphLoader::GraphLoader(const GraphLoader &other) :
 
 GraphLoader::~GraphLoader()
 {
-
 }
 
 /*!
@@ -175,6 +174,9 @@ void GraphLoader::processLine(QString line)
         x = lon * DEG_TO_RAD;
         y = lat * DEG_TO_RAD;
         pj_transform(_pjIn, _pjOut, 1, 1, &x, &y, NULL);
+    } else {
+        x = lon;
+        y = lat;
     }
 
     QHash<QString, QVariant> props;

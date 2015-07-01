@@ -4,6 +4,7 @@
 #include <QObject>
 #include "abstractevolvinggraph.h"
 #include "types.h"
+#include "/usr/local/include/proj_api.h"
 
 class WayPoint
 {
@@ -108,6 +109,8 @@ class GTFSLoader
 public:
     // initialize the GTFS loader to parse into the traj variable
     GTFSLoader(QString folderPath);
+    GTFSLoader(QString folderPath, QString projIn, QString projOut);
+    GTFSLoader(const GTFSLoader &other);
     ~GTFSLoader();
 
     AbstractEvolvingGraph * evolvingGraph() const;
@@ -121,6 +124,8 @@ private:
     QString _stopsFilePath;
     QString _shapesFilePath;
     QString _tripsFilePath;
+    projPJ _pjIn;
+    projPJ _pjOut;
 
     // trajectories indexed by the trip id of each trajectory
     QMap<QString,Trajectory *> _trajectories;

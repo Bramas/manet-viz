@@ -25,7 +25,8 @@ SOURCES += main.cpp\
     graphloader.cpp \
     graphicsview.cpp \
     pluginmanager.cpp \
-    gtfsloader.cpp
+    gtfsloader.cpp \
+    gtfsdialog.cpp
 
 HEADERS  += mainwindow.h \
     graphicsview.h \
@@ -46,10 +47,13 @@ HEADERS  += mainwindow.h \
     igraphdecorator.h \
     igraphlayout.h \
     gtfsloader.h \
-    graphicsitems.h
+    graphicsitems.h \
+    iloader.h \
+    gtfsdialog.h
 
 FORMS    += mainwindow.ui \
     controlwidget.ui \
-    importdialog.ui
+    importdialog.ui \
+    gtfsdialog.ui
 
 LIBS += -L/usr/local/lib -lproj
