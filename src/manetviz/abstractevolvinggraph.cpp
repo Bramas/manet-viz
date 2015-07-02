@@ -1,6 +1,6 @@
 #include "abstractevolvinggraph.h"
 
-AbstractEvolvingGraph::AbstractEvolvingGraph()
+AbstractEvolvingGraph::AbstractEvolvingGraph() : _loader(0)
 {
 
 }

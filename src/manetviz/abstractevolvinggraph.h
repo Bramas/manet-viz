@@ -8,7 +8,7 @@
 #include "graph.h"
 #include "node.h"
 
-
+class ILoader;
 
 class AbstractEvolvingGraph : public QObject
 {
@@ -23,6 +23,11 @@ public:
     virtual const QHash<int, QMap<mvtime, NodeProperties>* > & nodes() const = 0;
 
     virtual void addNode(int id, mvtime time, QHash<QString, QVariant> props) = 0;
+
+    virtual ILoader * loader() const { return _loader; }
+    virtual void setLoader(ILoader * loader) { _loader = loader; }
+protected:
+    ILoader * _loader;
 };
 
 #endif // ABSTRACTGRAPH_H

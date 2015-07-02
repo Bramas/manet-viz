@@ -6,6 +6,9 @@
 #include "types.h"
 #include "/usr/local/include/proj_api.h"
 
+#include "iloader.h"
+
+
 class WayPoint
 {
 public:
@@ -104,8 +107,9 @@ private:
     QMap<mvtime, WayPoint *> _trajectory;
 };
 
-class GTFSLoader
+class GTFSLoader : public QObject, public ILoader
 {
+    Q_OBJECT
 public:
     // initialize the GTFS loader to parse into the traj variable
     GTFSLoader(QString folderPath);
@@ -114,6 +118,12 @@ public:
     ~GTFSLoader();
 
     AbstractEvolvingGraph * evolvingGraph() const;
+    const AbstractEvolvingGraph * constEvolvingGraph() const;
+    QObject * getQObject() { return this; }
+    bool isLoaded() const { return true; }
+
+signals:
+    void onLoaded();
 
 public slots:
     void load();
