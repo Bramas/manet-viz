@@ -28,7 +28,6 @@ public:
 private:
     QHash<int, Node> _nodes;
 
-
 };
 
 #endif // GRAPH_H

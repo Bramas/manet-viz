@@ -6,4 +6,5 @@ SUBDIRS	    = graphlayer \
     WirelessCommunicationDecorator \
     GridStatDecorator \
     WComDecorator \
-    GraphConvertor
+    GraphConvertor \
+    ShapeLoader

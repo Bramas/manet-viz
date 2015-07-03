@@ -115,8 +115,6 @@ void ImportDialog::processOutputTable()
     _timeCol = -1;
     _isLoading = true;
 
-    CSVParser parser = CSVParser();
-
     ComboBoxDelegate * delegate = new ComboBoxDelegate();
     QStringList defaultHeaders;
     defaultHeaders << "Id" << "Time" << "X" << "Y";
@@ -125,7 +123,7 @@ void ImportDialog::processOutputTable()
         ui->tableViewOutput->horizontalHeader()->setVisible(true);
         QStringList fields;
         QString line = _sampleTrace[idx++];
-        parser.parseRegEx(line, fields, _regEx);
+        CSVParser::parseRegEx(line, fields, _regEx);
         int j = 0;
         foreach(const QString &field, fields)
         {
@@ -141,7 +139,7 @@ void ImportDialog::processOutputTable()
         ui->tableViewOutput->horizontalHeader()->setVisible(false);
         QStringList fields;
         QString line = _sampleTrace[idx];
-        parser.parseRegEx(line, fields, _regEx);
+        CSVParser::parseRegEx(line, fields, _regEx);
         for(int i = 0; i<fields.count(); ++i)
         {
             QString field = "";
@@ -159,7 +157,7 @@ void ImportDialog::processOutputTable()
     for(; idx<_sampleTrace.count(); ++idx) {
         QStringList fields;
         QString line = _sampleTrace[idx];
-        parser.parseRegEx(line, fields, _regEx);
+        CSVParser::parseRegEx(line, fields, _regEx);
 
         int j = 0;
         foreach(QString field, fields) {

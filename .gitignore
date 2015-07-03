@@ -31,3 +31,5 @@ build/
 build-manet-viz-Desktop_Qt_5_4_1_clang_64bit-Release
 manet-viz.pro.user
 .DS_Store
+build-manet-viz-Desktop_Qt_5_5_0_clang_64bit-Debug
+build-manet-viz-Qt_5_5_0_clang_64-Debug
