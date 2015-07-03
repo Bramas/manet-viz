@@ -177,6 +177,8 @@ int CSVParser::parseCSV(QString filename, QVector<QMap<QString,QString>> &fields
     parseString(line,headerLine,delim,quote,escape);
     while (!file.atEnd()) {
         line = QString(file.readLine()).split(QRegExp("[\r\n]")).at(0);
+        if(line.isEmpty())
+            continue;
         QStringList values;
         parseString(line,values,delim,quote,escape);
         QMap<QString,QString> map = QMap<QString,QString>();

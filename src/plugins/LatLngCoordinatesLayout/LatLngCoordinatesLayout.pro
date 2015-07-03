@@ -26,3 +26,4 @@ unix {
 
 DISTFILES += \
     latlngcoordinateslayout.json
+

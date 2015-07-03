@@ -7,4 +7,3 @@ SUBDIRS	    = graphlayer \
     GridStatDecorator \
     WComDecorator \
     GraphConvertor
-

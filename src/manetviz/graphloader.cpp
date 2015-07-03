@@ -167,7 +167,6 @@ void GraphLoader::processLine(QString line)
             time = capturedText.at(i + 1);
         } else if(header == X) {
             lat = capturedText.at(i + 1).toDouble();
-
         } else if(header == Y){
             lon = capturedText.at(i + 1).toDouble();
         }

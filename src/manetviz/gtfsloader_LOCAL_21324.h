@@ -4,8 +4,6 @@
 #include <QObject>
 #include "abstractevolvinggraph.h"
 #include "types.h"
-#include "iloader.h"
-
 #include "/usr/local/include/proj_api.h"
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/Coordinate.h>
@@ -52,9 +50,9 @@ public:
     WayPoint(QPointF coords):
         _coords(coords), _departureTime(0), _arrivalTime(0) {}
     WayPoint(Stop * stop):
-        _coords(stop->getCoords()), _departureTime(0), _arrivalTime(0), _stop(stop) {}
+        _stop(stop), _coords(stop->getCoords()), _departureTime(0), _arrivalTime(0) {}
     WayPoint(Stop * stop, mvtime departureTime, mvtime arrivalTime):
-        _coords(stop->getCoords()), _departureTime(departureTime), _arrivalTime(arrivalTime), _stop(stop) {}
+        _stop(stop), _coords(stop->getCoords()), _departureTime(departureTime), _arrivalTime(arrivalTime) {}
     WayPoint(QPointF coords, mvtime departureTime, mvtime arrivalTime, Stop * stop = NULL):
         _coords(coords), _departureTime(departureTime), _arrivalTime(arrivalTime), _stop(stop) {}
 
@@ -146,22 +144,16 @@ private:
     QMap<mvtime, WayPoint *> _trajectory;
 };
 
-class GTFSLoader : public QObject, public ILoader
+class GTFSLoader
 {
-    Q_OBJECT
 public:
+    // initialize the GTFS loader to parse into the traj variable
     GTFSLoader(QString folderPath);
     GTFSLoader(QString folderPath, QString projIn, QString projOut);
     GTFSLoader(const GTFSLoader &other);
     ~GTFSLoader();
 
     AbstractEvolvingGraph * evolvingGraph() const;
-    const AbstractEvolvingGraph * constEvolvingGraph() const;
-    QObject * getQObject() { return this; }
-    bool isLoaded() const { return true; }
-
-signals:
-    void onLoaded();
 
 public slots:
     void load();

@@ -4,9 +4,8 @@
 #include <QObject>
 #include "abstractevolvinggraph.h"
 #include "types.h"
-#include "iloader.h"
-
 #include "/usr/local/include/proj_api.h"
+<<<<<<< HEAD
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/Coordinate.h>
 #include <geos/operation/overlay/snap/GeometrySnapper.h>
@@ -23,6 +22,27 @@ using namespace geos::geom;
 using namespace geos::linearref;
 
 class Stop
+=======
+
+#include "iloader.h"
+
+
+class WayPoint
+{
+public:
+    WayPoint():
+        _coords(QPointF()) {}
+    WayPoint(QPointF coords):
+        _coords(coords) {}
+
+    QPointF getCoords() {return _coords;}
+
+protected:
+    QPointF _coords;
+};
+
+class Stop: public WayPoint
+>>>>>>> 12bd08fa7ba836e69403aac8a4d8ea5f6e43695e
 {
 public:
     Stop():
@@ -52,9 +72,9 @@ public:
     WayPoint(QPointF coords):
         _coords(coords), _departureTime(0), _arrivalTime(0) {}
     WayPoint(Stop * stop):
-        _coords(stop->getCoords()), _departureTime(0), _arrivalTime(0), _stop(stop) {}
+        _stop(stop), _coords(stop->getCoords()), _departureTime(0), _arrivalTime(0) {}
     WayPoint(Stop * stop, mvtime departureTime, mvtime arrivalTime):
-        _coords(stop->getCoords()), _departureTime(departureTime), _arrivalTime(arrivalTime), _stop(stop) {}
+        _stop(stop), _coords(stop->getCoords()), _departureTime(departureTime), _arrivalTime(arrivalTime) {}
     WayPoint(QPointF coords, mvtime departureTime, mvtime arrivalTime, Stop * stop = NULL):
         _coords(coords), _departureTime(departureTime), _arrivalTime(arrivalTime), _stop(stop) {}
 
@@ -150,6 +170,7 @@ class GTFSLoader : public QObject, public ILoader
 {
     Q_OBJECT
 public:
+    // initialize the GTFS loader to parse into the traj variable
     GTFSLoader(QString folderPath);
     GTFSLoader(QString folderPath, QString projIn, QString projOut);
     GTFSLoader(const GTFSLoader &other);
