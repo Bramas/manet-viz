@@ -1,5 +1,6 @@
 #include "gridstatdecorator.h"
-
+#include "project.h"
+#include "iloader.h"
 GridStatDecorator::GridStatDecorator()
 {
 //    QObject * instance = PluginManager::getPlugin("WirelessCommunicationDecorator");
@@ -22,17 +23,17 @@ int roundUp(int numToRound, int multiple)
     return numToRound + multiple - remainder;
 }
 
-void GridStatDecorator::setEvolvingGraph(const AbstractEvolvingGraph *evolvingGraph)
+void GridStatDecorator::setProject(Project * project)
 {
 
-    _evolvingGraph = evolvingGraph;
+    _project = project;
 
     // Get the bounding box of the initial topology
     QPointF topLeft(MaxDist,MaxDist);
     QPointF bottomRight(-MaxDist,-MaxDist);
 
-    foreach(auto id, _evolvingGraph->nodes().keys()) {
-        auto nodeTimeline = _evolvingGraph->nodes().value(id);
+    foreach(auto id, _project->loader()->constEvolvingGraph()->nodes().keys()) {
+        auto nodeTimeline = _project->loader()->constEvolvingGraph()->nodes().value(id);
         for(auto it = nodeTimeline->begin(); it != nodeTimeline->end(); ++it) {
             double x = it.value().value(X).toDouble();
             double y = it.value().value(Y).toDouble();
@@ -65,7 +66,7 @@ void GridStatDecorator::setEvolvingGraph(const AbstractEvolvingGraph *evolvingGr
     // hexgrid http://www.redblobgames.com/ || http://www.redblobgames.com/grids/hexagons/implementation.html
 
 }
-
+/*
 void GridStatDecorator::setGraphicsScene(QGraphicsScene *scene)
 {
     _scene = scene;
@@ -81,7 +82,7 @@ void GridStatDecorator::setGraphicsScene(QGraphicsScene *scene)
     }
 
     _scene->createItemGroup(_gridGroupItems);
-}
+}*/
 
 void GridStatDecorator::setTransmissionRange(int range)
 {

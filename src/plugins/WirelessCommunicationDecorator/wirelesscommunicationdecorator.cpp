@@ -11,10 +11,6 @@ WirelessCommunicationDecorator::WirelessCommunicationDecorator():
     _communicationRange = 100;
     _displayRange = false;
 }
-void WirelessCommunicationDecorator::setEvolvingGraph(const AbstractEvolvingGraph *evolvingGraph)
-{
-    _evolvingGraph = evolvingGraph;
-}
 
 void WirelessCommunicationDecorator::decorateNodes(mvtime time, IGraph *graph)
 {

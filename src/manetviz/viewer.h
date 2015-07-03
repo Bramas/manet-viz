@@ -6,6 +6,8 @@
 
 #include "types.h"
 #include "viewer.h"
+
+class Project;
 class IViewerLayer;
 class IGraphLayout;
 class IGraphDecorator;
@@ -15,15 +17,15 @@ class Viewer : public QGraphicsScene
 {
     Q_OBJECT
 public:
-    explicit Viewer(const AbstractEvolvingGraph *evg);
+    explicit Viewer();
     ~Viewer();
 
+    void setProject(Project * project);
+
     QPointF toLocalCoordinates(QPointF globalCoordinates) const;
-    void addLayer(IViewerLayer * layer, int priority = 100);
 
     mvtime time() const { return _time; }
 
-    QList<IViewerLayer* > layers() const { return _layers.values(); }
     QList<IGraphDecorator* > graphDecorators() const { return _graphDecorators.values(); }
 
 signals:
@@ -43,13 +45,12 @@ private:
 
     IGraphLayout * _layout;
     QMap<int, IGraphDecorator *> _graphDecorators;
-    QMap<int, IViewerLayer*> _layers;
     mvtime _time;
     QPoint _lastMousePos;
     QPointF _afterTranslate;
     qreal _zoom;
     QElapsedTimer _timeSinceLastFrame;
-    const AbstractEvolvingGraph * _evolvingGraph;
+    Project * _project;
     QGraphicsItemGroup * _items;
 };
 

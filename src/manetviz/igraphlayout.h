@@ -5,16 +5,21 @@
 #include "abstractevolvinggraph.h"
 #include "node.h"
 
+class Project;
+
 class IGraphLayout
 {
 public:
     virtual ~IGraphLayout() {}
 
-    virtual void setEvolvingGraph(const AbstractEvolvingGraph * evolvingGraph) = 0;
+    virtual void setProject(Project * project) { _project = project; }
 
     virtual void footprint(mvtime time, IGraph *graph) const = 0;
 
     virtual QStringList requiredField() const = 0;
+
+protected:
+    Project * _project;
 };
 
 

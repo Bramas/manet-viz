@@ -12,13 +12,14 @@ class ControlWidget;
 }
 
 class Viewer;
+class Project;
 
 class ControlWidget : public QDockWidget
 {
     Q_OBJECT
 
 public:
-    explicit ControlWidget(QWidget *parent = 0);
+    explicit ControlWidget(QWidget *parent, Project *project);
     ~ControlWidget();
 
     void setViewer(Viewer * viewer);
@@ -46,6 +47,7 @@ private:
     qreal _cumulatedTime;
     bool _isPlaying;
     Viewer * _viewer;
+    Project * _project;
 };
 
 #endif // CONTROLWIDGET_H

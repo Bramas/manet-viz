@@ -14,6 +14,7 @@
 #include "graphloader.h"
 #include "gtfsloader.h"
 #include "gtfsdialog.h"
+#include "project.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -42,24 +43,21 @@ void MainWindow::open()
     settings.setValue("defaultTracePath", QFileInfo(filename).absolutePath());
 
     _graphLoader = new GraphLoader(importDialog.createGraphLoader());
-    _graphLoader->load();
-
-    ControlWidget * controlWidget = new ControlWidget();
-
-    const AbstractEvolvingGraph * evg = _graphLoader->constEvolvingGraph();
-
-    Viewer * viewer = new Viewer(evg);
+    Viewer * viewer = new Viewer();
+    Project * project = new Project(viewer, _graphLoader);
+    ControlWidget * controlWidget = new ControlWidget(this, project);
     GraphicsView * v = new GraphicsView(viewer, this);
-
     controlWidget->setViewer(viewer);
 
     //to enable OpenGL rendering
     //v->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
-    v->scale(10,10);
+
     connect(_graphLoader, &GraphLoader::onLoadProgressChanged, controlWidget, &ControlWidget::setLoadProgress);
 
     setCentralWidget(v);
     this->addDockWidget(Qt::LeftDockWidgetArea, controlWidget);
+
+    _graphLoader->load();
 }
 
 void MainWindow::openGTFS()
@@ -79,18 +77,16 @@ void MainWindow::openGTFS()
     settings.setValue("defaultGTFSDiretory", dir);
 
     _gtfsLoader = new GTFSLoader(importDialog.createGTFSLoader());
-    _gtfsLoader->load();
-
-    ControlWidget * controlWidget = new ControlWidget();
-
-    AbstractEvolvingGraph * evg = _gtfsLoader->evolvingGraph();
-    Viewer * viewer = new Viewer(evg);
+    Viewer * viewer = new Viewer();
+    Project * project = new Project(viewer, _gtfsLoader);
+    ControlWidget * controlWidget = new ControlWidget(this, project);
     GraphicsView * v = new GraphicsView(viewer, this);
-    v->scale(10,10);
     controlWidget->setViewer(viewer);
     connect(controlWidget, SIGNAL(timeChanged(mvtime)), viewer, SLOT(setTime(mvtime)));
     setCentralWidget(v);
     this->addDockWidget(Qt::LeftDockWidgetArea, controlWidget);
+    _gtfsLoader->load();
+
 }
 
 MainWindow::~MainWindow()

@@ -1,6 +1,8 @@
 #include "graphlayer.h"
 #include "viewer.h"
 #include "ui_graphlayercontrol.h"
+#include "project.h"
+
 #include <QPainter>
 #include <QWheelEvent>
 #include <QMouseEvent>
@@ -9,14 +11,18 @@
 GraphLayer::GraphLayer()
 {
     _displayContacts = false;
+    items = 0;
 }
 
 void GraphLayer::paint(IGraph * graph)
 {
     //Graph g = _evolvingGraph->footprint(_evolvingGraph->beginTime() + graph);//_parent->time());
 
-    _scene->removeItem(items);
-    delete items;
+    if(items)
+    {
+        _project->viewer()->removeItem(items);
+        delete items;
+    }
     items = new QGraphicsItemGroup();
 
 
@@ -47,15 +53,9 @@ void GraphLayer::paint(IGraph * graph)
         items->addToGroup((QGraphicsItem*)i);
     }
 
-    _scene->addItem(items);
+    _project->viewer()->addItem(items);
 }
 
-void GraphLayer::setGraphicsScene(QGraphicsScene *scene)
-{
-    _scene = scene;
-    items = new QGraphicsItemGroup();
-    _scene->addItem(items);
-}
 
 void GraphLayer::setDisplayContact(bool state)
 {

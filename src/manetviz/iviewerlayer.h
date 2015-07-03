@@ -12,6 +12,7 @@
 class QPainter;
 class AbstractEvolvingGraph;
 class IGraph;
+class Project;
 
 class IViewerLayer
 {
@@ -19,8 +20,7 @@ public:
     IViewerLayer() {}
     virtual ~IViewerLayer() {}
 
-    virtual void setEvolvingGraph(const AbstractEvolvingGraph * evolvingGraph) { _evolvingGraph = evolvingGraph; }
-    virtual void setGraphicsScene(QGraphicsScene * scene) { _scene = scene; }
+    virtual void setProject(Project * project) { _project = project; }
     virtual void paint(IGraph * graph) { return; }
 
     virtual void decorateEdges(mvtime time, IGraph *graph) { return; }
@@ -36,8 +36,7 @@ public:
     virtual QString toString() const { return ""; }
 
 protected:
-    const AbstractEvolvingGraph * _evolvingGraph;
-    QGraphicsScene * _scene;
+    Project * _project;
 };
 
 QT_BEGIN_NAMESPACE

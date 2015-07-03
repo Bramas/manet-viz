@@ -13,8 +13,6 @@ class IGraphDecorator
 public:
     virtual ~IGraphDecorator() {}
 
-    virtual void setEvolvingGraph(const AbstractEvolvingGraph * evolvingGraph) = 0;
-
     virtual void decorateEdges(mvtime time, IGraph *graph) = 0;
     virtual void decorateNodes(mvtime time, IGraph *graph) = 0;
 

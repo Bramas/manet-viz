@@ -1,5 +1,5 @@
 #include "wcomdecorator.h"
-
+#include "project.h"
 #include <QtCore>
 #include <QWidget>
 #include <QDebug>
@@ -18,12 +18,12 @@ WComDecorator::WComDecorator():
     _gridCount = QHash<QPointF,QHash<mvtime,int> >();
     _contactCount = QHash<QPointF,int>();
     _timeWindow = 60*60; // 60 minutes
-}
-void WComDecorator::setEvolvingGraph(const AbstractEvolvingGraph *evolvingGraph)
-{
-    _evolvingGraph = evolvingGraph;
-}
 
+
+    _pen = QPen(QColor(255,0,0));
+    _pen.setWidth(1);
+    _pen.setCosmetic(true);
+}
 
 
 void WComDecorator::paint(IGraph *graph)
@@ -45,7 +45,7 @@ void WComDecorator::paint(IGraph *graph)
         }
     }
 
-    _scene->createItemGroup(_gridGroupItems);
+    _project->viewer()->createItemGroup(_gridGroupItems);
 
 
 //    if(_oldSceneRect.isEmpty() || _oldSceneRect != sceneRect) {
@@ -73,13 +73,6 @@ void WComDecorator::paint(IGraph *graph)
 //    }
 }
 
-void WComDecorator::setGraphicsScene(QGraphicsScene *scene)
-{
-    _scene = scene;
-    _pen = QPen(QColor(255,0,0));
-    _pen.setWidth(1);
-    _pen.setCosmetic(true);
-}
 
 void WComDecorator::decorateNodes(mvtime time, IGraph *graph)
 {

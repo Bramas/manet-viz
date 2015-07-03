@@ -16,7 +16,6 @@ class LATLNGCOORDINATESLAYOUTSHARED_EXPORT LatLngCoordinatesLayout: public QObje
 public:
     LatLngCoordinatesLayout();
 
-    void setEvolvingGraph(const AbstractEvolvingGraph * evolvingGraph) { _evolvingGraph = evolvingGraph; }
 
     void footprint(mvtime time, IGraph *graph) const;
 
@@ -28,7 +27,6 @@ public:
         return l;
     }
 
-    const AbstractEvolvingGraph * _evolvingGraph;
 };
 
 #endif // LATLNGCOORDINATESLAYOUT_H
