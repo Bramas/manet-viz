@@ -6,8 +6,9 @@
 
 QT       += core gui concurrent opengl
 
-QMAKE_CXXFLAGS += -I/usr/local/Cellar/geos/3.4.2/include -I/Library/Frameworks/PROJ.framework/Versions/4/unix/include
-QMAKE_LFLAGS += -L/usr/local/Cellar/geos/3.4.2/lib -lgeos -L/Library/Frameworks/PROJ.framework/Versions/4/unix/lib -lproj
+
+LIBS += -L/usr/local/lib -lproj -lgeos
+INCLUDEPATH += /usr/local/include
 
 CONFIG += c++11
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
