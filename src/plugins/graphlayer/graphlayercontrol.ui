@@ -22,7 +22,7 @@
   <widget class="QCheckBox" name="displayContactCheckBox">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>10</x>
      <y>0</y>
      <width>151</width>
      <height>20</height>

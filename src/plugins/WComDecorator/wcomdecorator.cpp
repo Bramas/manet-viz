@@ -13,10 +13,10 @@ WComDecorator::WComDecorator():
     _communicationRange = 100;
     _displayRange = false;
     _cellSize = 2*_communicationRange;
-    _grid = QMultiHash<QPointF,Node>();
+    _grid = QMultiHash<QPoint,Node>();
     _oldSceneRect = QRectF();
-    _gridCount = QHash<QPointF,QHash<mvtime,int> >();
-    _contactCount = QHash<QPointF,int>();
+    _gridCount = QHash<QPoint,QHash<mvtime,int> >();
+    _contactCount = QHash<QPoint,int>();
     _timeWindow = 60*60; // 60 minutes
 
 
@@ -79,59 +79,59 @@ void WComDecorator::decorateNodes(mvtime time, IGraph *graph)
 
 }
 
-QList<QPointF> WComDecorator::getNeighborCells(double x, double y) {
-    QList<QPointF> ret;
+QList<QPoint> WComDecorator::getNeighborCells(double x, double y) {
+    QList<QPoint> ret;
     QStringList tmp;
-    QPointF gc((int)qFloor(x / _cellSize)*_cellSize, (int)qFloor(y / _cellSize)*_cellSize);
+    QPoint gc((int)qFloor(x / _cellSize), (int)qFloor(y / _cellSize));
     double dx = _communicationRange, dy = _communicationRange;
 
     ret.append(gc);
 
     // check northwest neighbor cell
     if(((x-dx) < (gc.x())) && ((y-dy) < (gc.y()))) {
-        ret.append(QPointF(gc.x()-_cellSize, gc.y()-_cellSize));
+        ret.append(QPoint(gc.x()-1, gc.y()-1));
         tmp << "northwest";
     }
     // check north neighbor cell
     if(((y-dy) < (gc.y()))) {
-        ret.append(QPointF(gc.x(), gc.y()-_cellSize));
+        ret.append(QPoint(gc.x(), gc.y()-1));
         tmp << "north";
     }
     // check northeast neighbor cell
-    if(((x+dx) > (gc.x()+_cellSize)) && ((y-dy) < (gc.y()))) {
-        ret.append(QPointF(gc.x()+_cellSize, gc.y()-_cellSize));
+    if(((x+dx) > (gc.x()+1)) && ((y-dy) < (gc.y()))) {
+        ret.append(QPoint(gc.x()+1, gc.y()-1));
         tmp << "northeast";
     }
     // check west neighbor cell
-    if(((x+dx) > (gc.x()+_cellSize))) {
-        ret.append(QPointF(gc.x()+_cellSize, gc.y()));
+    if(((x+dx) > (gc.x()+1))) {
+        ret.append(QPoint(gc.x()+1, gc.y()));
         tmp << "west";
     }
     // check east neighbor cell
     if(((x-dx) < (gc.x()))) {
-        ret.append(QPointF(gc.x()-_cellSize, gc.y()));
+        ret.append(QPoint(gc.x()-1, gc.y()));
         tmp << "east";
     }
     // check southwest neighbor cell
-    if(((x+dx) < (gc.x())) && ((y+dy) > (gc.y()+_cellSize))) {
-        ret.append(QPointF(gc.x()-_cellSize, gc.y()+_cellSize));
+    if(((x+dx) < (gc.x())) && ((y+dy) > (gc.y()+1))) {
+        ret.append(QPoint(gc.x()-1, gc.y()+1));
         tmp << "southwest";
     }
     // check south neighbor cell
-    if(((y+dy) > (gc.y()+_cellSize))) {
-        ret.append(QPointF(gc.x(), gc.y()+_cellSize));
+    if(((y+dy) > (gc.y()+1))) {
+        ret.append(QPoint(gc.x(), gc.y()+1));
         tmp << "south";
     }
     // check southeast neighbor cell
-    if(((x+dx) > (gc.x()+_cellSize)) && ((y+dy) > (gc.y()+_cellSize))) {
-        ret.append(QPointF(gc.x()+_cellSize, gc.y()+_cellSize));
+    if(((x+dx) > (gc.x()+1)) && ((y+dy) > (gc.y()+1))) {
+        ret.append(QPoint(gc.x()+1, gc.y()+1));
         tmp << "southeast";
     }
 
     return ret;
 }
 
-void WComDecorator::increaseCellCount(QPointF cell, mvtime time)
+void WComDecorator::increaseCellCount(QPoint cell, mvtime time)
 {
     if(!_gridCount.contains(cell)) {
         _gridCount.insert(cell,QHash<mvtime,int>());
@@ -251,7 +251,7 @@ QList<double> WComDecorator::getJenksBreaks(QList<double> sListDouble, int sClas
     return pResult;
 }
 
-inline uint qHash(const QPointF &key)
+inline uint qHash(const QPoint &key)
 {
     return qHash(key.x()) ^ qHash(key.y());
 }
@@ -266,23 +266,25 @@ void WComDecorator::decorateEdges(mvtime time, IGraph *graph)
         double x = n1.properties().value(X).toDouble();
         double y = n1.properties().value(Y).toDouble();
 
-        QPointF gc((int)qFloor(x / _cellSize) * _cellSize, (int)qFloor(y / _cellSize) * _cellSize);
+        QPoint gc((int)qFloor(x / _cellSize), (int)qFloor(y / _cellSize));
 
         _grid.insert(gc,n1);
     }
 
-    foreach(const QPointF gc, _grid.keys()) {
+    foreach(const QPoint gc, _grid.uniqueKeys()) {
         foreach(const Node& n1, _grid.values(gc)) {
+            int idn1 = n1.id();
             double x = n1.properties().value(X).toDouble();
             double y = n1.properties().value(Y).toDouble();
             QVector2D p1(x,y);
-            QList<QPointF> gcList = getNeighborCells(x,y);
+            QList<QPoint> gcList = getNeighborCells(x,y);
             foreach(auto c, gcList) {
                 if(!_grid.keys().contains(c)) {
                     continue;
                 }
 
                 foreach(const Node& n2, _grid.values(c)) {
+                    int idn2 = n2.id();
                     if(n1.id() < n2.id())
                     {
                         QVector2D p2(n2.properties().value(X).toDouble(), n2.properties().value(Y).toDouble());
