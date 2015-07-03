@@ -52,9 +52,9 @@ public:
     WayPoint(QPointF coords):
         _coords(coords), _departureTime(0), _arrivalTime(0) {}
     WayPoint(Stop * stop):
-        _stop(stop), _coords(stop->getCoords()), _departureTime(0), _arrivalTime(0) {}
+        _coords(stop->getCoords()), _departureTime(0), _arrivalTime(0), _stop(stop) {}
     WayPoint(Stop * stop, mvtime departureTime, mvtime arrivalTime):
-        _stop(stop), _coords(stop->getCoords()), _departureTime(departureTime), _arrivalTime(arrivalTime) {}
+        _coords(stop->getCoords()), _departureTime(departureTime), _arrivalTime(arrivalTime), _stop(stop) {}
     WayPoint(QPointF coords, mvtime departureTime, mvtime arrivalTime, Stop * stop = NULL):
         _coords(coords), _departureTime(departureTime), _arrivalTime(arrivalTime), _stop(stop) {}
 
@@ -150,7 +150,6 @@ class GTFSLoader : public QObject, public ILoader
 {
     Q_OBJECT
 public:
-    // initialize the GTFS loader to parse into the traj variable
     GTFSLoader(QString folderPath);
     GTFSLoader(QString folderPath, QString projIn, QString projOut);
     GTFSLoader(const GTFSLoader &other);
