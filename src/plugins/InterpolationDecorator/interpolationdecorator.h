@@ -20,8 +20,6 @@ class INTERPOLATIONDECORATORSHARED_EXPORT InterpolationDecorator : public QObjec
 public:
     InterpolationDecorator();
 
-    void setEvolvingGraph(const AbstractEvolvingGraph * evolvingGraph);
-
     void decorateEdges(mvtime time, IGraph *graph);
     void decorateNodes(mvtime time, IGraph *graph);
 
@@ -30,8 +28,6 @@ public:
     virtual QString toString() const { return "InterpolationDecorator"; }
 
 
-private:
-    const AbstractEvolvingGraph * _evolvingGraph;
 };
 
 #endif // INTERPOLATIONDECORATOR_H

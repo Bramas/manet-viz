@@ -26,7 +26,8 @@ SOURCES += main.cpp\
     graphicsview.cpp \
     pluginmanager.cpp \
     gtfsloader.cpp \
-    gtfsdialog.cpp
+    gtfsdialog.cpp \
+    project.cpp
 
 HEADERS  += mainwindow.h \
     graphicsview.h \
@@ -49,7 +50,8 @@ HEADERS  += mainwindow.h \
     gtfsloader.h \
     graphicsitems.h \
     iloader.h \
-    gtfsdialog.h
+    gtfsdialog.h \
+    project.h
 
 FORMS    += mainwindow.ui \
     controlwidget.ui \

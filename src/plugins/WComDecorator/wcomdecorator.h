@@ -20,10 +20,8 @@ class WCOMDECORATORSHARED_EXPORT WComDecorator: public QObject, public IViewerLa
 
 public:
     WComDecorator();
-    void setEvolvingGraph(const AbstractEvolvingGraph * evolvingGraph);
 
     virtual void paint(IGraph * graph);
-    void setGraphicsScene(QGraphicsScene * scene);
 
     virtual void decorateEdges(mvtime time, IGraph *graph);
     virtual void decorateNodes(mvtime time, IGraph *graph);
@@ -49,7 +47,6 @@ private:
     QColor selectCellColor(int cellCount);
     QList<double> getJenksBreaks(QList<double> sListDouble, int sClassCount);
 
-    const AbstractEvolvingGraph * _evolvingGraph;
     Ui::Control *ui;
     bool _displayRange;
     int _communicationRange;

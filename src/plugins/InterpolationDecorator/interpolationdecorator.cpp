@@ -1,14 +1,10 @@
 #include "interpolationdecorator.h"
-
+#include "project.h"
+#include "iloader.h"
 #include <QDebug>
 
 InterpolationDecorator::InterpolationDecorator()
 {
-}
-
-void InterpolationDecorator::setEvolvingGraph(const AbstractEvolvingGraph *evolvingGraph)
-{
-    _evolvingGraph = evolvingGraph;
 }
 
 void InterpolationDecorator::decorateEdges(mvtime time, IGraph *graph)
@@ -18,9 +14,9 @@ void InterpolationDecorator::decorateEdges(mvtime time, IGraph *graph)
 
 void InterpolationDecorator::decorateNodes(mvtime time, IGraph *graph)
 {
-    foreach(int id, _evolvingGraph->nodes().keys())
+    foreach(int id, _project->loader()->constEvolvingGraph()->nodes().keys())
     {
-        auto nodeTimeline = _evolvingGraph->nodes().value(id);
+        auto nodeTimeline = _project->loader()->constEvolvingGraph()->nodes().value(id);
         QMap<mvtime, NodeProperties>::const_iterator up = nodeTimeline->lowerBound(time);
         if(up == nodeTimeline->constEnd())
         {

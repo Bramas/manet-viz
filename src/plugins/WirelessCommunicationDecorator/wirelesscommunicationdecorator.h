@@ -22,7 +22,6 @@ class WIRELESSCOMMUNICATIONDECORATORSHARED_EXPORT WirelessCommunicationDecorator
 public:
     WirelessCommunicationDecorator();
 
-    void setEvolvingGraph(const AbstractEvolvingGraph * evolvingGraph);
 
     virtual void decorateEdges(mvtime time, IGraph *graph);
     virtual void decorateNodes(mvtime time, IGraph *graph);
@@ -42,7 +41,6 @@ signals:
     void transmissionRangeChanged(int);
 
 private:
-    const AbstractEvolvingGraph * _evolvingGraph;
     Ui::Control *ui;
     bool _displayRange;
     int _communicationRange;

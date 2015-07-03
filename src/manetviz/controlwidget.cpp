@@ -3,15 +3,17 @@
 #include "viewer.h"
 #include "iviewerlayer.h"
 #include "igraphdecorator.h"
+#include "project.h"
 
 #include <QSpacerItem>
 
-ControlWidget::ControlWidget(QWidget *parent) :
+ControlWidget::ControlWidget(QWidget *parent, Project * project) :
     QDockWidget(parent),
     ui(new Ui::ControlWidget),
     _cumulatedTime(0),
     _isPlaying(false)
 {
+    _project = project;
     ui->setupUi(this);
     ui->dockWidgetContents->setLayout(ui->verticalLayout);
 
@@ -96,7 +98,7 @@ void ControlWidget::setViewer(Viewer *viewer)
     _viewer = viewer;
     connect(this, SIGNAL(timeChanged(mvtime)), _viewer, SLOT(setTime(mvtime)));
 
-    foreach(IViewerLayer * layer, _viewer->layers())
+    foreach(IViewerLayer * layer, _project->layers())
     {
         QWidget * w = layer->createControlWidget();
         if(w)

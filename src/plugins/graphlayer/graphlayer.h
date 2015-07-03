@@ -20,7 +20,6 @@ class GraphLayer : public QObject, public IViewerLayer
 public:
     GraphLayer();
     void paint(IGraph * graph) Q_DECL_OVERRIDE;
-    void setGraphicsScene(QGraphicsScene * scene);
 
     QWidget* createControlWidget() const;
 

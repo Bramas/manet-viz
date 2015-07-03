@@ -84,12 +84,18 @@ bool GraphLoader::load()
 
 bool GraphLoader::concurrentLoad(QFile * file)
 {
+    int limit = 20;
     while(!file->atEnd())
     {
+        if(--limit < 0)
+        {
+            break;
+        }
         for(int i = 0; i< 10000; ++i)
         {
-            if(!file->atEnd())
-                processLine(QString(file->readLine()).split(QRegExp("[\r\n]"), QString::SkipEmptyParts).at(0));
+            if(file->atEnd())
+                break;
+            processLine(QString(file->readLine()).split(QRegExp("[\r\n]"), QString::SkipEmptyParts).at(0));
         }
         _loadProgress = 1.0 - file->bytesAvailable() / (qreal)file->size();
         emit onLoadProgressChanged(_loadProgress);
@@ -98,7 +104,8 @@ bool GraphLoader::concurrentLoad(QFile * file)
             return false;
         }
     }
-
+    _loadProgress = 1.0;
+    emit onLoadProgressChanged(_loadProgress);
     file->close();
     file->deleteLater();
     _isFinished = true;

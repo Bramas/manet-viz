@@ -3,6 +3,8 @@
 #include "igraphlayout.h"
 #include "igraphdecorator.h"
 #include "pluginmanager.h"
+#include "project.h"
+#include "iloader.h"
 #include <QPainter>
 #include <QWheelEvent>
 #include <QMouseEvent>
@@ -12,21 +14,24 @@
 #include <QPointF>
 #include <QDebug>
 
-Viewer::Viewer(const AbstractEvolvingGraph * evg)
+Viewer::Viewer()
 {
     _afterTranslate = QPointF(-83000, -12.35*2000);
     _layout = 0;
     _zoom=2000;
     //setMouseTracking(true);
     _timeSinceLastFrame.start();
-    _evolvingGraph = evg;
-    connect(&PluginManager::instance, SIGNAL(pluginsChanged()), this, SLOT(onPluginsChanged()));
-    onPluginsChanged();
 }
 
 Viewer::~Viewer()
 {
 
+}
+void Viewer::setProject(Project *project)
+{
+    _project = project;
+    connect(&PluginManager::instance, SIGNAL(pluginsChanged()), this, SLOT(onPluginsChanged()));
+    onPluginsChanged();
 }
 
 
@@ -37,7 +42,7 @@ QPointF Viewer::toLocalCoordinates(QPointF globalCoordinates) const
 
 void Viewer::setTime(mvtime time)
 {
-    _time = time + _evolvingGraph->beginTime();
+    _time = time + _project->loader()->constEvolvingGraph()->beginTime();
     updateLayers();
 }
 void Viewer::updateLayers()
@@ -46,17 +51,8 @@ void Viewer::updateLayers()
         qDebug() << "no layout";
         return;
     }
-    IGraph * graph = new Graph();
+    IGraph * graph = _project->constructSnapshot(_time);
 
-
-    foreach(auto layer, _layers)
-    {
-        layer->decorateNodes(_time, graph);
-    }
-    foreach(auto layer, _layers)
-    {
-        layer->decorateEdges(_time, graph);
-    }
 
     _layout->footprint(_time, graph);
 
@@ -87,7 +83,7 @@ void Viewer::updateLayers()
                 edge->setPen(p);
                 edge->setPos(middle);
 
-                foreach(auto layer, _layers)
+                foreach(auto layer, _project->layers())
                 {
                     layer->decoratesGraphicsEdge(edge);
                 }
@@ -107,7 +103,7 @@ void Viewer::updateLayers()
         GraphicsNodeItem * node = new GraphicsNodeItem();
         node->setPen(p);
         node->setPos(position);
-        foreach(auto layer, _layers)
+        foreach(auto layer, _project->layers())
         {
             layer->decoratesGraphicsNode(node);
         }
@@ -116,92 +112,19 @@ void Viewer::updateLayers()
     this->addItem(_items);
     update();
 
-    foreach(auto layer, _layers)
+    foreach(auto layer, _project->layers())
     {
         layer->paint(graph);
     }
     update();
 }
 
-/*
-void Viewer::paintEvent(QPaintEvent *)
-{
-    QPainter painter(this);
-    painter.drawText(QPoint(0,50), QString::number(1000.0/_timeSinceLastFrame.elapsed()));
-    _timeSinceLastFrame.start();
-    for(qreal x = 41; x < 43; x += 0.1)
-    {
-        qreal localX = toLocalCoordinates(QPointF(x,0)).x();
-        painter.drawLine(localX, 0, localX, height());
-    }
-    for(qreal y = 12; y < 14; y += 0.1)
-    {
-        qreal localY = toLocalCoordinates(QPointF(0, y)).y();
-        painter.drawLine(0, localY, width(), localY);
-    }
-
-
-    foreach(auto layer, _layers)
-    {
-        painter.save();
-        layer->paint(&painter);
-        painter.restore();
-    }
-}
-
-void Viewer::wheelEvent(QWheelEvent * e)
-{
-
-    qreal factor = (1+e->delta()/200.0);
-    factor = qMin(factor,1.1);
-    factor = qMax(factor, 0.9);
-
-    _zoom *= factor;
-    _afterTranslate -= e->pos();
-    _afterTranslate *= factor;
-    _afterTranslate += e->pos();
-
-    update();
-}
-
-void Viewer::mouseMoveEvent(QMouseEvent * e)
-{
-    //qDebug()<<e->buttons();
-    if(e->buttons() == Qt::LeftButton)
-    {
-        _afterTranslate += e->pos() - _lastMousePos;
-        _lastMousePos = e->pos();
-        update();
-    }
-}
-
-void Viewer::mousePressEvent(QMouseEvent * e)
-{
-    _lastMousePos = e->pos();
-}
-
-*/
-
-void Viewer::addLayer(IViewerLayer *layer, int priority)
-{
-    connect(layer->getQObject(), SIGNAL(requestUpdate()), this, SLOT(updateLayers()));
-    _layers.insertMulti(priority, layer);
-}
 
 void Viewer::onPluginsChanged()
 {
-    foreach(IViewerLayer * layer, PluginManager::getObjects<IViewerLayer>())
-    {
-        layer->setEvolvingGraph(_evolvingGraph);
-        layer->setGraphicsScene(this);
-        addLayer(layer);
-        qDebug() << "layer" << layer->toString();
-        connect(layer->getQObject(), SIGNAL(requestUpdate()), this, SLOT(updateLayers()));
-   }
-
     foreach(IGraphLayout * layout, PluginManager::getObjects<IGraphLayout>())
     {
-         layout->setEvolvingGraph(_evolvingGraph);
+         layout->setProject(_project);
          _layout = layout;
          break;
     }

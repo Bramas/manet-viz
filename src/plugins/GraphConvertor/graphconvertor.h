@@ -15,7 +15,7 @@ public:
     GraphConvertor();
 
     QStringList requiredField() const { return QStringList(); }
-    void setEvolvingGraph(const AbstractEvolvingGraph * evolvingGraph);
+    void setProject(Project * project);
     QWidget * createControlWidget() const;
 
     virtual QObject * getQObject() { return this; }
@@ -23,6 +23,8 @@ signals:
     void graphLoaded(bool);
 public slots:
     void onGraphLoaded();
+
+    void convert();
 };
 
 #endif // GRAPHCONVERTOR_H

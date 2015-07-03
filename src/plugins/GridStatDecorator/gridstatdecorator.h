@@ -20,14 +20,12 @@ class GRIDSTATDECORATORSHARED_EXPORT GridStatDecorator: public QObject, public I
 
 public:
     GridStatDecorator();
-    void setEvolvingGraph(const AbstractEvolvingGraph * evolvingGraph);
-    void setGraphicsScene(QGraphicsScene * scene);
+    void setProject(Project * project);
 
     QObject * getQObject() { return this; }
     virtual QString toString() const { return "GridStatDecorator"; }
 
 private:
-    const AbstractEvolvingGraph * _evolvingGraph;
     int _transmissionRange = 500;
     QList<QRectF> _grid;
     QGraphicsItemGroup * _items;
