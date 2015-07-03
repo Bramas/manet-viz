@@ -8,10 +8,11 @@
 
 #include "/usr/local/include/proj_api.h"
 #include "types.h"
+#include "iloader.h"
 
 class AbstractEvolvingGraph;
 
-class GraphLoader : public QObject
+class GraphLoader : public QObject, public ILoader
 {
     Q_OBJECT
 public:
@@ -22,12 +23,15 @@ public:
     const AbstractEvolvingGraph *   constEvolvingGraph() const;
     AbstractEvolvingGraph *         evolvingGraph() const;
 
-    bool    isFinished() const { return _isFinished; }
+    bool    isLoaded() const { return _isFinished; }
 
     qreal loadProgress() const { return _loadProgress; }
     void cancelLoadAndWait();
 
+    QObject * getQObject() { return this; }
+
 signals:
+    void loaded();
     void onLoadProgressChanged(qreal);
 public slots:
     bool load();

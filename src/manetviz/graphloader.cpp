@@ -15,6 +15,7 @@ GraphLoader::GraphLoader(QString filename, QRegExp lineRegex, QList<QString> hea
     _forceStop = false;
     _loadProgress = 0;
     _evolvingGraph = new EvolvingGraph();
+    _evolvingGraph->setLoader(this);
     if(!projIn.isEmpty() && !projOut.isEmpty()) {
         _pjIn  = pj_init_plus(projIn.toStdString().c_str());
         _pjOut = pj_init_plus(projOut.toStdString().c_str());
@@ -31,6 +32,7 @@ GraphLoader::GraphLoader(const GraphLoader &other) :
     _forceStop = false;
     _loadProgress = 0;
     _evolvingGraph = new EvolvingGraph();
+    _evolvingGraph->setLoader(this);
     _pjIn = other._pjIn;
     _pjOut = other._pjOut;
 }
@@ -54,7 +56,7 @@ const AbstractEvolvingGraph * GraphLoader::constEvolvingGraph() const
  */
 AbstractEvolvingGraph * GraphLoader::evolvingGraph() const
 {
-    if(!isFinished())
+    if(!isLoaded())
     {
         return 0;
     }
@@ -99,6 +101,8 @@ bool GraphLoader::concurrentLoad(QFile * file)
 
     file->close();
     file->deleteLater();
+    _isFinished = true;
+    emit loaded();
     return true;
 }
 

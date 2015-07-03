@@ -13,6 +13,7 @@ GTFSLoader::GTFSLoader(QString folderPath):
     _tripsFilePath(folderPath+"/trips.txt")
 {
     _evolvingGraph = new EvolvingGraph();
+    _evolvingGraph->setLoader(this);
     _trajectories = QMap<QString, Trajectory *>();
 }
 
@@ -44,6 +45,11 @@ GTFSLoader::~GTFSLoader()
 }
 
 AbstractEvolvingGraph * GTFSLoader::evolvingGraph() const
+{
+    return _evolvingGraph;
+}
+
+const AbstractEvolvingGraph * GTFSLoader::constEvolvingGraph() const
 {
     return _evolvingGraph;
 }
