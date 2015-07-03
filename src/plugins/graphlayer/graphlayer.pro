@@ -16,4 +16,3 @@ DISTFILES += \
 
 FORMS += \
     graphlayercontrol.ui
-

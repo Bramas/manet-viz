@@ -6,4 +6,3 @@ SUBDIRS	    = graphlayer \
     WirelessCommunicationDecorator \
     GridStatDecorator \
     WComDecorator
-

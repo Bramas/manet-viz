@@ -5,28 +5,32 @@
 #include "abstractevolvinggraph.h"
 #include "types.h"
 #include "/usr/local/include/proj_api.h"
+#include <geos/geom/GeometryFactory.h>
+#include <geos/geom/Coordinate.h>
+#include <geos/operation/overlay/snap/GeometrySnapper.h>
+#include <geos/geom/LineString.h>
+#include <geos/geom/Point.h>
+#include <geos/geom/CoordinateSequence.h>
+#include <geos/geom/CoordinateArraySequence.h>
+#include <geos/linearref/LinearLocation.h>
+#include <geos/linearref/LocationIndexedLine.h>
+#include <geos/linearref/ExtractLineByLocation.h>
 
-class WayPoint
-{
-public:
-    WayPoint():
-        _coords(QPointF()) {}
-    WayPoint(QPointF coords):
-        _coords(coords) {}
+using namespace geos;
+using namespace geos::geom;
+using namespace geos::linearref;
 
-    QPointF getCoords() {return _coords;}
-
-protected:
-    QPointF _coords;
-};
-
-class Stop: public WayPoint
+class Stop
 {
 public:
     Stop():
-        WayPoint(), _id(""), _name("") {}
+        _id(""), _name(""), _coords(QPointF()) {}
     Stop(QString id, QString name, QPointF coords):
-        WayPoint(coords), _id(id), _name(name) {}
+        _id(id), _name(name), _coords(coords) {}
+
+    QPointF getCoords() {return _coords;}
+    void setCoords(double x, double y) { _coords = QPointF(x,y); }
+    void setCoords(QPointF p) { _coords = QPointF(p); }
 
     QString toString() {
         return QString("%1 - %2 (%3, %4)").arg(_id).arg(_name).arg(_coords.x()).arg(_coords.y());
@@ -35,6 +39,35 @@ public:
 private:
     QString _id;
     QString _name;
+    QPointF _coords;
+};
+
+class WayPoint
+{
+public:
+    WayPoint():
+        _coords(QPointF()), _departureTime(0), _arrivalTime(0) {}
+    WayPoint(QPointF coords):
+        _coords(coords), _departureTime(0), _arrivalTime(0) {}
+    WayPoint(Stop * stop):
+        _stop(stop), _coords(stop->getCoords()), _departureTime(0), _arrivalTime(0) {}
+    WayPoint(Stop * stop, mvtime departureTime, mvtime arrivalTime):
+        _stop(stop), _coords(stop->getCoords()), _departureTime(departureTime), _arrivalTime(arrivalTime) {}
+    WayPoint(QPointF coords, mvtime departureTime, mvtime arrivalTime, Stop * stop = NULL):
+        _coords(coords), _departureTime(departureTime), _arrivalTime(arrivalTime), _stop(stop) {}
+
+    QPointF getCoords() {return _coords;}
+    void setCoords(double x, double y) { _coords = QPointF(x,y); }
+    void setCoords(QPointF p) { _coords = QPointF(p); }
+    void setTimes(mvtime departureTime, mvtime arrivalTime) { _departureTime = departureTime; _arrivalTime = arrivalTime; }
+    mvtime getDepartureTime() { return _departureTime; }
+    mvtime getArrivalTime() { return _arrivalTime; }
+
+protected:
+    QPointF _coords;
+    mvtime _departureTime;
+    mvtime _arrivalTime;
+    Stop * _stop;
 };
 
 class Trip
@@ -59,6 +92,7 @@ public:
 
     QString getRouteId() const { return _routeId; }
     QString getServiceId() const { return _serviceId; }
+    QString getShapeId() const { return _shapeId; }
 
 protected:
     QString _routeId;
@@ -69,6 +103,8 @@ protected:
     QString _shapeId;
 
 };
+
+class GTFSLoader;
 
 class Trajectory: public Trip
 {
@@ -90,15 +126,19 @@ public:
         return time <= _trajectory.lastKey() && time >= _trajectory.firstKey();
     }
 
-    void addWayPoint(mvtime time, WayPoint * p) {
-        _trajectory.insert(time, p);
+    void addWayPoint(WayPoint * p) {
+        _trajectory.insert(p->getArrivalTime(), p);
     }
+
+    QMap<mvtime, WayPoint *> getTrajectory() const { return _trajectory; }
 
     QString toString() {
         QString ret;
         return QString("%1 / %2 / %3 / %4").arg(_tripId).arg(_serviceId).arg(_routeId).arg(_trajectory.count());
         return ret;
     }
+
+    friend class GTFSLoader;
 
 private:
     QMap<mvtime, WayPoint *> _trajectory;
@@ -134,6 +174,7 @@ private:
 
     void parseTrips();
     mvtime toSeconds(QString time);
+    QPointF transfromCoordinates(double lat, double lon);
 };
 
 #endif // GTFSLOADER_H

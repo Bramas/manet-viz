@@ -27,4 +27,3 @@ DISTFILES += \
     wirelesscommunicationdecorator.json
 
 FORMS += control.ui
-
