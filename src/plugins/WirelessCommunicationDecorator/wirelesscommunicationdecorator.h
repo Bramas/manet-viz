@@ -29,7 +29,7 @@ public:
     QObject * getQObject() { return this; }
 
     QWidget * createControlWidget() const;
-    void  decoratesGraphicsNode(GraphicsNodeItem * node) const;
+    void  decoratesGraphicsNode(const Node &n, GraphicsNodeItem * node) const;
     QString toString() const { return "WirelessCommunicationDecorator"; }
 
 public slots:

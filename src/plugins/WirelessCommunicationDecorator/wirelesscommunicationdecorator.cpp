@@ -60,7 +60,7 @@ QWidget * WirelessCommunicationDecorator::createControlWidget() const
     return control;
 }
 
-void  WirelessCommunicationDecorator::decoratesGraphicsNode(GraphicsNodeItem * node) const
+void  WirelessCommunicationDecorator::decoratesGraphicsNode(const Node &n, GraphicsNodeItem * node) const
 {
     if(!_displayRange)
         return ;

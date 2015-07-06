@@ -20,7 +20,7 @@ public:
 
     virtual QWidget*        createControlWidget() const { return 0; }
     virtual void decoratesGraphicsEdge(GraphicsEdgeItem * edge) const { return; }
-    virtual void decoratesGraphicsNode(GraphicsNodeItem * node) const { return; }
+    virtual void decoratesGraphicsNode(const Node &n, GraphicsNodeItem * node) const { return; }
 
     virtual QObject* getQObject() = 0;
 

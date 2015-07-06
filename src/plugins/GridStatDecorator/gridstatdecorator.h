@@ -45,7 +45,7 @@ private:
     QHash<QPoint,QLinkedList<QPair<mvtime,int> > > _gridCount;
     QHash<QPoint,int> _contactCount;
     mvtime _timeWindow;
-    QList<QGraphicsItem*> _gridGroupItems;
+    QGraphicsItemGroup * _gridGroupItems;
 
 private slots:
     void setShowGrid(bool);

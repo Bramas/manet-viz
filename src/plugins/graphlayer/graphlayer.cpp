@@ -73,7 +73,7 @@ QWidget* GraphLayer::createControlWidget() const
     return control;
 }
 
-void GraphLayer::decoratesGraphicsEdge(GraphicsEdgeItem * node) const
+void GraphLayer::decoratesGraphicsEdge(const Node &n, GraphicsEdgeItem * node) const
 {
     QPen p(QColor(0,255,0));
     p.setWidth(1);

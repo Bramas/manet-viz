@@ -35,47 +35,37 @@ QList<QPoint> WComDecorator::getNeighborCells(double x, double y) {
 
     ret.append(gc);
 
-    // check northwest neighbor cell
-    if(((x-dx) < (gc.x())) && ((y-dy) < (gc.y()))) {
-        ret.append(QPoint(gc.x()-1, gc.y()-1));
-        tmp << "northwest";
-    }
-    // check north neighbor cell
-    if(((y-dy) < (gc.y()))) {
-        ret.append(QPoint(gc.x(), gc.y()-1));
-        tmp << "north";
-    }
-    // check northeast neighbor cell
-    if(((x+dx) > (gc.x()+1)) && ((y-dy) < (gc.y()))) {
-        ret.append(QPoint(gc.x()+1, gc.y()-1));
-        tmp << "northeast";
-    }
-    // check west neighbor cell
-    if(((x+dx) > (gc.x()+1))) {
-        ret.append(QPoint(gc.x()+1, gc.y()));
-        tmp << "west";
-    }
-    // check east neighbor cell
-    if(((x-dx) < (gc.x()))) {
-        ret.append(QPoint(gc.x()-1, gc.y()));
-        tmp << "east";
-    }
-    // check southwest neighbor cell
-    if(((x+dx) < (gc.x())) && ((y+dy) > (gc.y()+1))) {
-        ret.append(QPoint(gc.x()-1, gc.y()+1));
-        tmp << "southwest";
-    }
-    // check south neighbor cell
-    if(((y+dy) > (gc.y()+1))) {
-        ret.append(QPoint(gc.x(), gc.y()+1));
-        tmp << "south";
-    }
-    // check southeast neighbor cell
-    if(((x+dx) > (gc.x()+1)) && ((y+dy) > (gc.y()+1))) {
-        ret.append(QPoint(gc.x()+1, gc.y()+1));
-        tmp << "southeast";
-    }
+    // Consider the cell of the same point, translated by communicationRange on both x and y axis
+    QPoint gc_p((int)qFloor((x + _communicationRange) / _cellSize), (int)qFloor((y + _communicationRange) / _cellSize));
 
+    if(gc_p.x() == gc.x()) // if they have the same x coordinates, collisions can only occurs with cells on the left
+    {
+        ret.append(QPoint(gc.x()-1, gc.y()));
+        if(gc_p.y() == gc.y()) // if they have the same y coordinates, collisions can only occurs with cells on the top
+        {
+            ret.append(QPoint(gc.x(), gc.y()-1));
+            ret.append(QPoint(gc.x()-1, gc.y()-1));
+        }
+        else  // if they have different y coordinates, collisions can only occurs with cells on the bottom
+        {
+            ret.append(QPoint(gc.x(), gc.y()+1));
+            ret.append(QPoint(gc.x()-1, gc.y()+1));
+        }
+    }
+    else // if they have different x coordinates, collisions can only occurs with cells on the right
+    {
+        ret.append(QPoint(gc.x()+1, gc.y()));
+        if(gc_p.y() == gc.y()) // if they have the same y coordinates, collisions can only occurs with cells on the top
+        {
+            ret.append(QPoint(gc.x(), gc.y()-1));
+            ret.append(QPoint(gc.x()+1, gc.y()-1));
+        }
+        else  // if they have different y coordinates, collisions can only occurs with cells on the bottom
+        {
+            ret.append(QPoint(gc.x(), gc.y()+1));
+            ret.append(QPoint(gc.x()+1, gc.y()+1));
+        }
+    }
     return ret;
 }
 
@@ -144,7 +134,7 @@ QWidget * WComDecorator::createControlWidget() const
     return control;
 }
 
-void  WComDecorator::decoratesGraphicsNode(GraphicsNodeItem * node) const
+void  WComDecorator::decoratesGraphicsNode(const Node &n, GraphicsNodeItem * node) const
 {
     if(!_displayRange)
         return ;

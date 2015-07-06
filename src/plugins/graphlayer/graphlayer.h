@@ -24,7 +24,7 @@ public:
     QWidget* createControlWidget() const;
 
     QGraphicsItem*  graphicsNodeChildItem(const Node &n) const { return 0; }
-    void decoratesGraphicsEdge(GraphicsEdgeItem * node) const;
+    void decoratesGraphicsEdge(const Node &n, GraphicsEdgeItem * node) const;
 
     QObject* getQObject() { return this; }
     virtual QString toString() const { return "GraphLayer"; }

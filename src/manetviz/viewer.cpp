@@ -104,7 +104,7 @@ void Viewer::updateLayers()
         node->setPos(position);
         foreach(auto layer, _project->layers())
         {
-            layer->decoratesGraphicsNode(node);
+            layer->decoratesGraphicsNode(n, node);
         }
         _items->addToGroup(node);
     }

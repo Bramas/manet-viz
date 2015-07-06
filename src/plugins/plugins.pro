@@ -7,4 +7,5 @@ SUBDIRS	    = graphlayer \
     GridStatDecorator \
     WComDecorator \
     GraphConvertor \
-    ShapeLoader
+    ShapeLoader \
+    StaticNodes

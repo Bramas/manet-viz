@@ -7,11 +7,11 @@
 CONFIG += c++11
 QT       += widgets
 DESTDIR         = ../../manetviz/plugins
+INCLUDEPATH    += ../../manetviz
 
 
 TARGET = InterpolationDecorator
 TEMPLATE = lib
-INCLUDEPATH    += ../../manetviz
 
 DEFINES += INTERPOLATIONDECORATOR_LIBRARY
 

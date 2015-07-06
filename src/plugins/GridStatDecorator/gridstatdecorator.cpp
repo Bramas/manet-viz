@@ -13,9 +13,10 @@ GridStatDecorator::GridStatDecorator():
 
     _gridCount = QHash<QPoint,QLinkedList<QPair<mvtime,int> > >();
     _contactCount = QHash<QPoint,int>();
-    _timeWindow = 5; // 60 minutes
+    _timeWindow = 60*60; // 60 minutes
     _showGrid = true;
     _cellSize = 500;
+    _gridGroupItems = new QGraphicsItemGroup();
 }
 
 void GridStatDecorator::setProject(Project * project)
@@ -33,8 +34,9 @@ void GridStatDecorator::setProject(Project * project)
 void GridStatDecorator::paint(IGraph *graph)
 {
     // Display the cell counts
-    _gridGroupItems.clear();
-
+    delete _gridGroupItems;
+    _gridGroupItems = new QGraphicsItemGroup();
+    _project->viewer()->addItem(_gridGroupItems);
     for(auto cellIt = _contactCount.begin(); cellIt != _contactCount.end(); ++cellIt) {
         int contactSum = cellIt.value();
 
@@ -44,16 +46,13 @@ void GridStatDecorator::paint(IGraph *graph)
             item->setBrush(QBrush(selectCellColor(contactSum)));
             item->setPen(Qt::NoPen);
             item->setOpacity(0.5);
-            _gridGroupItems.append(item);
+            _gridGroupItems->addToGroup(item);
         }
     }
-
-    _project->viewer()->createItemGroup(_gridGroupItems);
 }
 
 void GridStatDecorator::decorateEdges(mvtime time, IGraph *graph)
 {
-    qDebug()<<"decorateEdges ";
     if(_showGrid) {
         // update the grid count hash by deleting the obsolete cells
         deleteObsoleteCells(time);
@@ -72,7 +71,6 @@ void GridStatDecorator::decorateEdges(mvtime time, IGraph *graph)
                     if(gc1 != gc2)
                         increaseCellCount(gc2, time);
 
-                    qDebug()<<"increase "<<gc1;
                 }
             }
         }
@@ -98,7 +96,7 @@ void GridStatDecorator::increaseCellCount(QPoint cell, mvtime time)
         _contactCount.insert(cell, 0);
     }
     _contactCount[cell]++;
-    if(!_gridCount.value(cell).back().first != time) {
+    if(_gridCount.value(cell).isEmpty() || !_gridCount.value(cell).back().first != time) {
         _gridCount[cell].append(QPair<mvtime, int>(time, 1));
     } else {
         _gridCount[cell].back().second++;
@@ -112,13 +110,11 @@ void GridStatDecorator::deleteObsoleteCells(mvtime time)
 
         while(!cellIt.value().isEmpty() && cellIt.value().front().first < time - _timeWindow)
         {
-            qDebug()<<"remove  "<<cellIt.value().front().first;
             _contactCount[cellIt.key()] -= cellIt.value().front().second;
             cellIt.value().pop_front();
         }
         if(cellIt.value().isEmpty())
         {
-            qDebug()<<"delete  "<<cellIt.key();
             _contactCount.remove(cellIt.key());
             cellIt = _gridCount.erase(cellIt);
         }
@@ -135,14 +131,19 @@ QColor GridStatDecorator::selectCellColor(int cellCount)
     // TODO: use natural jenks
     QList<int> l(_contactCount.values());
     std::sort(l.begin(), l.end());
-    int q12 = l[l.size()*1/4];
+    if(cellCount == 0 || l.isEmpty())
+    {
+        return QColor(255,255,255,0);
+    }
+    return QColor(0,0, 255, cellCount * 200 / l.last());
+    /*int q12 = l[l.size()*1/4];
     int q23 = l[l.size()*2/4];
     int q34 = l[l.size()*3/4];
 
     if(cellCount > q34) return QColor(210,211,231);
     else if(cellCount > q23) return QColor(219,218,234);
     else if(cellCount > q12) return QColor(226,225,239);
-    else return QColor(233,233,243);
+    else return QColor(233,233,243);*/
 }
 
 QList<double> GridStatDecorator::getJenksBreaks(QList<double> sListDouble, int sClassCount)
@@ -217,7 +218,6 @@ void GridStatDecorator::setShowGrid(bool show)
 {
     _showGrid = show;
     _contactCount.clear();
-    _gridGroupItems.clear();
 }
 
 inline uint qHash(const QPoint &key)
