@@ -16,6 +16,7 @@ GridStatDecorator::GridStatDecorator():
     _timeWindow = 60*60; // 60 minutes
     _showGrid = true;
     _cellSize = 500;
+    _communicationRange = 100;
     _gridGroupItems = new QGraphicsItemGroup();
 }
 
@@ -23,12 +24,22 @@ void GridStatDecorator::setProject(Project * project)
 {
 
     _project = project;
-
+/*
     foreach(auto layer, _project->layers()) {
-        qDebug() << "plugin:" + layer->getQObject()->objectName();
+        QObject * comPlugin = PluginManager::getPluginByName("WComDecorator");
+        if(comPlugin->metaObject()->indexOfSignal("transmissionRangeChanged(int)"))
+        {
+            connect(comPlugin, SIGNAL(transmissionRangeChanged(int)), this, SLOT(setCommunicationRange(int)));
+        }
     }
+*/
 
     qDebug() << "GridStatDecorator set project";
+}
+
+void GridStatDecorator::setCommunicationRange(int com)
+{
+    _communicationRange = com;
 }
 
 void GridStatDecorator::paint(IGraph *graph)
@@ -77,6 +88,7 @@ void GridStatDecorator::decorateEdges(mvtime time, IGraph *graph)
     }
 }
 
+
 QWidget *GridStatDecorator::createControlWidget() const
 {
     QWidget * control = new QWidget();
@@ -84,6 +96,15 @@ QWidget *GridStatDecorator::createControlWidget() const
     qDebug() << "gridstatdecorator control widget";
     connect(ui->showGridCheckBox, SIGNAL(toggled(bool)), this, SLOT(setShowGrid(bool)));
     return control;
+}
+
+void GridStatDecorator::addDependancy(QObject *plugin)
+{
+    if(plugin->objectName() == "WComDecorator")
+    {
+        _wirelessCommunicationPlugin = plugin;
+        connect(_wirelessCommunicationPlugin, SIGNAL(transmissionRangeChanged(int)), this, SLOT(setCommunicationRange(int)));
+    }
 }
 
 void GridStatDecorator::increaseCellCount(QPoint cell, mvtime time)

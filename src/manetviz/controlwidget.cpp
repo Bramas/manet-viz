@@ -104,6 +104,7 @@ void ControlWidget::setViewer(Viewer *viewer)
         if(w)
         {
             ui->verticalLayout->addWidget(w);
+            qDebug()<<"add control for "<<layer->getQObject()->objectName();
         }
     }
     //add vertical Spacer

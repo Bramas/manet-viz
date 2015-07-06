@@ -20,6 +20,8 @@ public:
     IViewerLayer() {}
     virtual ~IViewerLayer() {}
 
+    virtual void addDependancy(QObject* plugin) { }
+
     virtual void setProject(Project * project) { _project = project; }
     virtual void paint(IGraph * graph) { return; }
 

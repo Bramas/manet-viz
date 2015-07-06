@@ -4,6 +4,7 @@
 #include <QSet>
 #include <QDebug>
 #include <QJsonArray>
+#include "iviewerlayer.h"
 
 PluginManager PluginManager::instance;
 
@@ -33,14 +34,6 @@ QList<QObject *> PluginManager::allObjects()
     return ret;
 }
 
-QObject * PluginManager::getPlugin(QString name){
-    foreach(auto o, instance._allObjects) {
-        if(o.first == name)
-            return o.second;
-    }
-    return NULL;
-}
-
 void PluginManager::loadPlugins()
 {
     QList<QPair<QString,QString> > pluginFilenames = loadFilenames();
@@ -52,8 +45,17 @@ void PluginManager::loadPlugins()
             qWarning()<<"Unable to laod plugin: "<<filename.first;
             continue;
         }
+        QObject * plugin = loader.instance();
+        plugin->setObjectName(filename.first);
         qDebug() << "Load " << filename.first;
-        instance._allObjects.append(qMakePair(filename.first, loader.instance()));
+
+        QJsonObject meta = loader.metaData();
+        QStringList dependancyList = meta.value("MetaData").toObject().value("dependencies").toVariant().toStringList();
+        foreach(QString dep, dependancyList) {
+            qobject_cast<IViewerLayer*>(plugin)->addDependancy(getObjectByName(dep));
+        }
+
+        instance._allObjects.append(qMakePair(filename.first, plugin));
     }
 }
 

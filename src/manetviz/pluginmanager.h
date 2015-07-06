@@ -2,6 +2,7 @@
 #define PLUGINMANAGER_H
 
 #include <QObject>
+#include <QMetaObject>
 #include <QReadWriteLock>
 #include <QPluginLoader>
 #include <QStringList>
@@ -35,7 +36,16 @@ public:
     static void loadPlugins();
     static QStringList pluginPaths();
     static void setPluginPaths(const QStringList &paths);
-    static QObject * getPlugin(QString name);
+    static QObject * getObjectByName(QString name){
+        QReadLocker lock(listLock());
+        QList<QObject *> all = allObjects();
+
+        foreach (QObject *obj, all) {
+            if (obj->objectName() == name)
+                return obj;
+        }
+        return NULL;
+    }
 
     enum PluginState { Invalid, Loaded, Initialized, Running, Stopped, Deleted};
 

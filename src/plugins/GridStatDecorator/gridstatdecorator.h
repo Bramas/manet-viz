@@ -32,7 +32,9 @@ public:
 
     QObject * getQObject() { return this; }
     virtual QString toString() const { return "GridStatDecorator"; }
-
+    void addDependancy(QObject* plugin);
+public slots:
+    void setCommunicationRange(int);
 private:
     void increaseCellCount(QPoint cell, mvtime time);
     void deleteObsoleteCells(mvtime time);
@@ -46,6 +48,9 @@ private:
     QHash<QPoint,int> _contactCount;
     mvtime _timeWindow;
     QGraphicsItemGroup * _gridGroupItems;
+    int _communicationRange;
+
+    QObject * _wirelessCommunicationPlugin;
 
 private slots:
     void setShowGrid(bool);
