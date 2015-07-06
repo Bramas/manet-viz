@@ -106,14 +106,6 @@ void ControlWidget::setViewer(Viewer *viewer)
             ui->verticalLayout->addWidget(w);
         }
     }
-    foreach(IGraphDecorator * decorator, _viewer->graphDecorators())
-    {
-        QWidget * w = decorator->createControlWidget();
-        if(w)
-        {
-            ui->verticalLayout->addWidget(w);
-        }
-    }
     //add vertical Spacer
     ui->verticalLayout->addSpacerItem(new QSpacerItem(20,20,QSizePolicy::Minimum, QSizePolicy::Expanding));
 }

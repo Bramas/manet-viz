@@ -24,3 +24,6 @@ unix {
 
 DISTFILES += \
     gridstatdecorator.json
+
+FORMS += \
+    control.ui

@@ -10,7 +10,6 @@
 class Project;
 class IViewerLayer;
 class IGraphLayout;
-class IGraphDecorator;
 class AbstractEvolvingGraph;
 
 class Viewer : public QGraphicsScene
@@ -25,8 +24,6 @@ public:
     QPointF toLocalCoordinates(QPointF globalCoordinates) const;
 
     mvtime time() const { return _time; }
-
-    QList<IGraphDecorator* > graphDecorators() const { return _graphDecorators.values(); }
 
 signals:
 
@@ -44,7 +41,6 @@ protected:
 private:
 
     IGraphLayout * _layout;
-    QMap<int, IGraphDecorator *> _graphDecorators;
     mvtime _time;
     QPoint _lastMousePos;
     QPointF _afterTranslate;
