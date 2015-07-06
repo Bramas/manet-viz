@@ -1,7 +1,6 @@
 #include "viewer.h"
 #include "iviewerlayer.h"
 #include "igraphlayout.h"
-#include "igraphdecorator.h"
 #include "pluginmanager.h"
 #include "project.h"
 #include "iloader.h"

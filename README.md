@@ -26,6 +26,8 @@ Since we want to work with distances and spatial operations, we use a projected 
 +proj=utm +zone=33 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs
 ```
 
+*Note.*  You can use [this website][4] to transform WGS 84 lat/lon coordinates into UTM x/y coordinates. The website also gives the UTM zone associated with the lat/lon coordinates.
+
 ## Add a plugin
 
 To add a new plugin under QT:
@@ -68,3 +70,4 @@ Create a new file in the plugin directory of the name: `<plugin_name>.json` that
 [1]:	http://crawdad.cs.dartmouth.edu/roma/taxi/ "Crawdad roma/taxi dataset"
 [2]: http://spatialreference.org/ref/epsg/wgs-84/ "ESPG:4326"
 [3]: http://spatialreference.org/ref/epsg/3065/ "EPSG:3065"
+[4]: http://www.movable-type.co.uk/scripts/latlong-utm-mgrs.html "WGS84 to UTM coordinates"

@@ -47,9 +47,11 @@ void Project::addLayer(IViewerLayer *layer, int priority)
 
 void Project::onPluginsChanged()
 {
+    int i = 0;
     foreach(IViewerLayer * layer, PluginManager::getObjects<IViewerLayer>())
     {
         layer->setProject(this);
-        addLayer(layer);
+        qDebug() << layer->toString();
+        addLayer(layer, i++);
     }
 }

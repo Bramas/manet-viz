@@ -6,10 +6,15 @@
 #include <QObject>
 #include <QMultiHash>
 
-#include  "ui_control.h"
+
 #include "iviewerlayer.h"
 #include "types.h"
 #include "graph.h"
+
+namespace Ui {
+class Control;
+}
+
 
 class WCOMDECORATORSHARED_EXPORT WComDecorator: public QObject, public IViewerLayer
 {
@@ -21,10 +26,7 @@ class WCOMDECORATORSHARED_EXPORT WComDecorator: public QObject, public IViewerLa
 public:
     WComDecorator();
 
-    virtual void paint(IGraph * graph);
-
     virtual void decorateEdges(mvtime time, IGraph *graph);
-    virtual void decorateNodes(mvtime time, IGraph *graph);
 
     QObject * getQObject() { return this; }
 
@@ -42,22 +44,13 @@ signals:
 
 private:
     QList<QPoint> getNeighborCells(double x, double y);
-    void increaseCellCount(QPoint cell, mvtime time);
-    void deleteObsoleteCells(mvtime time);
-    QColor selectCellColor(int cellCount);
-    QList<double> getJenksBreaks(QList<double> sListDouble, int sClassCount);
 
     Ui::Control *ui;
     bool _displayRange;
     int _communicationRange;
     QMultiHash<QPoint,Node> _grid;
-    QHash<QPoint,QHash<mvtime,int> > _gridCount;
-    mvtime _timeWindow;
     int _cellSize;
-    QHash<QPoint,int> _contactCount;
-    QList<QGraphicsItem*> _gridGroupItems;
     QPen _pen;
-    QRectF _oldSceneRect;
 
 };
 

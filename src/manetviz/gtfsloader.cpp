@@ -56,16 +56,15 @@ const AbstractEvolvingGraph * GTFSLoader::constEvolvingGraph() const
 
 void GTFSLoader::parseTrips()
 {
-    CSVParser parser = CSVParser();
     QVector<QMap<QString, QString>> stopList  = QVector<QMap<QString, QString>>();
     QVector<QMap<QString, QString>> timesList = QVector<QMap<QString, QString>>();
     QVector<QMap<QString, QString>> tripsList = QVector<QMap<QString, QString>>();
     QVector<QMap<QString, QString>> shapesList = QVector<QMap<QString, QString>>();
 
-    parser.parseCSV(_stopsFilePath, stopList, ",");
-    parser.parseCSV(_stopTimesFilePath, timesList, ",");
-    parser.parseCSV(_tripsFilePath, tripsList, ",");
-    parser.parseCSV(_shapesFilePath, shapesList, ",");
+    CSVParser::parseCSV(_stopsFilePath, stopList, ",");
+    CSVParser::parseCSV(_stopTimesFilePath, timesList, ",");
+    CSVParser::parseCSV(_tripsFilePath, tripsList, ",");
+    CSVParser::parseCSV(_shapesFilePath, shapesList, ",");
 
     // TODO: case if the folder does not contain a shapes.txt file
 
@@ -102,7 +101,7 @@ void GTFSLoader::parseTrips()
     qDebug() << "stopMap " << stopMap.count();
 
     // get all the shapes
-    GeometryFactory *global_factory;
+    GeometryFactory *global_factory = new GeometryFactory();
     QMap<QString, QMap<int,QPointF>* > shapesMap;
     foreach(auto waypoint, shapesList) {
         QString shapeId = waypoint.value("shape_id");
@@ -116,7 +115,6 @@ void GTFSLoader::parseTrips()
             shapesMap.insert(shapeId, new QMap<int,QPointF>());
         }
         shapesMap.value(shapeId)->insert(seq, coord);
-        qDebug() << shapeId << seq << coord;
     }
 
     qDebug() << "shapesMap" << shapesMap.count();
