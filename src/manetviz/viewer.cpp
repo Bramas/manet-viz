@@ -117,6 +117,7 @@ void Viewer::updateLayers()
         layer->paint(graph);
     }
     update();
+    delete graph;
 }
 
 

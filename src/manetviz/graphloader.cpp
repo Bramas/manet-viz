@@ -84,13 +84,8 @@ bool GraphLoader::load()
 
 bool GraphLoader::concurrentLoad(QFile * file)
 {
-    int limit = 20;
     while(!file->atEnd())
     {
-        if(--limit < 0)
-        {
-            break;
-        }
         for(int i = 0; i< 10000; ++i)
         {
             if(file->atEnd())
@@ -161,9 +156,9 @@ void GraphLoader::processLine(QString line)
     for(int i = 0; i < _headers.size(); ++i)
     {
         QString header = _headers.at(i);
-        if(header == "Id") {
+        if(header == Id) {
             id = capturedText.at(i + 1).toInt();
-        } else if(header == "Time") {
+        } else if(header == Time) {
             time = capturedText.at(i + 1);
         } else if(header == X) {
             lat = capturedText.at(i + 1).toDouble();

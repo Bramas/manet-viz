@@ -82,6 +82,11 @@ void GraphConvertor::convert()
                 out << p.first << p.second;
             }
         }
+        if(!(i%1000))
+        {
+            qDebug()<<((i - evg->beginTime())/qreal(evg->endTime() - evg->beginTime()));
+        }
+        delete snapshot;
     }
     qDebug()<<"DONE";
     //_project->constructSnapshot(_time);
