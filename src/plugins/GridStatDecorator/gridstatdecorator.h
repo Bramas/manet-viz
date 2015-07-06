@@ -42,7 +42,7 @@ private:
     Ui::Control *ui;
     int _cellSize;
     bool _showGrid;
-    QHash<QPoint,QHash<mvtime,int> > _gridCount;
+    QHash<QPoint,QLinkedList<QPair<mvtime,int> > > _gridCount;
     QHash<QPoint,int> _contactCount;
     mvtime _timeWindow;
     QList<QGraphicsItem*> _gridGroupItems;

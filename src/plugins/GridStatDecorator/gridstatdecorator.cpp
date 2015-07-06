@@ -11,9 +11,9 @@ GridStatDecorator::GridStatDecorator():
 //        connect(instance, SIGNAL(transmissionRangeChanged(int)), this, SLOT(setTransmissionRange(int)));
 //    }
 
-    _gridCount = QHash<QPoint,QHash<mvtime,int> >();
+    _gridCount = QHash<QPoint,QLinkedList<QPair<mvtime,int> > >();
     _contactCount = QHash<QPoint,int>();
-    _timeWindow = 10*60; // 60 minutes
+    _timeWindow = 5; // 60 minutes
     _showGrid = true;
     _cellSize = 500;
 }
@@ -53,6 +53,7 @@ void GridStatDecorator::paint(IGraph *graph)
 
 void GridStatDecorator::decorateEdges(mvtime time, IGraph *graph)
 {
+    qDebug()<<"decorateEdges ";
     if(_showGrid) {
         // update the grid count hash by deleting the obsolete cells
         deleteObsoleteCells(time);
@@ -63,11 +64,16 @@ void GridStatDecorator::decorateEdges(mvtime time, IGraph *graph)
             QPoint gc1((int)qFloor(n1.properties().value(X).toDouble() / _cellSize), (int)qFloor(n1.properties().value(Y).toDouble() / _cellSize));
             foreach(int n2, n1.neighbors())
             {
-                QPoint gc2((int)qFloor(graph->nodes().value(n2).properties().value(X).toDouble() / _cellSize), (int)qFloor(graph->nodes().value(n2).properties().value(Y).toDouble() / _cellSize));
-                // increase the contact count for the grid cells
-                increaseCellCount(gc1, time);
-                if(gc1 != gc2)
-                    increaseCellCount(gc2, time);
+                if(n1.id() < n2)
+                {
+                    QPoint gc2((int)qFloor(graph->nodes().value(n2).properties().value(X).toDouble() / _cellSize), (int)qFloor(graph->nodes().value(n2).properties().value(Y).toDouble() / _cellSize));
+                    // increase the contact count for the grid cells
+                    increaseCellCount(gc1, time);
+                    if(gc1 != gc2)
+                        increaseCellCount(gc2, time);
+
+                    qDebug()<<"increase "<<gc1;
+                }
             }
         }
     }
@@ -85,39 +91,40 @@ QWidget *GridStatDecorator::createControlWidget() const
 void GridStatDecorator::increaseCellCount(QPoint cell, mvtime time)
 {
     if(!_gridCount.contains(cell)) {
-        _gridCount.insert(cell,QHash<mvtime,int>());
+        _gridCount.insert(cell,QLinkedList<QPair<mvtime,int> >());
     }
-    if(!_gridCount.value(cell).contains(time)) {
-        _gridCount[cell].insert(time, 1);
+    if(!_contactCount.contains(cell))
+    {
+        _contactCount.insert(cell, 0);
+    }
+    _contactCount[cell]++;
+    if(!_gridCount.value(cell).back().first != time) {
+        _gridCount[cell].append(QPair<mvtime, int>(time, 1));
     } else {
-        int count = _gridCount.value(cell).value(time);
-        _gridCount[cell].insert(time, count + 1);
+        _gridCount[cell].back().second++;
     }
 }
 
 void GridStatDecorator::deleteObsoleteCells(mvtime time)
 {
-    _contactCount.clear();
-    for(auto cellIt = _gridCount.begin(); cellIt != _gridCount.end();) {
-        int cellCount = 0;
-        for(auto i = cellIt.value().begin(); i != cellIt.value().end();) {
-            mvtime timeDiff = time - i.key();
-            if(timeDiff > _timeWindow) {
-                // erase the item in the hash
-                qDebug() << i.key() << i.value();
-                i = cellIt.value().erase(i);
-            } else {
-                cellCount += i.value();
-                i++;
-            }
-        }
+    //_contactCount.clear();
+    for(auto cellIt = _gridCount.begin(); cellIt != _gridCount.end(); ) {
 
-        // delete grid in hash table if there is no counts
-        if(cellCount < 5) {
+        while(!cellIt.value().isEmpty() && cellIt.value().front().first < time - _timeWindow)
+        {
+            qDebug()<<"remove  "<<cellIt.value().front().first;
+            _contactCount[cellIt.key()] -= cellIt.value().front().second;
+            cellIt.value().pop_front();
+        }
+        if(cellIt.value().isEmpty())
+        {
+            qDebug()<<"delete  "<<cellIt.key();
+            _contactCount.remove(cellIt.key());
             cellIt = _gridCount.erase(cellIt);
-        } else {
-            _contactCount.insert(cellIt.key(), cellCount);
-            cellIt++;
+        }
+        else
+        {
+            ++cellIt;
         }
     }
 }
