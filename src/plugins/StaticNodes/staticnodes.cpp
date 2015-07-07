@@ -24,7 +24,7 @@ void StaticNodes::decorateEdges(mvtime time, IGraph *graph)
         y = graph->nodes().value(1000).properties().value(Y).toDouble();
 
         QVector2D p2(x,y);
-        if(p1.distanceToPoint(p2) <= 130)
+        if(p1.distanceToPoint(p2) <= 160)
         {
             graph->addEdge(n.id(), 1000);
         }
@@ -50,7 +50,7 @@ void StaticNodes::decoratesGraphicsNode(const Node &n, GraphicsNodeItem * node) 
     {
         return;
     }
-    QGraphicsEllipseItem * e = new QGraphicsEllipseItem(QRectF(-130, -130, 260, 260), node);
+    QGraphicsEllipseItem * e = new QGraphicsEllipseItem(QRectF(-160, -160, 320, 320), node);
     QPen p;
     p.setWidth(2);
     p.setColor(QColor(0,150,0));
