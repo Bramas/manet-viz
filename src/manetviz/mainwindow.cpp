@@ -23,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(open()));
     connect(ui->actionOpen_GTFS, SIGNAL(triggered()), this, SLOT(openGTFS()));
+    ui->menuBar->addMenu("hello")->addAction("coucou");
     _graphLoader = 0;
 }
 
@@ -34,6 +35,9 @@ void MainWindow::open()
                                                     "Open a trace",
                                                     settings.value("defaultTracePath", QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)).toString(),
                                                     tr("Trace file (*.csv *.txt);;All files (*.*)"));
+    if(filename.isEmpty()) {
+        return;
+    }
     ImportDialog importDialog(filename);
     int ret = importDialog.exec(); // synchronous
     if (ret == QDialog::Rejected) {
@@ -44,7 +48,7 @@ void MainWindow::open()
 
     _graphLoader = new GraphLoader(importDialog.createGraphLoader());
     Viewer * viewer = new Viewer();
-    Project * project = new Project(viewer, _graphLoader);
+    Project * project = new Project(viewer, _graphLoader, ui->menuBar);
     ControlWidget * controlWidget = new ControlWidget(this, project);
     GraphicsView * v = new GraphicsView(viewer, this);
     controlWidget->setViewer(viewer);
@@ -67,6 +71,9 @@ void MainWindow::openGTFS()
                                                     settings.value("defaultGTFSDiretory", QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)).toString(),
                                                     QFileDialog::ShowDirsOnly
                                                     | QFileDialog::DontResolveSymlinks);
+    if(dir.isEmpty()) {
+        return;
+    }
     GTFSDialog importDialog(dir);
     int ret = importDialog.exec(); // synchronous
     if (ret == QDialog::Rejected) {
@@ -78,7 +85,7 @@ void MainWindow::openGTFS()
 
     _gtfsLoader = new GTFSLoader(importDialog.createGTFSLoader());
     Viewer * viewer = new Viewer();
-    Project * project = new Project(viewer, _gtfsLoader);
+    Project * project = new Project(viewer, _gtfsLoader, ui->menuBar);
     ControlWidget * controlWidget = new ControlWidget(this, project);
     GraphicsView * v = new GraphicsView(viewer, this);
     controlWidget->setViewer(viewer);

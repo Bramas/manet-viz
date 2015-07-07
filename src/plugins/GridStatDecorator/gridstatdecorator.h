@@ -33,8 +33,14 @@ public:
     QObject * getQObject() { return this; }
     virtual QString toString() const { return "GridStatDecorator"; }
     void addDependancy(QObject* plugin);
+
+signals:
+    void requestUpdate();
+
 public slots:
     void setCommunicationRange(int);
+
+
 private:
     void increaseCellCount(QPoint cell, mvtime time);
     void deleteObsoleteCells(mvtime time);
@@ -54,6 +60,8 @@ private:
 
 private slots:
     void setShowGrid(bool);
+    void setTimeWindow(int);
+    void open();
 
 };
 

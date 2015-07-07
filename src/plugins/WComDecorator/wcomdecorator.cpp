@@ -74,6 +74,7 @@ void WComDecorator::decorateEdges(mvtime time, IGraph *graph)
     _grid.clear();
 
     // Populate the grid
+    int nrofNodes = 0, nrofContacts = 0;
     foreach(const Node& n1, graph->nodes())
     {
         double x = n1.properties().value(X).toDouble();
@@ -82,6 +83,7 @@ void WComDecorator::decorateEdges(mvtime time, IGraph *graph)
         QPoint gc((int)qFloor(x / _cellSize), (int)qFloor(y / _cellSize));
 
         _grid.insert(gc,n1);
+        nrofNodes++;
     }
 
     foreach(const QPoint gc, _grid.uniqueKeys()) {
@@ -102,17 +104,24 @@ void WComDecorator::decorateEdges(mvtime time, IGraph *graph)
                         if(p1.distanceToPoint(p2) <= _communicationRange)
                         {
                             graph->addEdge(n1.id(),n2.id());
+                            nrofContacts++;
                         }
                     }
                 }
             }
         }
     }
+
+    // update the number of nodes and contacts in the UI
+
+    ui->labelNrofNodes->setText(QString::number(nrofNodes));
+    ui->labelNrofContacts->setText(QString::number(nrofContacts));
 }
 
 void WComDecorator::setCommunicationRange(int range)
 {
     _communicationRange = range;
+    _cellSize = 2*range;
     ui->labelTransmissionRange->setText(QString::number(range));
     emit requestUpdate();
     emit transmissionRangeChanged(range);

@@ -2,44 +2,37 @@
 #include "ui_control.h"
 #include "project.h"
 #include "iloader.h"
+#include <QFileDialog>
 
 GridStatDecorator::GridStatDecorator():
     ui(new Ui::Control)
 {
-//    QObject * instance = PluginManager::getPlugin("WirelessCommunicationDecorator");
-//    if(instance) {
-//        connect(instance, SIGNAL(transmissionRangeChanged(int)), this, SLOT(setTransmissionRange(int)));
-//    }
-
     _gridCount = QHash<QPoint,QLinkedList<QPair<mvtime,int> > >();
     _contactCount = QHash<QPoint,int>();
     _timeWindow = 60*60; // 60 minutes
     _showGrid = true;
-    _cellSize = 500;
+    _cellSize = 200;
     _communicationRange = 100;
     _gridGroupItems = new QGraphicsItemGroup();
 }
 
 void GridStatDecorator::setProject(Project * project)
 {
-
     _project = project;
-/*
-    foreach(auto layer, _project->layers()) {
-        QObject * comPlugin = PluginManager::getPluginByName("WComDecorator");
-        if(comPlugin->metaObject()->indexOfSignal("transmissionRangeChanged(int)"))
-        {
-            connect(comPlugin, SIGNAL(transmissionRangeChanged(int)), this, SLOT(setCommunicationRange(int)));
-        }
-    }
-*/
-
-    qDebug() << "GridStatDecorator set project";
+    QMenu * menu = new QMenu(_project->menuBar());
+    _project->menuBar()->addAction(menu->menuAction());
+    menu->setTitle("GridStat");
+    menu->addAction("Open");
+//    QAction * menuActionOpen = menu->addAction("Open");
+//    connect(menuActionOpen, SIGNAL(triggered()), this, SLOT(open()));
 }
 
 void GridStatDecorator::setCommunicationRange(int com)
 {
     _communicationRange = com;
+    _cellSize = 2*com;
+    _contactCount.clear();
+    emit requestUpdate();
 }
 
 void GridStatDecorator::paint(IGraph *graph)
@@ -81,7 +74,6 @@ void GridStatDecorator::decorateEdges(mvtime time, IGraph *graph)
                     increaseCellCount(gc1, time);
                     if(gc1 != gc2)
                         increaseCellCount(gc2, time);
-
                 }
             }
         }
@@ -93,8 +85,9 @@ QWidget *GridStatDecorator::createControlWidget() const
 {
     QWidget * control = new QWidget();
     ui->setupUi(control);
-    qDebug() << "gridstatdecorator control widget";
+    ui->labelTimeWindow->setText(QString::number(_timeWindow/60));
     connect(ui->showGridCheckBox, SIGNAL(toggled(bool)), this, SLOT(setShowGrid(bool)));
+    connect(ui->TimeWindowSlider, SIGNAL(valueChanged(int)), this, SLOT(setTimeWindow(int)));
     return control;
 }
 
@@ -239,6 +232,22 @@ void GridStatDecorator::setShowGrid(bool show)
 {
     _showGrid = show;
     _contactCount.clear();
+    emit requestUpdate();
+}
+
+void GridStatDecorator::setTimeWindow(int timeWindow)
+{
+    _timeWindow = timeWindow*60;
+    ui->labelTimeWindow->setText(QString::number(timeWindow));
+    _contactCount.clear();
+    emit requestUpdate();
+}
+
+void GridStatDecorator::open()
+{
+    QString filename = QFileDialog::getOpenFileName();
+    qDebug() << filename;
+
 }
 
 inline uint qHash(const QPoint &key)

@@ -5,6 +5,7 @@
 #include <QList>
 #include <QMap>
 #include <QGraphicsScene>
+#include <QMenuBar>
 
 #include "types.h"
 
@@ -16,11 +17,12 @@ class Project : public QObject
 {
     Q_OBJECT
 public:
-    Project(Viewer *viewer, ILoader *loader);
+    Project(Viewer *viewer, ILoader *loader, QMenuBar *menuBar);
     ~Project();
 
     Viewer * viewer() { return _viewer; }
     ILoader * loader() { return _loader; }
+    QMenuBar * menuBar() { return _menuBar; }
 
     //void setLoader(ILoader *loader) { _loader = loader; }
     //void setViewer(Viewer *viewer) { _viewer = viewer; }
@@ -36,6 +38,7 @@ protected:
     QMap<int, IViewerLayer*> _layers;
     Viewer * _viewer;
     ILoader * _loader;
+    QMenuBar * _menuBar;
 };
 
 #endif // PROJECT_H

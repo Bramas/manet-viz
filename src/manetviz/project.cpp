@@ -4,10 +4,11 @@
 #include "pluginmanager.h"
 #include "iloader.h"
 
-Project::Project(Viewer *viewer, ILoader *loader)
+Project::Project(Viewer *viewer, ILoader *loader, QMenuBar *menuBar)
 {
     _viewer = viewer;
     _loader = loader;
+    _menuBar = menuBar;
     _viewer->setProject(this);
     _loader->setProject(this);
 
