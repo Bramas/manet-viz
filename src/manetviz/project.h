@@ -22,7 +22,6 @@ public:
 
     Viewer * viewer() { return _viewer; }
     ILoader * loader() { return _loader; }
-    QMenuBar * menuBar() { return _menuBar; }
 
     //void setLoader(ILoader *loader) { _loader = loader; }
     //void setViewer(Viewer *viewer) { _viewer = viewer; }

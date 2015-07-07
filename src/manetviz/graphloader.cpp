@@ -174,18 +174,10 @@ void GraphLoader::processLine(QString line)
         return;
     }
 
-    // Transformation of the lat/lon coordinates to projected coordinates
-    if(_pjIn && _pjOut) {
-        x = lon * DEG_TO_RAD;
-        y = lat * DEG_TO_RAD;
-        pj_transform(_pjIn, _pjOut, 1, 1, &x, &y, NULL);
-    } else {
-        x = lon;
-        y = lat;
-    }
+    QPointF pt(transformCoordinates(lat, lon));
 
     QHash<QString, QVariant> props;
-    props.insert(X, x);
-    props.insert(Y, y);
+    props.insert(X, pt.x());
+    props.insert(Y, pt.y());
     _evolvingGraph->addNode(id, mvt, props);
 }

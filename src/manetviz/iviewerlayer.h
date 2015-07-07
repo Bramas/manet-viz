@@ -13,6 +13,7 @@ class QPainter;
 class AbstractEvolvingGraph;
 class IGraph;
 class Project;
+class QMenu;
 
 class IViewerLayer
 {
@@ -31,6 +32,7 @@ public:
     virtual QStringList requiredField() const { return QStringList(); }
 
     virtual QWidget * createControlWidget() const { return NULL; }
+    virtual QMenu *   createMenu() const{ return NULL; }
     virtual void decoratesGraphicsEdge(GraphicsEdgeItem * edge) const { return; }
     virtual void decoratesGraphicsNode(const Node &n, GraphicsNodeItem * node) const { return; }
 

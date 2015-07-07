@@ -29,7 +29,6 @@ public:
             if (result)
                 results += result;
         }
-        qDebug() << results.size();
         return results;
     }
 

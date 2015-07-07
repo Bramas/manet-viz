@@ -29,6 +29,8 @@ public:
     void cancelLoadAndWait();
 
     QObject * getQObject() { return this; }
+    QString getType() const { return "GraphLoader"; }
+    QString getPath() const { return QFileInfo(_filename).absolutePath(); }
 
 signals:
     void loaded();
@@ -43,8 +45,6 @@ private:
     QString _filename;
     QRegExp _lineRegex;
     QString _timeFormat;
-    projPJ _pjIn;
-    projPJ _pjOut;
     QList<QString> _headers;
 
     QFuture<bool> _loadResult;

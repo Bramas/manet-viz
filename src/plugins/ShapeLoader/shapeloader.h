@@ -5,10 +5,8 @@
 
 #include <QObject>
 #include <QString>
+#include <QColor>
 #include "iviewerlayer.h"
-#include "csvparser.h"
-
-#include "proj_api.h"
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/Coordinate.h>
 #include <geos/geom/Point.h>
@@ -21,6 +19,23 @@
 using namespace geos;
 using namespace geos::geom;
 
+namespace Ui {
+class Control;
+}
+
+class GeometryAttribute
+{
+public:
+    GeometryAttribute(int size, QColor color) :
+        _size(size), _color(color) {}
+    int getSize() { return _size; }
+    QColor getColor() { return _color; }
+
+private:
+    int _size;
+    QColor _color;
+};
+
 class SHAPELOADERSHARED_EXPORT ShapeLoader: public QObject, public IViewerLayer
 {
     Q_OBJECT
@@ -30,21 +45,32 @@ public:
     ShapeLoader();
 
     void setProject(Project * project);
+    QMenu *createMenu() const;
+    QWidget *createControlWidget() const;
 
     virtual QObject * getQObject() { return this; }
 
-private:
-    QPointF transfromCoordinates(double lat, double lon);
+signals:
+    void requestUpdate();
 
+private:
+    void drawGeometries();
+
+    Ui::Control *ui;
     QString _shapeFilename;
     QString _tripFilename;
-    projPJ _pjIn;
-    projPJ _pjOut;
     QPen _pen;
     QList<QGraphicsItem*> _groupItems;
     QMap<QString, QMap<int,QPointF>* > _shapesMap;
     QMap<QString, QList<QString>* > _shapesToRoutes;
     QMap<QString, QList<QString>* > _shapesToTrips;
+    QList<QPair<Geometry*,GeometryAttribute*> > _shapestoDraw;
+
+    bool _showShape;
+
+private slots:
+    void setShowShape(bool);
+
 };
 
 #endif // SHAPELOADER_H

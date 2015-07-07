@@ -23,7 +23,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(open()));
     connect(ui->actionOpen_GTFS, SIGNAL(triggered()), this, SLOT(openGTFS()));
-    ui->menuBar->addMenu("hello")->addAction("coucou");
+    QMenu * menu = ui->menuBar->addMenu("hello");
+    menu->setEnabled(false);
     _graphLoader = 0;
 }
 

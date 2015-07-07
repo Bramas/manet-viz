@@ -19,12 +19,6 @@ GridStatDecorator::GridStatDecorator():
 void GridStatDecorator::setProject(Project * project)
 {
     _project = project;
-    QMenu * menu = new QMenu(_project->menuBar());
-    _project->menuBar()->addAction(menu->menuAction());
-    menu->setTitle("GridStat");
-    menu->addAction("Open");
-//    QAction * menuActionOpen = menu->addAction("Open");
-//    connect(menuActionOpen, SIGNAL(triggered()), this, SLOT(open()));
 }
 
 void GridStatDecorator::setCommunicationRange(int com)

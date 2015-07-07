@@ -146,6 +146,7 @@ private:
     QMap<mvtime, WayPoint *> _trajectory;
 };
 
+
 class GTFSLoader : public QObject, public ILoader
 {
     Q_OBJECT
@@ -158,6 +159,8 @@ public:
     AbstractEvolvingGraph * evolvingGraph() const;
     const AbstractEvolvingGraph * constEvolvingGraph() const;
     QObject * getQObject() { return this; }
+    QString getType() const { return "GTFSLoader"; }
+    QString getPath() const { return _folderPath; }
     bool isLoaded() const { return true; }
 
 signals:
@@ -172,8 +175,6 @@ private:
     QString _stopsFilePath;
     QString _shapesFilePath;
     QString _tripsFilePath;
-    projPJ _pjIn;
-    projPJ _pjOut;
 
     // trajectories indexed by the trip id of each trajectory
     QMap<QString,Trajectory *> _trajectories;
@@ -182,7 +183,6 @@ private:
 
     void parseTrips();
     mvtime toSeconds(QString time);
-    QPointF transfromCoordinates(double lat, double lon);
 };
 
 #endif // GTFSLOADER_H

@@ -92,7 +92,7 @@ void GTFSLoader::parseTrips()
         QString stopName = stop.value("stop_name");
         double lat = stop.value("stop_lat").toDouble();
         double lon = stop.value("stop_lon").toDouble();
-        QPointF coord = transfromCoordinates(lat, lon);
+        QPointF coord = transformCoordinates(lat, lon);
 
         stopMap.insert(stopId,
                        new Stop(stopId, stopName, coord));
@@ -108,7 +108,7 @@ void GTFSLoader::parseTrips()
         double lat = waypoint.value("shape_pt_lat").toDouble();
         double lon = waypoint.value("shape_pt_lon").toDouble();
         int seq = waypoint.value("shape_pt_sequence").toInt();
-        QPointF coord = transfromCoordinates(lat, lon);
+        QPointF coord = transformCoordinates(lat, lon);
 
         if(!shapesMap.contains(shapeId)) {
             // instanciate a new point sequence
@@ -259,22 +259,6 @@ mvtime GTFSLoader::toSeconds(QString time)
     long minutes = time.mid(3, 2).toLong();
     long seconds = time.mid(6, 2).toLong();
     return hours * 3600 + minutes * 60 + seconds;
-}
-
-QPointF GTFSLoader::transfromCoordinates(double lat, double lon)
-{
-    double x=0,y=0;
-    // Transformation of the lat/lon coordinates to projected coordinates
-    if(_pjIn && _pjOut) {
-        x = lon * DEG_TO_RAD;
-        y = lat * DEG_TO_RAD;
-        pj_transform(_pjIn, _pjOut, 1, 1, &x, &y, NULL);
-    } else {
-        x = lon;
-        y = lat;
-    }
-
-    return QPointF(x,y);
 }
 
 void GTFSLoader::load()

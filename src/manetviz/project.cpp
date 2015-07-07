@@ -52,7 +52,10 @@ void Project::onPluginsChanged()
     foreach(IViewerLayer * layer, PluginManager::getObjects<IViewerLayer>())
     {
         layer->setProject(this);
-        qDebug() << layer->toString();
+        QMenu * menu = layer->createMenu();
+        if(menu) {
+            _menuBar->addMenu(menu);
+        }
         addLayer(layer, i++);
     }
 }

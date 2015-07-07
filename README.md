@@ -67,6 +67,41 @@ Create a new file in the plugin directory of the name: `<plugin_name>.json` that
 }
 ```
 
+#### Add a control Widget to a plugin
+On the plugin folder, right click > Add new > Qt > Qt Designer Form > Widget > Name `control.ui` > Finish
+
+Add the elements you want into the designer view. **Do not forget to set a minimum width/height for the QWidget to see it.**
+
+In the `<plugin_name>.h`, add the following:
+```c++
+namespace Ui {
+    class Control;
+}
+```
+Add a private variable `ui`:
+```c++
+Ui::Control *ui;
+```
+
+In the `<plugin_name>.cpp`, add the following:
+```c++
+#include "ui_control.h"
+```
+
+Set the UI attribute for the plugin
+```
+<plugin_name>::<plugin_name>():
+  ui(new Ui::Control) { ... }
+```
+
+Implement the `createControlWidget()` method:
+```c++
+QWidget * control new QWidget();
+ui->setupUi(control);
+... // init the widgets and connections
+return control;
+```
+
 [1]:	http://crawdad.cs.dartmouth.edu/roma/taxi/ "Crawdad roma/taxi dataset"
 [2]: http://spatialreference.org/ref/epsg/wgs-84/ "ESPG:4326"
 [3]: http://spatialreference.org/ref/epsg/3065/ "EPSG:3065"

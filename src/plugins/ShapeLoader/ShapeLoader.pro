@@ -37,3 +37,6 @@ unix|win32: LIBS += -L$$PWD/../../../../../../../usr/local/Cellar/geos/3.4.2/lib
 
 INCLUDEPATH += $$PWD/../../../../../../../usr/local/Cellar/geos/3.4.2/include
 DEPENDPATH += $$PWD/../../../../../../../usr/local/Cellar/geos/3.4.2/include
+
+FORMS += \
+    control.ui

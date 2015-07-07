@@ -195,5 +195,6 @@ void ShapeLoader::setShowShape(bool show)
         drawGeometries();
     else
         _groupItems.clear();
+    
     emit requestUpdate();
 }
