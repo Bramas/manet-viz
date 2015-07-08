@@ -32,21 +32,21 @@ void ShapeLoader::drawGeometries() {
     _groupItems.clear();
 
     foreach (auto shape, _shapestoDraw) {
-        Geometry * geom = shape.first;
+        OGRGeometry * geom = shape.first;
         GeometryAttribute * geomAttr = shape.second;
 
         int size = geomAttr->getSize();
         QColor color = geomAttr->getColor();
 
-        GeometryTypeId geomId = geom->getGeometryTypeId();
-        if(geomId == GEOS_LINESTRING) {
-            CoordinateSequence * points = geom->getCoordinates();
+        if(wkbFlatten(geom->getGeometryType()) == wkbLineString) {
+            OGRLineString * ls = (OGRLineString *) geom;
             QPainterPath path;
-
-            path.moveTo(QPointF(points->front().x, points->front().y));
-            for(int i = 1; i < points->getSize(); ++i) {
-                Coordinate coord = points->getAt(i);
-                path.lineTo(QPointF(coord.x, coord.y));
+            OGRPoint pt;
+            ls->getPoint(0,&pt);
+            path.moveTo(QPointF(pt.getX(), pt.getY()));
+            for(int i = 1; i < ls->getNumPoints(); ++i) {
+                ls->getPoint(i,&pt);
+                path.lineTo(QPointF(pt.getX(), pt.getY()));
             }
             QGraphicsPathItem * item = new QGraphicsPathItem(path);
             _pen.setWidth(size);
@@ -54,15 +54,12 @@ void ShapeLoader::drawGeometries() {
             item->setPen(_pen);
              _groupItems.append(item);
         }
-        else if(geomId == GEOS_POINT) {
-            CoordinateSequence * points = geom->getCoordinates();
-            for(int i = 0; i < points->getSize(); ++i) {
-                Coordinate coord = points->getAt(i);
-                QGraphicsEllipseItem * item = new QGraphicsEllipseItem(coord.x-size/2.0, coord.y-size/2.0, size, size);
-                item->setBrush(QBrush(color));
-                item->setPen(Qt::NoPen);
-                _groupItems.append(item);
-            }
+        else if(wkbFlatten(geom->getGeometryType()) == wkbPoint) {
+            OGRPoint * pt = (OGRPoint *) geom;
+            QGraphicsEllipseItem * item = new QGraphicsEllipseItem(pt->getX()-size/2.0, pt->getY()-size/2.0, size, size);
+            item->setBrush(QBrush(color));
+            item->setPen(Qt::NoPen);
+            _groupItems.append(item);
         }
     }
     _project->viewer()->createItemGroup(_groupItems);
@@ -82,9 +79,8 @@ void ShapeLoader::loadGTFSShapes()
     QVector<QMap<QString, QString> > shapesList = QVector<QMap<QString, QString> >();
     QVector<QMap<QString, QString> > tripsList = QVector<QMap<QString, QString> >();
 
-    _shapestoDraw = QList<QPair<Geometry*,GeometryAttribute*> >();
-    GeometryFactory *globalFactory = new GeometryFactory();
-
+    // The list of OGRGeometry objects to draw on the QGraphicsScene
+    _shapestoDraw = QList<QPair<OGRGeometry*,GeometryAttribute*> >();
 
     CSVParser::parseCSV(_shapeFilename, shapesList, ",");
     CSVParser::parseCSV(_tripFilename, tripsList, ",");
@@ -132,16 +128,16 @@ void ShapeLoader::loadGTFSShapes()
     }
 
     // create the map of shape linestring
-    QMap<QString, LineString*> shapes;
+    QMap<QString, OGRLineString*> shapes;
 
     for(auto it = _shapesMap.begin(); it != _shapesMap.end(); ++it) {
         QString shapeId = it.key();
         if(! _shapesToTrips.contains(shapeId)) continue;
-        CoordinateSequence* cl = new CoordinateArraySequence();
+        OGRLineString * ls = new OGRLineString();
+
         for(auto sIt = it.value()->begin(); sIt != it.value()->end(); ++sIt) {
-            cl->add(Coordinate(sIt.value().x(), sIt.value().y()));
+            ls->addPoint(sIt.value().x(), sIt.value().y());
         }
-        LineString *ls = globalFactory->createLineString(cl);
         shapes.insert(it.key(), ls);
 
         // compute the width
@@ -155,25 +151,32 @@ void ShapeLoader::loadGTFSShapes()
     qDebug() << "shapes" << shapes.count();
     // Get all of the intersections between the linestrings
     for(auto it = shapes.begin(); it != shapes.end(); ++it) {
-        LineString * ls1 = it.value();
+        OGRLineString * ls1 = it.value();
         int count1 = _shapesToTrips.value(it.key())->size();
         for(auto jt = it+1; jt != shapes.end(); jt++) {
-            LineString * ls2 = jt.value();
+            OGRLineString * ls2 = jt.value();
             int count2 = _shapesToTrips.value(jt.key())->size();
-            Geometry * lsInt = ls1->intersection(ls2);
-            if(!lsInt->isEmpty()) {
-                GeometryTypeId geomId = lsInt->getGeometryTypeId();
-                if(geomId == GEOS_POINT || geomId == GEOS_MULTIPOINT) {
-                    CoordinateSequence * points = lsInt->getCoordinates();
-                    int size = (int)(35.0+(((double)count1 * (double)count2) / ((double)maxTripCount * (double)maxTripCount)) * 150.0);
-                    for(int i = 0; i < points->getSize(); i++) {
-                        Point * pt = globalFactory->createPoint(points->getAt(i));
-                        _shapestoDraw.append(qMakePair(pt, new GeometryAttribute(size,QColor(0,0,255))));
+            OGRGeometry * geom = ls1->Intersection(ls2);
+            int size = (int)(35.0+(((double)count1 * (double)count2) / ((double)maxTripCount * (double)maxTripCount)) * 150.0);
+            if(!geom->IsEmpty()) {
+                if(wkbFlatten(geom->getGeometryType()) == wkbPoint) {
+                    OGRPoint * pt = (OGRPoint *) geom;
+                    _shapestoDraw.append(qMakePair(pt, new GeometryAttribute(size,QColor(0,0,255))));
+                } else if(wkbFlatten(geom->getGeometryType()) == wkbMultiPoint) {
+                    OGRMultiPoint * mPt = (OGRMultiPoint *) geom;
+                    for(int i = 0; i < mPt->getNumGeometries(); ++i) {
+                        OGRGeometry * mGeom = mPt->getGeometryRef(i);
+                        if(wkbFlatten(mGeom->getGeometryType()) == wkbPoint) {
+                            OGRPoint * pt  = (OGRPoint *) mGeom->clone();
+                            _shapestoDraw.append(qMakePair(pt, new GeometryAttribute(size,QColor(0,0,255))));
+                        }
                     }
                 }
             }
         }
     }
+
+    qDebug() << "loaded shapefile with" << _shapestoDraw.count() << "features";
 }
 
 void ShapeLoader::loadShapeFile()
@@ -192,7 +195,7 @@ QWidget *ShapeLoader::createControlWidget() const
 QMenu * ShapeLoader::createMenu() const
 {
     QMenu * menu = new QMenu();
-    menu->setTitle("Shape");
+    menu->setTitle("ShapeFile");
     QAction * menuActionOpen = menu->addAction("Open Shapefile");
     connect(menuActionOpen, SIGNAL(triggered()), this, SLOT(openShapeFile()));
     return menu;
@@ -234,7 +237,7 @@ void ShapeLoader::openShapeFile()
    _shapestoDraw.clear();
 
    QSet<QString> acceptedHWFieldsSet = QSet<QString>();
-   acceptedHWFieldsSet << "primary_link" << "tertiary_link" << "trunk_link" << "motorway" << "residential" << "road" <<  "secondary_link" << "tertiary" << "motorway_link" << "secondary" << "trunk" << "primary";
+   acceptedHWFieldsSet << "primary_link" << "tertiary_link" << "trunk_link" << "motorway" << "road" <<  "secondary_link" << "tertiary" << "motorway_link" << "secondary" << "trunk" << "primary";
    for(int i = 0; i < poDS->GetLayerCount(); ++i) {
        OGRLayer  *poLayer = poDS->GetLayer(i);
        qDebug() << "Loading layer" << QString::fromStdString(poLayer->GetName()) << "...";
@@ -245,7 +248,6 @@ void ShapeLoader::openShapeFile()
        poLayer->ResetReading();
        OGRFeatureDefn *poFDefn = poLayer->GetLayerDefn();
        int hwIdx = poFDefn->GetFieldIndex("highway");
-       QSet<QString> setOfHWFields = QSet<QString>();
        while( (poFeature = poLayer->GetNextFeature()) != NULL )
        {
            QString HWFieldStr = QString::fromStdString(poFeature->GetFieldAsString(hwIdx));
@@ -255,8 +257,7 @@ void ShapeLoader::openShapeFile()
                    && wkbFlatten(poGeometry->getGeometryType()) == wkbPoint )
                {
                    poGeometry->transformTo(poTarget);
-                   OGRPoint *poPoint = (OGRPoint *) poGeometry;
-                    Point * pt = convertFromOGRToGEOS(poPoint);
+                   OGRPoint * pt = (OGRPoint *) poGeometry;
                    _shapestoDraw.append(qMakePair(pt, new GeometryAttribute(50,QColor(0,0,255))));
 
                }
@@ -264,12 +265,10 @@ void ShapeLoader::openShapeFile()
                         && wkbFlatten(poGeometry->getGeometryType()) == wkbLineString)
                {
                    poGeometry->transformTo(poTarget);
-                   OGRLineString * poLineString = (OGRLineString *) poGeometry;
-                   LineString * ls = convertFromOGRToGEOS(poLineString);
+                   OGRLineString * ls = (OGRLineString *) poGeometry;
                    _shapestoDraw.append(qMakePair(ls, new GeometryAttribute(1,QColor(255,0,0))));
 
                }
-               OGRFeature::DestroyFeature( poFeature );
            }
        }
    }
@@ -278,19 +277,19 @@ void ShapeLoader::openShapeFile()
    drawGeometries();
 }
 
-LineString * ShapeLoader::convertFromOGRToGEOS(OGRLineString * ls) {
-    CoordinateSequence * coordinates = new CoordinateArraySequence();
-    for(int i = 0; i < ls->getNumPoints(); ++i) {
-        OGRPoint pt;
-        ls->getPoint(i, &pt);
-        Coordinate coord(pt.getX(), pt.getY());
-        coordinates->add(coord);
-    }
-    GeometryFactory globalFactory;
-    return globalFactory.createLineString(coordinates);
-}
+//LineString * ShapeLoader::convertFromOGRToGEOS(OGRLineString * ls) {
+//    CoordinateSequence * coordinates = new CoordinateArraySequence();
+//    for(int i = 0; i < ls->getNumPoints(); ++i) {
+//        OGRPoint pt;
+//        ls->getPoint(i, &pt);
+//        Coordinate coord(pt.getX(), pt.getY());
+//        coordinates->add(coord);
+//    }
+//    GeometryFactory globalFactory;
+//    return globalFactory.createLineString(coordinates);
+//}
 
-Point * ShapeLoader::convertFromOGRToGEOS(OGRPoint * pt) {
-    GeometryFactory globalFactory;
-    return globalFactory.createPoint(Coordinate(pt->getX(), pt->getY()));
-}
+//Point * ShapeLoader::convertFromOGRToGEOS(OGRPoint * pt) {
+//    GeometryFactory globalFactory;
+//    return globalFactory.createPoint(Coordinate(pt->getX(), pt->getY()));
+//}

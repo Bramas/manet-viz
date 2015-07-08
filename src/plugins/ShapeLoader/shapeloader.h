@@ -7,18 +7,7 @@
 #include <QString>
 #include <QColor>
 #include "iviewerlayer.h"
-#include <geos/geom/GeometryFactory.h>
-#include <geos/geom/Coordinate.h>
-#include <geos/geom/Point.h>
-#include <geos/operation/overlay/snap/GeometrySnapper.h>
-#include <geos/geom/LineString.h>
-#include <geos/geom/Geometry.h>
-#include <geos/geom/CoordinateSequence.h>
-#include <geos/geom/CoordinateArraySequence.h>
 #include <ogrsf_frmts.h>
-
-using namespace geos;
-using namespace geos::geom;
 
 namespace Ui {
 class Control;
@@ -58,8 +47,6 @@ private:
     void drawGeometries();
     void loadGTFSShapes();
     void loadShapeFile();
-    LineString * convertFromOGRToGEOS(OGRLineString * ls);
-    Point * convertFromOGRToGEOS(OGRPoint * pt);
 
     Ui::Control *ui;
     QString _shapeFilename;
@@ -69,7 +56,7 @@ private:
     QMap<QString, QMap<int,QPointF>* > _shapesMap;
     QMap<QString, QList<QString>* > _shapesToRoutes;
     QMap<QString, QList<QString>* > _shapesToTrips;
-    QList<QPair<Geometry*,GeometryAttribute*> > _shapestoDraw;
+    QList<QPair<OGRGeometry*,GeometryAttribute*> > _shapestoDraw;
 
     bool _showShape;
 
