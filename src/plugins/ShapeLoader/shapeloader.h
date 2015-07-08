@@ -46,13 +46,13 @@ signals:
 private:
     void drawGeometries();
     void loadGTFSShapes();
-    void loadShapeFile();
+    void loadShapeFile(QString filename);
 
     Ui::Control *ui;
     QString _shapeFilename;
     QString _tripFilename;
     QPen _pen;
-    QList<QGraphicsItem*> _groupItems;
+    QGraphicsItemGroup * _groupItems;
     QMap<QString, QMap<int,QPointF>* > _shapesMap;
     QMap<QString, QList<QString>* > _shapesToRoutes;
     QMap<QString, QList<QString>* > _shapesToTrips;

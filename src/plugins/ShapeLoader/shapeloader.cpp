@@ -24,13 +24,12 @@ void ShapeLoader::setProject(Project *project)
     if(_project->loader()->getType() == "GTFSLoader")
         loadGTFSShapes();
 
-    if(_showShape)
-        drawGeometries();
+    drawGeometries();
+    _groupItems->setVisible(_showShape);
 }
 
 void ShapeLoader::drawGeometries() {
-    _groupItems.clear();
-
+    _groupItems = new QGraphicsItemGroup();
     foreach (auto shape, _shapestoDraw) {
         OGRGeometry * geom = shape.first;
         GeometryAttribute * geomAttr = shape.second;
@@ -52,17 +51,17 @@ void ShapeLoader::drawGeometries() {
             _pen.setWidth(size);
             _pen.setColor(color);
             item->setPen(_pen);
-             _groupItems.append(item);
+            _groupItems->addToGroup(item);
         }
         else if(wkbFlatten(geom->getGeometryType()) == wkbPoint) {
             OGRPoint * pt = (OGRPoint *) geom;
             QGraphicsEllipseItem * item = new QGraphicsEllipseItem(pt->getX()-size/2.0, pt->getY()-size/2.0, size, size);
             item->setBrush(QBrush(color));
             item->setPen(Qt::NoPen);
-            _groupItems.append(item);
+            _groupItems->addToGroup(item);
         }
     }
-    _project->viewer()->createItemGroup(_groupItems);
+    _project->viewer()->addItem(_groupItems);
 }
 
 void ShapeLoader::loadGTFSShapes()
@@ -179,66 +178,23 @@ void ShapeLoader::loadGTFSShapes()
     qDebug() << "loaded shapefile with" << _shapestoDraw.count() << "features";
 }
 
-void ShapeLoader::loadShapeFile()
+void ShapeLoader::loadShapeFile(QString filename)
 {
-
-}
-
-QWidget *ShapeLoader::createControlWidget() const
-{
-    QWidget * control = new QWidget();
-    ui->setupUi(control);
-    connect(ui->showShapeCheckBox, SIGNAL(toggled(bool)), this, SLOT(setShowShape(bool)));
-    return control;
-}
-
-QMenu * ShapeLoader::createMenu() const
-{
-    QMenu * menu = new QMenu();
-    menu->setTitle("ShapeFile");
-    QAction * menuActionOpen = menu->addAction("Open Shapefile");
-    connect(menuActionOpen, SIGNAL(triggered()), this, SLOT(openShapeFile()));
-    return menu;
-}
-
-void ShapeLoader::setShowShape(bool show)
-{
-    _showShape = show;
-    if(show)
-        drawGeometries();
-    else
-        _groupItems.clear();
-
-    emit requestUpdate();
-}
-
-void ShapeLoader::openShapeFile()
-{
-    QSettings settings;
-    QString filename = QFileDialog::getOpenFileName(0,
-                                                    "Open a shapefile",
-                                                    settings.value("defaultShapeFilePath", QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)).toString(),
-                                                    tr("Shapefile (*.shp)"));
-    if(filename.isEmpty())
-        return;
-    // Save the filename path in the app settings
-    settings.setValue("defaultShapeFilePath", QFileInfo(filename).absolutePath());
-
     OGRRegisterAll();
     OGRDataSource *poDS;
 
-   poDS = OGRSFDriverRegistrar::Open( filename.toStdString().c_str(), FALSE );
-   if( poDS == NULL )
-   {
+    poDS = OGRSFDriverRegistrar::Open(filename.toStdString().c_str(), FALSE);
+    if( poDS == NULL )
+    {
        qWarning() << "Open failed for " << filename;
        return;
-   }
+    }
 
-   _shapestoDraw.clear();
+    _shapestoDraw.clear();
 
-   QSet<QString> acceptedHWFieldsSet = QSet<QString>();
-   acceptedHWFieldsSet << "primary_link" << "tertiary_link" << "trunk_link" << "motorway" << "road" <<  "secondary_link" << "tertiary" << "motorway_link" << "secondary" << "trunk" << "primary";
-   for(int i = 0; i < poDS->GetLayerCount(); ++i) {
+    QSet<QString> acceptedHWFieldsSet = QSet<QString>();
+    acceptedHWFieldsSet << "primary_link" << "tertiary_link" << "trunk_link" << "motorway" << "road" <<  "secondary_link" << "tertiary" << "motorway_link" << "secondary" << "trunk" << "primary";
+    for(int i = 0; i < poDS->GetLayerCount(); ++i) {
        OGRLayer  *poLayer = poDS->GetLayer(i);
        qDebug() << "Loading layer" << QString::fromStdString(poLayer->GetName()) << "...";
        OGRFeature *poFeature;
@@ -271,10 +227,50 @@ void ShapeLoader::openShapeFile()
                }
            }
        }
-   }
+    }
+    // Do not delete any structure as they will be used later
+    qDebug() << "loaded shapefile with" << _shapestoDraw.count() << "features";
+}
 
-   qDebug() << "loaded shapefile with" << _shapestoDraw.count() << "features";
-   drawGeometries();
+QWidget *ShapeLoader::createControlWidget() const
+{
+    QWidget * control = new QWidget();
+    ui->setupUi(control);
+    connect(ui->showShapeCheckBox, SIGNAL(toggled(bool)), this, SLOT(setShowShape(bool)));
+    return control;
+}
+
+QMenu * ShapeLoader::createMenu() const
+{
+    QMenu * menu = new QMenu();
+    menu->setTitle("ShapeFile");
+    QAction * menuActionOpen = menu->addAction("Open Shapefile");
+    connect(menuActionOpen, SIGNAL(triggered()), this, SLOT(openShapeFile()));
+    return menu;
+}
+
+void ShapeLoader::setShowShape(bool show)
+{
+    _groupItems->setVisible(show);
+    _showShape = show;
+
+    emit requestUpdate();
+}
+
+void ShapeLoader::openShapeFile()
+{
+    QSettings settings;
+    QString filename = QFileDialog::getOpenFileName(0,
+                                                    "Open a shapefile",
+                                                    settings.value("defaultShapeFilePath", QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)).toString(),
+                                                    tr("Shapefile (*.shp)"));
+    if(filename.isEmpty())
+        return;
+    // Save the filename path in the app settings
+    settings.setValue("defaultShapeFilePath", QFileInfo(filename).absolutePath());
+
+    loadShapeFile(filename);
+    drawGeometries();
 }
 
 //LineString * ShapeLoader::convertFromOGRToGEOS(OGRLineString * ls) {
