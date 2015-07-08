@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 CONFIG += c++11
-QT       += widgets
+QT       += widgets concurrent
 DESTDIR         = ../../manetviz/plugins
 INCLUDEPATH    += ../../manetviz
 
