@@ -15,6 +15,7 @@
 #include <geos/geom/Geometry.h>
 #include <geos/geom/CoordinateSequence.h>
 #include <geos/geom/CoordinateArraySequence.h>
+#include <ogrsf_frmts.h>
 
 using namespace geos;
 using namespace geos::geom;
@@ -55,6 +56,10 @@ signals:
 
 private:
     void drawGeometries();
+    void loadGTFSShapes();
+    void loadShapeFile();
+    LineString * convertFromOGRToGEOS(OGRLineString * ls);
+    Point * convertFromOGRToGEOS(OGRPoint * pt);
 
     Ui::Control *ui;
     QString _shapeFilename;
@@ -70,6 +75,7 @@ private:
 
 private slots:
     void setShowShape(bool);
+    void openShapeFile();
 
 };
 

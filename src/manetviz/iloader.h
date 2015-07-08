@@ -19,7 +19,7 @@ public:
     virtual const AbstractEvolvingGraph *   constEvolvingGraph() const = 0;
     virtual AbstractEvolvingGraph *         evolvingGraph() const = 0;
 
-    QPointF transformCoordinates(double lat, double lon) const {
+    virtual QPointF transformCoordinates(double lat, double lon) const {
         double x=0,y=0;
         // Transformation of the lat/lon coordinates to projected coordinates
         if(_pjIn && _pjOut) {
@@ -32,6 +32,14 @@ public:
         }
 
         return QPointF(x,y);
+    }
+
+    virtual char* getInputProj() const {
+        return pj_get_def(_pjIn,0);
+    }
+
+    virtual char* getOutputProj() const {
+        return pj_get_def(_pjOut,0);
     }
 
     virtual QString getType() const = 0;

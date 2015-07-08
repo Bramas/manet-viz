@@ -40,3 +40,8 @@ DEPENDPATH += $$PWD/../../../../../../../usr/local/Cellar/geos/3.4.2/include
 
 FORMS += \
     control.ui
+
+unix|win32: LIBS += -L$$PWD/../../../../../../../usr/local/Cellar/gdal/1.11.2_1/lib/ -lgdal.1
+
+INCLUDEPATH += $$PWD/../../../../../../../usr/local/Cellar/gdal/1.11.2_1/include
+DEPENDPATH += $$PWD/../../../../../../../usr/local/Cellar/gdal/1.11.2_1/include
