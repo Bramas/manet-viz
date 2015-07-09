@@ -15,7 +15,7 @@
 
 Viewer::Viewer()
 {
-    _isRequestWaiting = false;
+    _isRequestPending = false;
     _afterTranslate = QPointF(-83000, -12.35*2000);
     _layout = 0;
     _zoom=2000;
@@ -63,7 +63,7 @@ void Viewer::requestUpdate()
     }
     if(_futureGraph.isRunning())
     {
-        _isRequestWaiting = true;
+        _isRequestPending = true;
         return;
     }
 
@@ -151,9 +151,9 @@ void Viewer::updateLayers()
     update();
     delete graph;
 
-    if(_isRequestWaiting)
+    if(_isRequestPending)
     {
-        _isRequestWaiting = false;
+        _isRequestPending = false;
         requestUpdate();
     }
 }
