@@ -2,7 +2,6 @@
 #include "ui_controlwidget.h"
 #include "viewer.h"
 #include "iplugin.h"
-#include "igraphdecorator.h"
 #include "project.h"
 
 #include <QSpacerItem>
