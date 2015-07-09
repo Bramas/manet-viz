@@ -26,6 +26,7 @@ public:
     mvtime time() const { return _time; }
 
 signals:
+    void mousePressedEvent(QGraphicsSceneMouseEvent *);
 
 public slots:
     void setTime(mvtime time);
@@ -35,8 +36,8 @@ public slots:
 protected:
     /*void paintEvent(QPaintEvent *);
     void wheelEvent(QWheelEvent *);
-    void mouseMoveEvent(QMouseEvent *);
-    void mousePressEvent(QMouseEvent *);*/
+    void mouseMoveEvent(QMouseEvent *);*/
+    void mousePressEvent(QGraphicsSceneMouseEvent * e) { emit mousePressedEvent(e); }
 
 private:
 
