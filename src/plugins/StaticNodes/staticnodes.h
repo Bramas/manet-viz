@@ -35,8 +35,9 @@ public:
     GraphicsStaticNodeItem() : _node(new StaticNode()) { }
     QRectF boundingRect() const
     {
-        double range = (double)_node->getTransmissionRange()+0.1;
-        return QRectF(_node->getCoordinates().x()-range, _node->getCoordinates().y()-range,range*2,range*2);
+        int range = _node->getTransmissionRange();
+        QPointF offset = QPointF(range,range);
+        return QRectF(_node->getCoordinates() - offset, _node->getCoordinates()+offset);
     }
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
@@ -54,10 +55,10 @@ public:
         // draw the communication range
         int range = _node->getTransmissionRange();
         offset = QPointF(range,range);
-        r = QRectF(t.map(point - offset), t.map(point+offset));
+        r = QRectF(_node->getCoordinates() - offset, _node->getCoordinates()+offset);
         QPen p;
+        p.setWidth(1);
         p.setCosmetic(true);
-        p.setWidth(2);
         p.setColor(QColor(0,150,0));
         painter->setPen(p);
         painter->setBrush(QBrush(QColor(0,255,0,130)));
