@@ -66,6 +66,7 @@ private:
     QElapsedTimer _timeSinceLastFrame;
     Project * _project;
     QGraphicsItemGroup * _items;
+    bool _isRequestPending;
 };
 
 #endif // VIEWER_H
