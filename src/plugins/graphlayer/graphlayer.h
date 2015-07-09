@@ -6,16 +6,16 @@
 #include <QGraphicsLineItem>
 
 #include "abstractevolvinggraph.h"
-#include "iviewerlayer.h"
+#include "iplugin.h"
 
 class Viewer;
 
-class GraphLayer : public QObject, public IViewerLayer
+class GraphLayer : public QObject, public IPlugin
 {
 
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.manet-viz.IViewerLayer" FILE "graphlayer.json")
-    Q_INTERFACES(IViewerLayer)
+    Q_PLUGIN_METADATA(IID "org.manet-viz.IPlugin" FILE "graphlayer.json")
+    Q_INTERFACES(IPlugin)
 
 public:
     GraphLayer();

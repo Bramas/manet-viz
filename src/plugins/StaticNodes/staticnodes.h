@@ -4,16 +4,16 @@
 #include "staticnodes_global.h"
 #include <QObject>
 
-#include "iviewerlayer.h"
+#include "iplugin.h"
 #include "types.h"
 #include "graph.h"
 
-class STATICNODESSHARED_EXPORT StaticNodes : public QObject, public IViewerLayer
+class STATICNODESSHARED_EXPORT StaticNodes : public QObject, public IPlugin
 {
 
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.manet-viz.IViewerLayer" FILE "staticnodes.json")
-    Q_INTERFACES(IViewerLayer)
+    Q_PLUGIN_METADATA(IID "org.manet-viz.IPlugin" FILE "staticnodes.json")
+    Q_INTERFACES(IPlugin)
 
 public:
     StaticNodes();
@@ -21,7 +21,7 @@ public:
     void decorateEdges(mvtime time, IGraph *graph);
     void decorateNodes(mvtime time, IGraph *graph);
 
-    void decoratesGraphicsNode(const Node &n, GraphicsNodeItem * node) const;
+    void decorateGraphicsNode(const Node &n, GraphicsNodeItem * node) const;
 
     QObject * getQObject() { return this; }
 

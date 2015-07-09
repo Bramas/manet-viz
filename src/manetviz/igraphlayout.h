@@ -18,6 +18,8 @@ public:
 
     virtual QStringList requiredField() const = 0;
 
+    virtual QObject * getQObject() = 0;
+
 protected:
     Project * _project;
 };

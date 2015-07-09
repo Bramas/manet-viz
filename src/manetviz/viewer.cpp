@@ -1,5 +1,5 @@
 #include "viewer.h"
-#include "iviewerlayer.h"
+#include "iplugin.h"
 #include "igraphlayout.h"
 #include "pluginmanager.h"
 #include "project.h"
@@ -111,7 +111,7 @@ void Viewer::updateLayers()
 
                 foreach(auto layer, _project->layers())
                 {
-                    layer->decoratesGraphicsEdge(edge);
+                    layer->decorateGraphicsEdge(edge);
                 }
 
                 _items->addToGroup(edge);
@@ -131,7 +131,7 @@ void Viewer::updateLayers()
         node->setPos(position);
         foreach(auto layer, _project->layers())
         {
-            layer->decoratesGraphicsNode(n, node);
+            layer->decorateGraphicsNode(n, node);
         }
         _items->addToGroup(node);
     }

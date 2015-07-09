@@ -4,7 +4,8 @@
 #include <QSet>
 #include <QDebug>
 #include <QJsonArray>
-#include "iviewerlayer.h"
+#include "iplugin.h"
+#include "igraphlayout.h"
 
 PluginManager PluginManager::instance;
 
@@ -45,17 +46,28 @@ void PluginManager::loadPlugins()
             qWarning()<<"Unable to laod plugin: "<<filename.first;
             continue;
         }
-        QObject * plugin = loader.instance();
-        plugin->setObjectName(filename.first);
-        qDebug() << "Load " << filename.first;
 
-        QJsonObject meta = loader.metaData();
-        QStringList dependancyList = meta.value("MetaData").toObject().value("dependencies").toVariant().toStringList();
-        foreach(QString dep, dependancyList) {
-            qobject_cast<IViewerLayer*>(plugin)->addDependancy(getObjectByName(dep));
+        IPlugin * plugin = qobject_cast<IPlugin*>(loader.instance());
+        if(plugin) // Load a plugin
+        {
+            plugin->getQObject()->setObjectName(filename.first);
+            qDebug() << "Load IPlugin " << filename.first;
+            QJsonObject meta = loader.metaData();
+            QStringList dependancyList = meta.value("MetaData").toObject().value("dependencies").toVariant().toStringList();
+            foreach(QString dep, dependancyList) {
+                plugin->addDependancy(getObjectByName(dep));
+            }
+            instance._allObjects.append(qMakePair(filename.first, plugin->getQObject()));
         }
 
-        instance._allObjects.append(qMakePair(filename.first, plugin));
+        IGraphLayout * layout = qobject_cast<IGraphLayout*>(loader.instance());
+        if(layout) // Load a layout
+        {
+            layout->getQObject()->setObjectName(filename.first);
+            qDebug() << "Load Layout " << filename.first;
+            instance._allObjects.append(qMakePair(filename.first, layout->getQObject()));
+        }
+
     }
 }
 

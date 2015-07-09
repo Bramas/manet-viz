@@ -27,6 +27,8 @@ public:
         return l;
     }
 
+    QObject * getQObject() { return this; }
+
 };
 
 #endif // LATLNGCOORDINATESLAYOUT_H

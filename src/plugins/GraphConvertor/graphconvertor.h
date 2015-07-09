@@ -4,13 +4,13 @@
 #include "graphconvertor_global.h"
 
 #include <QObject>
-#include "iviewerlayer.h"
+#include "iplugin.h"
 
-class GRAPHCONVERTORSHARED_EXPORT GraphConvertor : public QObject, public IViewerLayer
+class GRAPHCONVERTORSHARED_EXPORT GraphConvertor : public QObject, public IPlugin
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.manet-viz.IViewerLayer" FILE "graphconvertor.json")
-    Q_INTERFACES(IViewerLayer)
+    Q_PLUGIN_METADATA(IID "org.manet-viz.IPlugin" FILE "graphconvertor.json")
+    Q_INTERFACES(IPlugin)
 public:
     GraphConvertor();
 
