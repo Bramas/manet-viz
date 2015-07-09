@@ -60,6 +60,10 @@ void Viewer::requestUpdate()
         qDebug() << "no layout";
         return;
     }
+    if(_futureGraph.isRunning())
+    {
+        return;
+    }
 
     _futureGraph = QtConcurrent::run(this, &Viewer::prepareUpdate);
     _futureGraphWatcher.setFuture(_futureGraph);
