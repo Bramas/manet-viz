@@ -41,7 +41,7 @@ void Project::addLayer(IViewerLayer *layer, int priority)
 {
     if(layer->getQObject()->metaObject()->indexOfSignal("requestUpdate()") != -1)
     {
-        connect(layer->getQObject(), SIGNAL(requestUpdate()), _viewer, SLOT(updateLayers()));
+        connect(layer->getQObject(), SIGNAL(requestUpdate()), _viewer, SLOT(requestUpdate()));
     }
     _layers.insertMulti(priority, layer);
 }

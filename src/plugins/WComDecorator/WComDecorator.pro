@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 DESTDIR         = ../../manetviz/plugins
-QT       += widgets
+QT       += widgets concurrent
 
 TARGET = WComDecorator
 TEMPLATE = lib

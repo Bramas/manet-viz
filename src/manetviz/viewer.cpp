@@ -20,6 +20,7 @@ Viewer::Viewer()
     _zoom=2000;
     //setMouseTracking(true);
     _timeSinceLastFrame.start();
+    connect(&_futureGraphWatcher, &QFutureWatcher<IGraph*>::finished, this, &Viewer::updateLayers);
 }
 
 Viewer::~Viewer()
@@ -42,20 +43,46 @@ QPointF Viewer::toLocalCoordinates(QPointF globalCoordinates) const
 void Viewer::setTime(mvtime time)
 {
     _time = time + _project->loader()->constEvolvingGraph()->beginTime();
-    updateLayers();
+    requestUpdate();
 }
-void Viewer::updateLayers()
+
+
+IGraph * Viewer::prepareUpdate()
+{
+    IGraph * graph = _project->constructSnapshot(_time);
+    _layout->footprint(_time, graph);
+    return graph;
+}
+
+void Viewer::requestUpdate()
 {
     if(!_layout) {
         qDebug() << "no layout";
         return;
     }
-    IGraph * graph = _project->constructSnapshot(_time);
 
+    _futureGraph = QtConcurrent::run(this, &Viewer::prepareUpdate);
+    _futureGraphWatcher.setFuture(_futureGraph);
+}
 
-    _layout->footprint(_time, graph);
+void Viewer::updateLayers()
+{
 
-//    this->clear();
+    if(_futureGraph.isCanceled() || !_futureGraph.isFinished())
+    {
+        qWarning()<<"updateLayers called but the future graph is not ready";
+        if(_futureGraph.isRunning())
+        {
+            qDebug()<<"The future graph is running so we wait for it";
+            _futureGraph.waitForFinished();
+        }
+        else
+        {
+            return;
+        }
+    }
+
+    IGraph * graph = _futureGraph.result();
 
     if(this->items().contains(_items)) {
         this->removeItem(_items);
