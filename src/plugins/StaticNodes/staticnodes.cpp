@@ -85,7 +85,11 @@ void StaticNodes::onMousePressed(QGraphicsSceneMouseEvent * e)
         // create new static node where the user clicked
         StaticNode * staticNode = new StaticNode(e->scenePos(),_communicationRange);
         _nodes.insert(staticNode->getId(),staticNode);
-        _nodesItems->addToGroup(new GraphicsStaticNodeItem(staticNode));
+        GraphicsStaticNodeItem * graphicsNode = new GraphicsStaticNodeItem(staticNode);
+        QPen p;
+        p.setWidthF(3);
+        graphicsNode->setPen(p);
+        _nodesItems->addToGroup(graphicsNode);
 
     } else if (e->button() == Qt::RightButton) {
         // delete the static node from the map
