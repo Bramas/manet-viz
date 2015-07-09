@@ -6,18 +6,18 @@
 #include <QObject>
 
 #include  "ui_control.h"
-#include "iviewerlayer.h"
+#include "iplugin.h"
 #include "types.h"
 #include "graph.h"
 
 class AbstractEvolvingGraph;
 
-class WIRELESSCOMMUNICATIONDECORATORSHARED_EXPORT WirelessCommunicationDecorator : public QObject, public IViewerLayer
+class WIRELESSCOMMUNICATIONDECORATORSHARED_EXPORT WirelessCommunicationDecorator : public QObject, public IPlugin
 {
 
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.manet-viz.IViewerLayer" FILE "wirelesscommunicationdecorator.json")
-    Q_INTERFACES(IViewerLayer)
+    Q_PLUGIN_METADATA(IID "org.manet-viz.IPlugin" FILE "wirelesscommunicationdecorator.json")
+    Q_INTERFACES(IPlugin)
 
 public:
     WirelessCommunicationDecorator();
@@ -29,7 +29,7 @@ public:
     QObject * getQObject() { return this; }
 
     QWidget * createControlWidget() const;
-    void  decoratesGraphicsNode(const Node &n, GraphicsNodeItem * node) const;
+    void  decorateGraphicsNode(const Node &n, GraphicsNodeItem * node) const;
     QString toString() const { return "WirelessCommunicationDecorator"; }
 
 public slots:

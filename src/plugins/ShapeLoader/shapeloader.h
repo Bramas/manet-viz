@@ -6,7 +6,7 @@
 #include <QObject>
 #include <QString>
 #include <QColor>
-#include "iviewerlayer.h"
+#include "iplugin.h"
 #include <ogrsf_frmts.h>
 
 namespace Ui {
@@ -26,11 +26,11 @@ private:
     QColor _color;
 };
 
-class SHAPELOADERSHARED_EXPORT ShapeLoader: public QObject, public IViewerLayer
+class SHAPELOADERSHARED_EXPORT ShapeLoader: public QObject, public IPlugin
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.manet-viz.IViewerLayer" FILE "shapeloader.json")
-    Q_INTERFACES(IViewerLayer)
+    Q_PLUGIN_METADATA(IID "org.manet-viz.IPlugin" FILE "shapeloader.json")
+    Q_INTERFACES(IPlugin)
 public:
     ShapeLoader();
 

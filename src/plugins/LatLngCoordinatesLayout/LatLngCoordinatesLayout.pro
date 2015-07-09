@@ -6,7 +6,7 @@
 
 DESTDIR         = ../../manetviz/plugins
 
-#QT       -= gui
+QT +=  concurrent
 
 TARGET = LatLngCoordinatesLayout
 TEMPLATE = lib

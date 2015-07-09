@@ -1,6 +1,6 @@
 TEMPLATE        = lib
 CONFIG         += plugin
-QT             += widgets
+QT             += widgets concurrent
 INCLUDEPATH    += ../../manetviz
 DESTDIR         = ../../manetviz/plugins
 TARGET          = Graphlayer

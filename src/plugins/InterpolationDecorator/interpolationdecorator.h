@@ -4,18 +4,18 @@
 #include "interpolationdecorator_global.h"
 #include <QObject>
 
-#include "iviewerlayer.h"
+#include "iplugin.h"
 #include "types.h"
 #include "graph.h"
 
 class AbstractEvolvingGraph;
 
-class INTERPOLATIONDECORATORSHARED_EXPORT InterpolationDecorator : public QObject, public IViewerLayer
+class INTERPOLATIONDECORATORSHARED_EXPORT InterpolationDecorator : public QObject, public IPlugin
 {
 
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.manet-viz.IViewerLayer" FILE "interpolationdecorator.json")
-    Q_INTERFACES(IViewerLayer)
+    Q_PLUGIN_METADATA(IID "org.manet-viz.IPlugin" FILE "interpolationdecorator.json")
+    Q_INTERFACES(IPlugin)
 
 public:
     InterpolationDecorator();

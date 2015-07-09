@@ -3,6 +3,8 @@
 
 #include <QGraphicsScene>
 #include <QElapsedTimer>
+#include <QtConcurrent>
+#include <QFutureWatcher>
 
 #include "types.h"
 #include "viewer.h"
@@ -11,6 +13,7 @@ class Project;
 class IViewerLayer;
 class IGraphLayout;
 class AbstractEvolvingGraph;
+class IGraph;
 
 class Viewer : public QGraphicsScene
 {
@@ -31,7 +34,7 @@ signals:
 public slots:
     void setTime(mvtime time);
     void onPluginsChanged();
-    void updateLayers();
+    void requestUpdate();
 
 protected:
     /*void paintEvent(QPaintEvent *);
@@ -40,7 +43,10 @@ protected:
     void mousePressEvent(QGraphicsSceneMouseEvent * e) { emit mousePressedEvent(e); }
 
 private:
-
+    void updateLayers();
+    IGraph * prepareUpdate();
+    QFuture<IGraph*> _futureGraph;
+    QFutureWatcher<IGraph*> _futureGraphWatcher;
     IGraphLayout * _layout;
     mvtime _time;
     QPoint _lastMousePos;

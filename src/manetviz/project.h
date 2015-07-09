@@ -11,7 +11,7 @@
 
 class Viewer;
 class IGraph;
-class IViewerLayer;
+class IPlugin;
 class ILoader;
 class Project : public QObject
 {
@@ -26,15 +26,15 @@ public:
     //void setLoader(ILoader *loader) { _loader = loader; }
     //void setViewer(Viewer *viewer) { _viewer = viewer; }
 
-    virtual void addLayer(IViewerLayer * layer, int priority = 100);
+    virtual void addLayer(IPlugin * layer, int priority = 100);
 
-    const QList<IViewerLayer* > layers() const { return _layers.values(); }
+    const QList<IPlugin* > layers() const { return _layers.values(); }
 
     virtual IGraph * constructSnapshot(mvtime time) const;
 public slots:
     void onPluginsChanged();
 protected:
-    QMap<int, IViewerLayer*> _layers;
+    QMap<int, IPlugin*> _layers;
     Viewer * _viewer;
     ILoader * _loader;
     QMenuBar * _menuBar;

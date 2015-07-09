@@ -15,11 +15,11 @@ class IGraph;
 class Project;
 class QMenu;
 
-class IViewerLayer
+class IPlugin
 {
 public:
-    IViewerLayer() {}
-    virtual ~IViewerLayer() {}
+    IPlugin() {}
+    virtual ~IPlugin() {}
 
     virtual void addDependancy(QObject* plugin) { }
 
@@ -33,8 +33,9 @@ public:
 
     virtual QWidget * createControlWidget() const { return NULL; }
     virtual QMenu *   createMenu() const{ return NULL; }
-    virtual void decoratesGraphicsEdge(GraphicsEdgeItem * edge) const { return; }
-    virtual void decoratesGraphicsNode(const Node &n, GraphicsNodeItem * node) const { return; }
+
+    virtual void decorateGraphicsEdge(GraphicsEdgeItem * edge) const { return; }
+    virtual void decorateGraphicsNode(const Node &n, GraphicsNodeItem * node) const { return; }
 
     virtual QObject* getQObject() = 0;
     virtual QString toString() const { return ""; }
@@ -45,8 +46,8 @@ protected:
 
 QT_BEGIN_NAMESPACE
 
-#define IViewerLayer_iid "org.manet-viz.IViewerLayer"
-Q_DECLARE_INTERFACE(IViewerLayer, IViewerLayer_iid)
+#define IPlugin_iid "org.manet-viz.IPlugin"
+Q_DECLARE_INTERFACE(IPlugin, IPlugin_iid)
 
 QT_END_NAMESPACE
 

@@ -7,7 +7,7 @@
 #include <QMultiHash>
 
 
-#include "iviewerlayer.h"
+#include "iplugin.h"
 #include "types.h"
 #include "graph.h"
 
@@ -16,12 +16,12 @@ class Control;
 }
 
 
-class WCOMDECORATORSHARED_EXPORT WComDecorator: public QObject, public IViewerLayer
+class WCOMDECORATORSHARED_EXPORT WComDecorator: public QObject, public IPlugin
 {
 
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.manet-viz.IViewerLayer" FILE "wcomdecorator.json")
-    Q_INTERFACES(IViewerLayer)
+    Q_PLUGIN_METADATA(IID "org.manet-viz.IPlugin" FILE "wcomdecorator.json")
+    Q_INTERFACES(IPlugin)
 
 public:
     WComDecorator();
@@ -31,7 +31,7 @@ public:
     QObject * getQObject() { return this; }
 
     QWidget * createControlWidget() const;
-    void  decoratesGraphicsNode(const Node &n, GraphicsNodeItem * node) const;
+    void  decorateGraphicsNode(const Node &n, GraphicsNodeItem * node) const;
     QString toString() const { return "WComDecorator"; }
 
 public slots:

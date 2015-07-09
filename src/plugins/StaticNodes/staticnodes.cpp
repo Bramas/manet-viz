@@ -61,7 +61,7 @@ void StaticNodes::decorateNodes(mvtime time, IGraph *graph)
     }
 }
 
-void StaticNodes::decoratesGraphicsNode(const Node &n, GraphicsNodeItem * node) const
+void StaticNodes::decorateGraphicsNode(const Node &n, GraphicsNodeItem * node) const
 {
     if(!_nodes.contains(n.id()))
         return;

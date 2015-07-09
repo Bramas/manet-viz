@@ -1,7 +1,7 @@
 #include "controlwidget.h"
 #include "ui_controlwidget.h"
 #include "viewer.h"
-#include "iviewerlayer.h"
+#include "iplugin.h"
 #include "igraphdecorator.h"
 #include "project.h"
 
@@ -98,7 +98,7 @@ void ControlWidget::setViewer(Viewer *viewer)
     _viewer = viewer;
     connect(this, SIGNAL(timeChanged(mvtime)), _viewer, SLOT(setTime(mvtime)));
 
-    foreach(IViewerLayer * layer, _project->layers())
+    foreach(IPlugin * layer, _project->layers())
     {
         QWidget * w = layer->createControlWidget();
         if(w)

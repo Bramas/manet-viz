@@ -5,7 +5,7 @@
 #include <QList>
 #include <QPen>
 
-#include "iviewerlayer.h"
+#include "iplugin.h"
 #include "pluginmanager.h"
 #include "gridstatdecorator_global.h"
 #include "types.h"
@@ -15,12 +15,12 @@ namespace Ui {
 class Control;
 }
 
-class GRIDSTATDECORATORSHARED_EXPORT GridStatDecorator: public QObject, public IViewerLayer
+class GRIDSTATDECORATORSHARED_EXPORT GridStatDecorator: public QObject, public IPlugin
 {
 
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.manet-viz.IViewerLayer" FILE "gridstatdecorator.json")
-    Q_INTERFACES(IViewerLayer)
+    Q_PLUGIN_METADATA(IID "org.manet-viz.IPlugin" FILE "gridstatdecorator.json")
+    Q_INTERFACES(IPlugin)
 
 public:
     GridStatDecorator();

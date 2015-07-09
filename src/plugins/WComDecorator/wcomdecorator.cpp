@@ -143,7 +143,7 @@ QWidget * WComDecorator::createControlWidget() const
     return control;
 }
 
-void  WComDecorator::decoratesGraphicsNode(const Node &n, GraphicsNodeItem * node) const
+void  WComDecorator::decorateGraphicsNode(const Node &n, GraphicsNodeItem * node) const
 {
     if(!_displayRange)
         return ;

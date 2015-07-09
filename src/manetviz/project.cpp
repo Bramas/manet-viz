@@ -1,6 +1,6 @@
 #include "project.h"
 #include "graph.h"
-#include "iviewerlayer.h"
+#include "iplugin.h"
 #include "pluginmanager.h"
 #include "iloader.h"
 
@@ -37,11 +37,11 @@ IGraph * Project::constructSnapshot(mvtime time) const
     return graph;
 }
 
-void Project::addLayer(IViewerLayer *layer, int priority)
+void Project::addLayer(IPlugin *layer, int priority)
 {
     if(layer->getQObject()->metaObject()->indexOfSignal("requestUpdate()") != -1)
     {
-        connect(layer->getQObject(), SIGNAL(requestUpdate()), _viewer, SLOT(updateLayers()));
+        connect(layer->getQObject(), SIGNAL(requestUpdate()), _viewer, SLOT(requestUpdate()));
     }
     _layers.insertMulti(priority, layer);
 }
@@ -49,7 +49,7 @@ void Project::addLayer(IViewerLayer *layer, int priority)
 void Project::onPluginsChanged()
 {
     int i = 0;
-    foreach(IViewerLayer * layer, PluginManager::getObjects<IViewerLayer>())
+    foreach(IPlugin * layer, PluginManager::getObjects<IPlugin>())
     {
         layer->setProject(this);
         QMenu * menu = layer->createMenu();
