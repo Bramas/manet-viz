@@ -20,7 +20,7 @@ Viewer::Viewer()
     _zoom=2000;
     //setMouseTracking(true);
     _timeSinceLastFrame.start();
-    connect(&_futureGraphWatcher, SIGNAL(finished()), this, SLOT(updateLayers()));
+    connect(&_futureGraphWatcher, &QFutureWatcher<IGraph*>::finished, this, &Viewer::updateLayers);
 }
 
 Viewer::~Viewer()
@@ -43,7 +43,7 @@ QPointF Viewer::toLocalCoordinates(QPointF globalCoordinates) const
 void Viewer::setTime(mvtime time)
 {
     _time = time + _project->loader()->constEvolvingGraph()->beginTime();
-    onUpdateRequested();
+    requestUpdate();
 }
 
 
@@ -54,7 +54,7 @@ IGraph * Viewer::prepareUpdate()
     return graph;
 }
 
-void Viewer::onUpdateRequested()
+void Viewer::requestUpdate()
 {
     if(!_layout) {
         qDebug() << "no layout";

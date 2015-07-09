@@ -33,7 +33,7 @@ signals:
 public slots:
     void setTime(mvtime time);
     void onPluginsChanged();
-    void onUpdateRequested();
+    void requestUpdate();
 
 protected:
     /*void paintEvent(QPaintEvent *);
