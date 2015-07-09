@@ -3,6 +3,7 @@
 
 #include "staticnodes_global.h"
 #include <QObject>
+#include <QGraphicsSceneDragDropEvent>
 
 #include "iplugin.h"
 #include "types.h"
@@ -19,6 +20,7 @@ public:
     QPointF getCoordinates() const { return _coordinates; }
     int getTransmissionRange() const { return _transmissionRange; }
     int getId() const { return _id; }
+    void setCoordinates(double x, double y) { _coordinates.setX(x); _coordinates.setY(y); }
 
 private:
     static int idGenerator;
@@ -31,13 +33,19 @@ class GraphicsStaticNodeItem : public QGraphicsItem
 {
 public:
 
-    GraphicsStaticNodeItem(StaticNode * node) : _node(node) { }
-    GraphicsStaticNodeItem() : _node(new StaticNode()) { }
+    GraphicsStaticNodeItem(StaticNode * node) : _node(node) {
+        setFlags(QGraphicsItem::ItemIsSelectable|
+                     QGraphicsItem::ItemIsMovable);
+    }
+    GraphicsStaticNodeItem() : _node(new StaticNode()) {
+        setFlags(QGraphicsItem::ItemIsSelectable|
+                     QGraphicsItem::ItemIsMovable);
+    }
     QRectF boundingRect() const
     {
         int range = _node->getTransmissionRange();
         QPointF offset = QPointF(range,range);
-        return QRectF(_node->getCoordinates() - offset, _node->getCoordinates()+offset);
+        return QRectF(_node->getCoordinates()-offset, _node->getCoordinates()+offset);
     }
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
@@ -64,14 +72,40 @@ public:
         painter->setBrush(QBrush(QColor(0,255,0,130)));
         painter->drawEllipse(r);
     }
+
     void setPen(const QPen &p)
     {
         _pen = p;
     }
 
+protected:
+    void mouseReleaseEvent ( QGraphicsSceneMouseEvent * event )
+    {
+        event->setAccepted(true);// tell the base class we are handling this event
+        this->setPos(_location);
+    }
+
+    void mousePressEvent ( QGraphicsSceneMouseEvent * event )
+    {
+        // allow the user to drag the box, capture the starting position on mouse-down
+        event->setAccepted(true);
+        qDebug() << "node" << _node->getId() << "left button pressed" << event->scenePos();
+        _dragStart = event->pos();
+    }
+
+    void mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
+    {
+        // user have moved the mouse, move the location of the box
+        QPointF newPos = event->pos() ;
+        _location += (newPos - _dragStart);
+        this->setPos(_location);
+    }
+
 private:
     StaticNode * _node;
     QPen _pen;
+    QPointF _dragStart;
+    QPointF _location;
 };
 
 class STATICNODESSHARED_EXPORT StaticNodes : public QObject, public IPlugin

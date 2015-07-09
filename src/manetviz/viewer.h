@@ -5,6 +5,9 @@
 #include <QElapsedTimer>
 #include <QtConcurrent>
 #include <QFutureWatcher>
+#include <QGraphicsSceneMouseEvent>
+#include <QGraphicsView>
+#include <QGraphicsItem>
 
 #include "types.h"
 #include "viewer.h"
@@ -40,7 +43,15 @@ protected:
     /*void paintEvent(QPaintEvent *);
     void wheelEvent(QWheelEvent *);
     void mouseMoveEvent(QMouseEvent *);*/
-    void mousePressEvent(QGraphicsSceneMouseEvent * e) { emit mousePressedEvent(e); }
+    void mousePressEvent(QGraphicsSceneMouseEvent * e) {
+        QGraphicsScene::mousePressEvent(e);
+        if(e->isAccepted()) {
+            qDebug() << "is accepted";
+        } else {
+            qDebug() << "";
+        }
+        emit mousePressedEvent(e);
+    }
 
 private:
     void updateLayers();

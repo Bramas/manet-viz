@@ -80,12 +80,14 @@ void StaticNodes::addDependancy(QObject *plugin)
 
 void StaticNodes::onMousePressed(QGraphicsSceneMouseEvent * e)
 {
+    e->setAccepted(true);
     if(e->button() == Qt::LeftButton) {
         qDebug() << "left button pressed" << e->scenePos() << e->screenPos() << e->lastPos() << e->pos();
         // create new static node where the user clicked
         StaticNode * staticNode = new StaticNode(e->scenePos(),_communicationRange);
         _nodes.insert(staticNode->getId(),staticNode);
         GraphicsStaticNodeItem * graphicsNode = new GraphicsStaticNodeItem(staticNode);
+        qDebug() << "bounding rectangle" << graphicsNode->boundingRect();
         QPen p;
         p.setWidthF(3);
         graphicsNode->setPen(p);
@@ -95,8 +97,6 @@ void StaticNodes::onMousePressed(QGraphicsSceneMouseEvent * e)
         // delete the static node from the map
         qDebug() << "right button pressed" << e->scenePos();
     }
-
-    e->accept();
 }
 
 void StaticNodes::setCommunicationRange(int range)
