@@ -11,12 +11,15 @@
 
 #include "types.h"
 #include "viewer.h"
+#include "graphicsitems.h"
 
 class Project;
 class IViewerLayer;
 class IGraphLayout;
 class AbstractEvolvingGraph;
 class IGraph;
+
+
 
 class Viewer : public QGraphicsScene
 {
@@ -43,14 +46,11 @@ protected:
     /*void paintEvent(QPaintEvent *);
     void wheelEvent(QWheelEvent *);
     void mouseMoveEvent(QMouseEvent *);*/
-    void mousePressEvent(QGraphicsSceneMouseEvent * e) {
-        QGraphicsScene::mousePressEvent(e);
-        if(e->isAccepted()) {
-            qDebug() << "is accepted";
-        } else {
-            qDebug() << "";
+    void mousePressEvent(QGraphicsSceneMouseEvent * event) {
+        QGraphicsScene::mousePressEvent(event);
+        if(!event->isAccepted()) {
+            emit mousePressedEvent(event);
         }
-        emit mousePressedEvent(e);
     }
 
 private:

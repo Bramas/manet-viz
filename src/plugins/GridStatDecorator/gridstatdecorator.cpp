@@ -38,9 +38,8 @@ void GridStatDecorator::paint(IGraph *graph)
     for(auto cellIt = _contactCount.begin(); cellIt != _contactCount.end(); ++cellIt) {
         int contactSum = cellIt.value();
 
-        // Display the sum on the grid
         if(contactSum > 0) {
-            QGraphicsRectItem * item = new QGraphicsRectItem(_cellSize*cellIt.key().x(), _cellSize*cellIt.key().y(), _cellSize, _cellSize);
+            GraphicsCellItem * item = new GraphicsCellItem(_cellSize*cellIt.key().x(), _cellSize*cellIt.key().y(), _cellSize, _cellSize);
             item->setBrush(QBrush(selectCellColor(contactSum)));
             item->setPen(Qt::NoPen);
             item->setOpacity(0.5);

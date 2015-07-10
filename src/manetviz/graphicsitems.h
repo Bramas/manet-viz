@@ -7,6 +7,7 @@
 #include <QPointF>
 #include <QLineF>
 #include <QPainter>
+#include <QGraphicsSceneMouseEvent>
 
 class GraphicsNodeItem : public QGraphicsItem
 {

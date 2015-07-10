@@ -15,6 +15,23 @@ namespace Ui {
 class Control;
 }
 
+class GraphicsCellItem: public QGraphicsRectItem
+{
+public:
+    GraphicsCellItem():
+        QGraphicsRectItem() {}
+    GraphicsCellItem(qreal x, qreal y, qreal w, qreal h, QGraphicsItem *parent = 0):
+        QGraphicsRectItem(x, y, w, h, parent) { }
+
+protected:
+    void mousePressEvent(QGraphicsSceneMouseEvent *event)
+    {
+        event->ignore();
+        qDebug() << "Custom item clicked.";
+    }
+
+};
+
 class GRIDSTATDECORATORSHARED_EXPORT GridStatDecorator: public QObject, public IPlugin
 {
 
