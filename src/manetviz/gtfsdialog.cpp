@@ -15,6 +15,17 @@ GTFSDialog::GTFSDialog(QString pathname, QWidget *parent) :
     ui->buttonBox->button(QDialogButtonBox::Ok)->setDisabled(true);
     ui->lineEditTrace->setText((new QFileInfo(pathname))->fileName());
 
+    // check whether the shape file exists
+    QFileInfo checkShapeFileTXT(pathname+"/shapes.txt");
+    QFileInfo checkShapeFileCSV(pathname+"/shapes.csv");
+    if((checkShapeFileCSV.exists() && checkShapeFileCSV.isFile()) || (checkShapeFileTXT.exists() && checkShapeFileTXT.isFile())) {
+        ui->snapToShapeCheckBox->setEnabled(true);
+        ui->snapToShapeCheckBox->setChecked(true);
+    } else {
+        ui->snapToShapeCheckBox->setEnabled(false);
+        ui->snapToShapeCheckBox->setChecked(false);
+    }
+
     QSettings settings;
 
     _projIns = settings.value("savedProjInsGTFS", QStringList()).toStringList();
@@ -32,6 +43,7 @@ GTFSDialog::GTFSDialog(QString pathname, QWidget *parent) :
     connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(onAccepted()));
     connect(ui->comboBoxInputProj,  SIGNAL(editTextChanged(QString)), this, SLOT(projInEdited(QString)));
     connect(ui->comboBoxOutputProj, SIGNAL(editTextChanged(QString)), this, SLOT(projOutEdited(QString)));
+    connect(ui->snapToShapeCheckBox, SIGNAL(stateChanged(int)), this, SLOT(snapToShapeChanged()));
 
     projInEdited(_projIn);
     projOutEdited(_projOut);
@@ -62,6 +74,11 @@ void GTFSDialog::projOutEdited(QString text)
         _isProjOutValid = true;
     }
     checkConsistency();
+}
+
+void GTFSDialog::snapToShapeChanged()
+{
+    _snapToShape = ui->snapToShapeCheckBox->isChecked();
 }
 
 bool GTFSDialog::isValidProj(QString proj)
@@ -143,5 +160,5 @@ void GTFSDialog::onAccepted()
 
 GTFSLoader GTFSDialog::createGTFSLoader()
 {
-    return GTFSLoader(_pathname, _projIn, _projOut);
+    return GTFSLoader(_pathname, _projIn, _projOut, _snapToShape);
 }

@@ -4,26 +4,45 @@
 #include "types.h"
 
 // TODO: Do a script to get the extension (either .csv or .txt)
+QString checkFile(QString foldername, QStringList exts, QString filename) {
+    foreach(auto ext, exts) {
+        QFileInfo check(foldername+"/"+filename+"."+ext);
+        if(check.exists() && check.isFile())
+            return check.absoluteFilePath();
+        return QString();
+    }
+}
 
 GTFSLoader::GTFSLoader(QString folderPath):
-    _folderPath(folderPath),
-    _stopTimesFilePath(folderPath+"/stop_times.txt"),
-    _stopsFilePath(folderPath+"/stops.txt"),
-    _shapesFilePath(folderPath+"/shapes.txt"),
-    _tripsFilePath(folderPath+"/trips.txt")
+    _folderPath(folderPath)
 {
+    QStringList exts;
+    exts << "txt" << "csv";
+    _stopTimesFilePath = checkFile(folderPath,exts,"stop_times");
+    _stopsFilePath = checkFile(folderPath,exts,"stops");
+    _shapesFilePath = checkFile(folderPath,exts,"shapes");
+    _tripsFilePath = checkFile(folderPath,exts,"trips");
+
+    if(_stopTimesFilePath.isEmpty() || _stopsFilePath.isEmpty() || _tripsFilePath.isEmpty())
+        qWarning() << "One file is missing from the directory";
+
     _evolvingGraph = new EvolvingGraph();
     _evolvingGraph->setLoader(this);
     _trajectories = QMap<QString, Trajectory *>();
 }
 
-GTFSLoader::GTFSLoader(QString folderPath, QString projIn, QString projOut):
+GTFSLoader::GTFSLoader(QString folderPath, QString projIn, QString projOut, bool snapToShape):
     GTFSLoader(folderPath)
 {
     if(!projIn.isEmpty() && !projOut.isEmpty()) {
         _pjIn  = pj_init_plus(projIn.toStdString().c_str());
         _pjOut = pj_init_plus(projOut.toStdString().c_str());
     }
+
+    if(snapToShape && !_shapesFilePath.isEmpty())
+        _snapToShape = true;
+    else
+        _snapToShape = false;
 }
 
 GTFSLoader::GTFSLoader(const GTFSLoader &other) :
@@ -101,36 +120,40 @@ void GTFSLoader::parseTrips()
     qDebug() << "stopMap " << stopMap.count();
 
     // get all the shapes
-    GeometryFactory *global_factory = new GeometryFactory();
-    QMap<QString, QMap<int,QPointF>* > shapesMap;
-    foreach(auto waypoint, shapesList) {
-        QString shapeId = waypoint.value("shape_id");
-        double lat = waypoint.value("shape_pt_lat").toDouble();
-        double lon = waypoint.value("shape_pt_lon").toDouble();
-        int seq = waypoint.value("shape_pt_sequence").toInt();
-        QPointF coord = transformCoordinates(lat, lon);
-
-        if(!shapesMap.contains(shapeId)) {
-            // instanciate a new point sequence
-            shapesMap.insert(shapeId, new QMap<int,QPointF>());
-        }
-        shapesMap.value(shapeId)->insert(seq, coord);
-    }
-
-    qDebug() << "shapesMap" << shapesMap.count();
-
-    // create the map of shape linestring
     QMap<QString, LineString*> shapes;
-    for(auto it = shapesMap.begin(); it != shapesMap.end(); it++) {
-        CoordinateSequence* cl = new CoordinateArraySequence();
-        for(auto sIt = it.value()->begin(); sIt != it.value()->end(); ++sIt) {
-            cl->add(Coordinate(sIt.value().x(), sIt.value().y()));
+    if(_snapToShape) {
+        GeometryFactory *global_factory = new GeometryFactory();
+        QMap<QString, QMap<int,QPointF>* > shapesMap;
+        foreach(auto waypoint, shapesList) {
+            QString shapeId = waypoint.value("shape_id");
+            double lat = waypoint.value("shape_pt_lat").toDouble();
+            double lon = waypoint.value("shape_pt_lon").toDouble();
+            int seq = waypoint.value("shape_pt_sequence").toInt();
+            QPointF coord = transformCoordinates(lat, lon);
+
+            if(!shapesMap.contains(shapeId)) {
+                // instanciate a new point sequence
+                shapesMap.insert(shapeId, new QMap<int,QPointF>());
+            }
+            shapesMap.value(shapeId)->insert(seq, coord);
         }
-        LineString *ls = global_factory->createLineString(cl);
-        shapes.insert(it.key(), ls);
+
+        qDebug() << "shapesMap" << shapesMap.count();
+
+
+        // create the map of shape linestring
+        for(auto it = shapesMap.begin(); it != shapesMap.end(); it++) {
+            CoordinateSequence* cl = new CoordinateArraySequence();
+            for(auto sIt = it.value()->begin(); sIt != it.value()->end(); ++sIt) {
+                cl->add(Coordinate(sIt.value().x(), sIt.value().y()));
+            }
+            LineString *ls = global_factory->createLineString(cl);
+            shapes.insert(it.key(), ls);
+        }
+
+        qDebug() << "shapes" << shapes.count();
     }
 
-    qDebug() << "shapes" << shapes.count();
 
     // initialize all the trajectories
     QMap<QString, QMap<int, WayPoint*>* > trajectories = QMap<QString, QMap<int, WayPoint*>* >();
@@ -154,103 +177,82 @@ void GTFSLoader::parseTrips()
 
     qDebug() << "trajectories" << trajectories.count();
 
-    for(auto it = trajectories.begin(); it != trajectories.end(); ++it) {
-        QString tripId = it.key();
-        Trip * trip = tripsMap.value(tripId);
-        QString shapeId = trip->getShapeId();
+    if(_snapToShape) {
+        for(auto it = trajectories.begin(); it != trajectories.end(); ++it) {
+            QString tripId = it.key();
+            Trip * trip = tripsMap.value(tripId);
+            QString shapeId = trip->getShapeId();
 
-        // convert the corresponding shape into a LineString
-        if(!shapes.contains(shapeId))
-            continue;
+            // convert the corresponding shape into a LineString
+            if(!shapes.contains(shapeId))
+                continue;
 
-        if(tripId == "6524963") {
-        // Add the trajectory to the map
-        _trajectories.insert(tripId,
-                             new Trajectory(*trip));
-        }
+            // Add the trajectory to the map
+            _trajectories.insert(tripId,
+                                 new Trajectory(*trip));
 
-        LineString* ls = shapes.value(shapeId);
-        LocationIndexedLine * lineRef = new LocationIndexedLine(ls);
+            LineString* ls = shapes.value(shapeId);
+            LocationIndexedLine * lineRef = new LocationIndexedLine(ls);
 
-        // get the first waypoint
-        auto tIt = it.value()->begin();
-        WayPoint * wp1 = tIt.value();
-        Coordinate pt1(wp1->getCoords().x(), wp1->getCoords().y());
-        LinearLocation loc1 = lineRef->project(pt1);
-        mvtime startTime = wp1->getDepartureTime();
-        Coordinate projWp1 = loc1.getCoordinate(ls);
+            // get the first waypoint
+            auto tIt = it.value()->begin();
+            WayPoint * wp1 = tIt.value();
+            Coordinate pt1(wp1->getCoords().x(), wp1->getCoords().y());
+            LinearLocation loc1 = lineRef->project(pt1);
+            mvtime startTime = wp1->getDepartureTime();
+            Coordinate projWp1 = loc1.getCoordinate(ls);
 
-        if(tripId == "6524963") {
-            qDebug() << QString::fromStdString(ls->toString());
-        }
+            tIt++;
+            // snap each waypoint of the trajectory to the shape linestring
+            for(; tIt != it.value()->end()-1; ++tIt) {
+                WayPoint * wp2 = (tIt+1).value();
+                Coordinate pt2(wp2->getCoords().x(), wp2->getCoords().y());
+                LinearLocation loc2 = lineRef->project(pt2);
+                mvtime endTime   = wp2->getArrivalTime();
+                Coordinate projWp2 = loc2.getCoordinate(ls);
 
-        tIt++;
-        // snap each waypoint of the trajectory to the shape linestring
-        for(; tIt != it.value()->end()-1; ++tIt) {
-            WayPoint * wp2 = (tIt+1).value();
-            Coordinate pt2(wp2->getCoords().x(), wp2->getCoords().y());
-            LinearLocation loc2 = lineRef->project(pt2);
-            mvtime endTime   = wp2->getArrivalTime();
-            Coordinate projWp2 = loc2.getCoordinate(ls);
+                // change the coordinates of the stop to match those of the projected point on the linestring
+                wp1->setCoords(QPointF(projWp1.x, projWp1.y));
+                wp2->setCoords(QPointF(projWp2.x, projWp2.y));
 
-            if(tripId == "6524963") {
-                qDebug() << QString::fromStdString(pt1.toString()) << QString::fromStdString(projWp1.toString());
-                qDebug() << QString::fromStdString(pt2.toString()) << QString::fromStdString(projWp2.toString());
-                qDebug() << startTime << endTime;
-            }
+                // add the way point to the corresponding trajectory
+                _trajectories.value(tripId)->addWayPoint(wp1);
+                _trajectories.value(tripId)->addWayPoint(wp2);
 
-            // change the coordinates of the stop to match those of the projected point on the linestring
-            wp1->setCoords(QPointF(projWp1.x, projWp1.y));
-            wp2->setCoords(QPointF(projWp2.x, projWp2.y));
+                // Get the partial time
+                LineString * partialLine = dynamic_cast<LineString*>(lineRef->extractLine(loc1, loc2));
+                double totalLength = partialLine->getLength();
+                double sumLength = 0;
 
-            if(tripId == "6524963") {
-            // add the way point to the corresponding trajectory
-            _trajectories.value(tripId)->addWayPoint(wp1);
-            _trajectories.value(tripId)->addWayPoint(wp2);
-            }
-
-            // Get the partial time
-            LineString * partialLine = dynamic_cast<LineString*>(lineRef->extractLine(loc1, loc2));
-            double totalLength = partialLine->getLength();
-            double sumLength = 0;
-
-            if(tripId == "6524963") {
-                qDebug() << "\t" << QString::fromStdString(partialLine->toString());
-            }
-
-            // Insert the points in the linestring between loc1 and loc2
-            // Interpolate the time of each waypoint
-            // ignore the two extermity waypoints
-            Coordinate prevPt = partialLine->getCoordinateN(0);
-            Coordinate curPt;
-            for(int ptIdx = 1; ptIdx < partialLine->getNumPoints()-1; ++ptIdx) {
-                curPt = partialLine->getCoordinateN(ptIdx);
-                double distance = prevPt.distance(curPt);
-                mvtime time = startTime + (endTime - startTime) * (sumLength/totalLength);
-                if(tripId == "6524963") {
-                    qDebug() <<  "\t\t" << QString::fromStdString(curPt.toString()) << QString::fromStdString(prevPt.toString()) << time;
+                // Insert the points in the linestring between loc1 and loc2
+                // Interpolate the time of each waypoint
+                // ignore the two extermity waypoints
+                Coordinate prevPt = partialLine->getCoordinateN(0);
+                Coordinate curPt;
+                for(int ptIdx = 1; ptIdx < partialLine->getNumPoints()-1; ++ptIdx) {
+                    curPt = partialLine->getCoordinateN(ptIdx);
+                    double distance = prevPt.distance(curPt);
+                    mvtime time = startTime + (endTime - startTime) * (sumLength/totalLength);
                     WayPoint * wp = new WayPoint(QPointF(curPt.x, curPt.y), time, time);
                     _trajectories.value(tripId)->addWayPoint(wp);
+
+                    // increment the distance and previous point
+                    sumLength += distance;
+                    prevPt = curPt;
                 }
-//                WayPoint * wp = new WayPoint(QPointF(curPt.x, curPt.y), time, time);
-//                _trajectories.value(tripId)->addWayPoint(wp);
 
-                // increment the distance and previous point
-                sumLength += distance;
-                prevPt = curPt;
+                // update the waypoints
+                wp1 = wp2;
+                pt1 = pt2;
+                loc1 = loc2;
+                startTime = endTime;
+                projWp1 = projWp2;
             }
-
-            // update the waypoints
-            wp1 = wp2;
-            pt1 = pt2;
-            loc1 = loc2;
-            startTime = endTime;
-            projWp1 = projWp2;
         }
 
+        qDebug() << "trajectories " << _trajectories.count();
     }
 
-    qDebug() << "trajectories " << _trajectories.count();
 }
 
 mvtime GTFSLoader::toSeconds(QString time)

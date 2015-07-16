@@ -11,7 +11,7 @@ GridStatDecorator::GridStatDecorator():
     _contactCount = QHash<QPoint,int>();
     _contacts = QMap<QPair<int,int>,ContactInfo*>();
     _timeWindow = 60*60; // 60 minutes
-    _minContactDuration = 0; // 0 seconds
+    _minContactDuration = 0; // 0 1/10 seconds
     _showGrid = true;
     _cellSize = 200;
     _communicationRange = 100;
@@ -264,6 +264,15 @@ void GridStatDecorator::setTimeWindow(int timeWindow)
 {
     _timeWindow = timeWindow*60;
     ui->labelTimeWindow->setText(QString::number(timeWindow));
+    update();
+}
+
+void GridStatDecorator::update()
+{
+    // delete all the contacts
+    qDeleteAll(_contacts);
+    _contacts.clear();
+    // delete all the contact counts
     _contactCount.clear();
     emit requestUpdate();
 }
@@ -272,6 +281,7 @@ void GridStatDecorator::setMinContactDuration(int value)
 {
     _minContactDuration = value;
     ui->labelContactDuration->setText(QString::number(value)+"s");
+    update();
 }
 
 

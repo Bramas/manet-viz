@@ -28,6 +28,7 @@ private:
     QString _projOut = "";
     QStringList _projIns, _projOuts;
     bool _isProjInValid = true, _isProjOutValid = true;
+    bool _snapToShape;
 
     bool isValidProj(QString proj);
     void checkConsistency();
@@ -37,6 +38,7 @@ private slots:
     void onAccepted();
     void projInEdited(QString);
     void projOutEdited(QString);
+    void snapToShapeChanged();
 
 };
 

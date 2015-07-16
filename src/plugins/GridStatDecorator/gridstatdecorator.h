@@ -79,6 +79,7 @@ private:
     void deleteObsoleteCells(mvtime time);
     QColor selectCellColor(int cellCount);
     QList<double> getJenksBreaks(QList<double> sListDouble, int sClassCount);
+    void update();
 
     Ui::Control *ui;
     int _cellSize;

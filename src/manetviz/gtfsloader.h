@@ -152,7 +152,7 @@ class GTFSLoader : public QObject, public ILoader
     Q_OBJECT
 public:
     GTFSLoader(QString folderPath);
-    GTFSLoader(QString folderPath, QString projIn, QString projOut);
+    GTFSLoader(QString folderPath, QString projIn, QString projOut, bool snapToShape);
     GTFSLoader(const GTFSLoader &other);
     ~GTFSLoader();
 
@@ -175,6 +175,7 @@ private:
     QString _stopsFilePath;
     QString _shapesFilePath;
     QString _tripsFilePath;
+    bool _snapToShape;
 
     // trajectories indexed by the trip id of each trajectory
     QMap<QString,Trajectory *> _trajectories;
