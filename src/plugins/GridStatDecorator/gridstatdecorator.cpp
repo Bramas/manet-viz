@@ -9,7 +9,9 @@ GridStatDecorator::GridStatDecorator():
 {
     _gridCount = QHash<QPoint,QLinkedList<QPair<mvtime,int> > >();
     _contactCount = QHash<QPoint,int>();
+    _contacts = QMap<QPair<int,int>,ContactInfo*>();
     _timeWindow = 60*60; // 60 minutes
+    _minContactDuration = 0; // 0 seconds
     _showGrid = true;
     _cellSize = 200;
     _communicationRange = 100;
@@ -55,6 +57,7 @@ void GridStatDecorator::decorateEdges(mvtime time, IGraph *graph)
         deleteObsoleteCells(time);
 
         // Populate the grid
+        QSet<QPair<int,int> > examinedContacts;
         foreach(const Node& n1, graph->nodes())
         {
             QPoint gc1((int)qFloor(n1.properties().value(X).toDouble() / _cellSize), (int)qFloor(n1.properties().value(Y).toDouble() / _cellSize));
@@ -62,13 +65,38 @@ void GridStatDecorator::decorateEdges(mvtime time, IGraph *graph)
             {
                 if(n1.id() < n2)
                 {
-                    QPoint gc2((int)qFloor(graph->nodes().value(n2).properties().value(X).toDouble() / _cellSize), (int)qFloor(graph->nodes().value(n2).properties().value(Y).toDouble() / _cellSize));
-                    // increase the contact count for the grid cells
-                    increaseCellCount(gc1, time);
-                    if(gc1 != gc2)
-                        increaseCellCount(gc2, time);
+                    QPair<int,int> nodes = qMakePair(n1.id(),n2);
+                     // add the contact to the examined contacts
+                    examinedContacts.insert(nodes);
+
+                    if(_contacts.contains(nodes)) {
+                        ContactInfo * ci = _contacts.value(nodes);
+
+                        // increment the contact duration
+                        ci->setEndTime(time);
+
+                        // display on the grid if the duration is greater than the minimum contact duration
+                        if(ci->getDuration() >= _minContactDuration) {
+                            QPoint gc2((int)qFloor(graph->nodes().value(n2).properties().value(X).toDouble() / _cellSize), (int)qFloor(graph->nodes().value(n2).properties().value(Y).toDouble() / _cellSize));
+                            // increase the contact count for the grid cells
+                            increaseCellCount(gc1, time);
+                            if(gc1 != gc2)
+                                increaseCellCount(gc2, time);
+                        }
+                    } else {
+                        // add the contact to the hash
+                        _contacts.insert(nodes,new ContactInfo(n1.id(),n2,time));
+                    }
                 }
             }
+        }
+
+        // delete all the contacts that have not been examined
+        QSet<QPair<int,int> > contactsToRemove = _contacts.uniqueKeys().toSet().subtract(examinedContacts);
+        for(auto it = contactsToRemove.begin(); it != contactsToRemove.end(); ++it) {
+            ContactInfo *ci = _contacts.value(*it);
+            if(_contacts.remove(*it))
+                delete ci;
         }
     }
 }
@@ -79,8 +107,12 @@ QWidget *GridStatDecorator::createControlWidget() const
     QWidget * control = new QWidget();
     ui->setupUi(control);
     ui->labelTimeWindow->setText(QString::number(_timeWindow/60));
+    ui->labelContactDuration->setText(QString::number(_minContactDuration) + "s");
+
     connect(ui->showGridCheckBox, SIGNAL(toggled(bool)), this, SLOT(setShowGrid(bool)));
-    connect(ui->TimeWindowSlider, SIGNAL(valueChanged(int)), this, SLOT(setTimeWindow(int)));
+    connect(ui->timeWindowSlider, SIGNAL(valueChanged(int)), this, SLOT(setTimeWindow(int)));
+    connect(ui->contactDurationSlider, SIGNAL(valueChanged(int)), this, SLOT(setMinContactDuration(int)));
+
     return control;
 }
 
@@ -236,15 +268,24 @@ void GridStatDecorator::setTimeWindow(int timeWindow)
     emit requestUpdate();
 }
 
-void GridStatDecorator::open()
+void GridStatDecorator::setMinContactDuration(int value)
 {
-    QString filename = QFileDialog::getOpenFileName();
-    qDebug() << filename;
-
+    _minContactDuration = value;
+    ui->labelContactDuration->setText(QString::number(value)+"s");
 }
+
+
+/**
+ * qHash implementations
+ */
 
 inline uint qHash(const QPoint &key)
 {
     return qHash(key.x()) ^ qHash(key.y());
 }
 
+inline uint qHash(const ContactInfo &key)
+{
+    QPair<int,int> nodes = key.getNodes();
+    return qHash(nodes.first) ^ qHash(nodes.second);
+}

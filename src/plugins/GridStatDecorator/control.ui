@@ -7,13 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>202</width>
-    <height>89</height>
+    <height>137</height>
    </rect>
   </property>
   <property name="sizePolicy">
    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
     <horstretch>200</horstretch>
-    <verstretch>38</verstretch>
+    <verstretch>137</verstretch>
    </sizepolicy>
   </property>
   <property name="minimumSize">
@@ -67,7 +67,7 @@
     <string>Time window</string>
    </property>
   </widget>
-  <widget class="QSlider" name="TimeWindowSlider">
+  <widget class="QSlider" name="timeWindowSlider">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -90,6 +90,57 @@
    </property>
    <property name="tickPosition">
     <enum>QSlider::NoTicks</enum>
+   </property>
+  </widget>
+  <widget class="QSlider" name="contactDurationSlider">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>100</y>
+     <width>151</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <number>5</number>
+   </property>
+   <property name="maximum">
+    <number>500</number>
+   </property>
+   <property name="sliderPosition">
+    <number>60</number>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="tickPosition">
+    <enum>QSlider::NoTicks</enum>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>80</y>
+     <width>151</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Min contact duration</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelContactDuration">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>100</y>
+     <width>31</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
    </property>
   </widget>
  </widget>

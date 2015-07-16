@@ -29,7 +29,23 @@ protected:
         event->ignore();
         qDebug() << "Custom item clicked.";
     }
+};
 
+class ContactInfo
+{
+public:
+    ContactInfo(int id1, int id2, mvtime t):
+        _id1(id1), _id2(id2), _startTime(t), _endTime(t) { }
+
+    void setEndTime(mvtime endTime) { _endTime = endTime; }
+    mvtime getDuration() const { return _endTime - _startTime; }
+    QPair<int,int> getNodes() const { return qMakePair(_id1, _id2); }
+
+private:
+    mvtime _startTime;
+    mvtime _endTime;
+    int _id1;
+    int _id2;
 };
 
 class GRIDSTATDECORATORSHARED_EXPORT GridStatDecorator: public QObject, public IPlugin
@@ -69,7 +85,9 @@ private:
     bool _showGrid;
     QHash<QPoint,QLinkedList<QPair<mvtime,int> > > _gridCount;
     QHash<QPoint,int> _contactCount;
+    QMap<QPair<int,int>, ContactInfo*> _contacts;
     mvtime _timeWindow;
+    mvtime _minContactDuration;
     QGraphicsItemGroup * _gridGroupItems;
     int _communicationRange;
 
@@ -78,7 +96,7 @@ private:
 private slots:
     void setShowGrid(bool);
     void setTimeWindow(int);
-    void open();
+    void setMinContactDuration(int);
 
 };
 

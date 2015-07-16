@@ -23,18 +23,6 @@ ControlWidget::ControlWidget(QWidget *parent, Project * project) :
     connect(ui->spinBoxTime, SIGNAL(valueChanged(int)), this, SLOT(emitTimeChanged()));
     connect(&_playTimer, SIGNAL(timeout()), this, SLOT(onPlayTimerTimeout()));
     connect(ui->pushButtonPlay, SIGNAL(clicked(bool)), this, SLOT(togglePlay()));
-    /*connect(ui->checkBoxContacts, &QCheckBox::stateChanged, [this]
-        {
-            emit contactDisplayChanged(ui->checkBoxContacts->isChecked());
-        });
-    connect(ui->checkBoxRange, &QCheckBox::stateChanged, [this]
-        {
-            emit rangeDisplayChanged(ui->checkBoxRange->isChecked());
-        });
-    connect(ui->sliderRange, &QSlider::valueChanged, [this](int v)
-        {
-            emit communicationRangeChanged((qreal)v);
-        });*/
     _playTimerElapsed.start();
 }
 

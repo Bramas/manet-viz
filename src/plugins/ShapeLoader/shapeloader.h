@@ -63,7 +63,6 @@ private:
 private slots:
     void setShowShape(bool);
     void openShapeFile();
-
 };
 
 #endif // SHAPELOADER_H

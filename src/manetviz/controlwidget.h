@@ -29,9 +29,6 @@ public slots:
 
 signals:
     void timeChanged(mvtime);
-    void communicationRangeChanged(qreal);
-    void contactDisplayChanged(bool);
-    void rangeDisplayChanged(bool);
 
 private slots:
     void emitTimeChanged();

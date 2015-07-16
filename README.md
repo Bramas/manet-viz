@@ -34,6 +34,8 @@ To add a new plugin under QT:
 Right click on Plugin directory > Add new Subproject > Library > C++ Library > Fill the name > Requires `QtWidgets`,`QtGui`,`QtCore` > Create the files you need to implement the decorator
 Add in the `*.pro` file:
 ```
+QT       += widgets concurrent
+...
 INCLUDEPATH    += ../../manetviz
 DESTDIR         = ../../manetviz/plugins
 ```
@@ -41,20 +43,23 @@ DESTDIR         = ../../manetviz/plugins
 In the `<plugin_name>.h` file, add:
 ```c++
 #include <QObject>
-#include "<interface_name>.h"
+#include "iplugin.h"
 ```
 
-Make the plugin inherit from the interface (eg. `IViewerLayer`):
+Make the plugin inherit from the interface (eg. `IPlugin`):
 
 ```c++
-class <plugin_name>: public QObject, public IViewerLayer
+class <plugin_name>: public QObject, public IPlugin
 {
   Q_OBJECT
-  Q_PLUGIN_METADATA(IID "org.manet-viz.<interface_name>" FILE "<plugin_name>.json")
-  Q_INTERFACES(<interface_name>)
+  Q_PLUGIN_METADATA(IID "org.manet-viz.IPlugin" FILE "<plugin_name>.json")
+  Q_INTERFACES(IPlugin)
 
 public:
   <plugin_name>(); // constructor
+  // implement the abstract method
+  // inherited from IPlugin
+  QObject * getQObject() { return this; }
 };
 ```
 
@@ -63,7 +68,8 @@ Create a new file in the plugin directory of the name: `<plugin_name>.json` that
 {
 "name" : "<plugin_name>",
 "version" : "0.0.1",
-"dependencies" : []
+"dependencies" : [],
+"active" : "true"
 }
 ```
 
@@ -88,13 +94,13 @@ In the `<plugin_name>.cpp`, add the following:
 #include "ui_control.h"
 ```
 
-Set the UI attribute for the plugin
+Set the UI attribute for the plugin in the constructor in the `cpp` file:
 ```
 <plugin_name>::<plugin_name>():
   ui(new Ui::Control) { ... }
 ```
 
-Implement the `createControlWidget()` method:
+Implement the `QWidget * createControlWidget() const` method:
 ```c++
 QWidget * control new QWidget();
 ui->setupUi(control);

@@ -29,8 +29,6 @@ int main(int argc, char *argv[])
     PluginManager::setPluginPaths(QStringList(pluginsDir.absolutePath()));
     PluginManager::loadPlugins();
 
-
-
     MainWindow w;
     w.show();
 

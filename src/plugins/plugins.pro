@@ -8,4 +8,5 @@ SUBDIRS	    = graphlayer \
     WComDecorator \
     GraphConvertor \
     ShapeLoader \
-    StaticNodes
+    StaticNodes \
+    Simulation
