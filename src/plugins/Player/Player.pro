@@ -4,10 +4,13 @@
 #
 #-------------------------------------------------
 
-QT       += widgets
+QT       += widgets concurrent
 
 TARGET = Player
 TEMPLATE = lib
+
+INCLUDEPATH    += ../../manetviz
+DESTDIR         = ../../manetviz/plugins
 
 DEFINES += PLAYER_LIBRARY
 
@@ -20,3 +23,9 @@ unix {
     target.path = /usr/lib
     INSTALLS += target
 }
+
+DISTFILES += \
+    player.json
+
+FORMS += \
+    control.ui
