@@ -2,8 +2,6 @@
 #define CONTROLWIDGET_H
 
 #include <QDockWidget>
-#include <QTimer>
-#include <QElapsedTimer>
 
 #include "types.h"
 
@@ -27,22 +25,8 @@ public:
 public slots:
     void setLoadProgress(qreal);
 
-signals:
-    void timeChanged(mvtime);
-
-private slots:
-    void emitTimeChanged();
-    void onPlayTimerTimeout();
-    void play();
-    void stop();
-    void togglePlay();
-
 private:
     Ui::ControlWidget *ui;
-    QTimer _playTimer;
-    QElapsedTimer _playTimerElapsed;
-    qreal _cumulatedTime;
-    bool _isPlaying;
     Viewer * _viewer;
     Project * _project;
 };

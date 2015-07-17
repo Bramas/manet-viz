@@ -102,11 +102,13 @@ Set the UI attribute for the plugin in the constructor in the `cpp` file:
 
 Implement the `QWidget * createControlWidget() const` method:
 ```c++
-QWidget * control new QWidget();
+QWidget * control = new QWidget();
 ui->setupUi(control);
 ... // init the widgets and connections
 return control;
 ```
+
+Clean all and run `qmake`
 
 [1]:	http://crawdad.cs.dartmouth.edu/roma/taxi/ "Crawdad roma/taxi dataset"
 [2]: http://spatialreference.org/ref/epsg/wgs-84/ "ESPG:4326"

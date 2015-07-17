@@ -9,4 +9,5 @@ SUBDIRS	    = graphlayer \
     GraphConvertor \
     ShapeLoader \
     StaticNodes \
-    Simulation
+    Simulation \
+    Player

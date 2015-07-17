@@ -35,75 +35,16 @@
        <property name="minimumSize">
         <size>
          <width>200</width>
-         <height>160</height>
+         <height>50</height>
         </size>
        </property>
-       <widget class="QLabel" name="label">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>10</y>
-          <width>47</width>
-          <height>13</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Time</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="pushButtonPlay">
-        <property name="geometry">
-         <rect>
-          <x>90</x>
-          <y>80</y>
-          <width>75</width>
-          <height>23</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Play</string>
-        </property>
-       </widget>
-       <widget class="QSpinBox" name="spinBoxTime">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>30</y>
-          <width>151</width>
-          <height>22</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QSpinBox" name="spinBoxSpeed">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>80</y>
-          <width>71</width>
-          <height>22</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_2">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>60</y>
-          <width>47</width>
-          <height>13</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Speed</string>
-        </property>
-       </widget>
        <widget class="QProgressBar" name="progressBarImport">
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>130</y>
+          <y>20</y>
           <width>151</width>
-          <height>23</height>
+          <height>20</height>
          </rect>
         </property>
         <property name="maximum">
@@ -120,9 +61,9 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>110</y>
+          <y>0</y>
           <width>151</width>
-          <height>20</height>
+          <height>17</height>
          </rect>
         </property>
         <property name="text">
