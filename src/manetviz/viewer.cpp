@@ -12,13 +12,13 @@
 #include <QGraphicsItem>
 #include <QPointF>
 #include <QDebug>
+#include <QPushButton>
+#include <QGraphicsProxyWidget>
 
 Viewer::Viewer()
 {
     _isRequestPending = false;
-    _afterTranslate = QPointF(-83000, -12.35*2000);
     _layout = 0;
-    _zoom=2000;
     //setMouseTracking(true);
     _timeSinceLastFrame.start();
     connect(&_futureGraphWatcher, &QFutureWatcher<IGraph*>::finished, this, &Viewer::updateLayers);
@@ -35,11 +35,6 @@ void Viewer::setProject(Project *project)
     onPluginsChanged();
 }
 
-
-QPointF Viewer::toLocalCoordinates(QPointF globalCoordinates) const
-{
-    return _afterTranslate + _zoom * (globalCoordinates);
-}
 
 void Viewer::setTime(mvtime time)
 {

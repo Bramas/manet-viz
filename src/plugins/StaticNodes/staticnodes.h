@@ -104,8 +104,6 @@ protected:
             _node->setCoordinates(_node->getCoordinates() + (pos() - _startDrag));
         }
         _node->setEnabled(true);
-
-
     }
 
     void mousePressEvent ( QGraphicsSceneMouseEvent * event )
@@ -118,7 +116,8 @@ protected:
                 double radius = boundingRect().width() / 2.0;
                 QPointF clikPos = event->scenePos();
                 double dist = sqrt(pow(_node->getCoordinates().x()-clikPos.x(), 2) + pow(_node->getCoordinates().y()-clikPos.y(), 2));
-                if(dist / radius > 0.8) {
+                double frac = dist / radius;
+                if(frac > 0.8 && frac <= 1.0) {
                     qDebug() << dist << radius << dist / radius;
                     _isResizing = true;
                 } else {
@@ -142,7 +141,7 @@ protected:
             double dist = sqrt(pow(_node->getCoordinates().x()-mousePos.x(), 2) + pow(_node->getCoordinates().y()-mousePos.y(), 2));
             _range = dist;
             _node->setRange(_range);
-
+            update(boundingRect());
         } else if(event->modifiers() != Qt::AltModifier) {
             QGraphicsItem::mouseMoveEvent(event);
         }

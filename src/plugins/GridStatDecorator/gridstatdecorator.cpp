@@ -34,18 +34,15 @@ void GridStatDecorator::setCommunicationRange(int com)
 void GridStatDecorator::paint(IGraph *graph)
 {
     // Display the cell counts
-    delete _gridGroupItems;
-    _gridGroupItems = new QGraphicsItemGroup();
-    _project->viewer()->addItem(_gridGroupItems);
     for(auto cellIt = _contactCount.begin(); cellIt != _contactCount.end(); ++cellIt) {
         int contactSum = cellIt.value();
 
         if(contactSum > 0) {
-            GraphicsCellItem * item = new GraphicsCellItem(_cellSize*cellIt.key().x(), _cellSize*cellIt.key().y(), _cellSize, _cellSize);
+            GraphicsCellItem * item = new GraphicsCellItem(_cellSize*cellIt.key().x(), _cellSize*cellIt.key().y(), _cellSize, _cellSize, contactSum);
             item->setBrush(QBrush(selectCellColor(contactSum)));
             item->setPen(Qt::NoPen);
             item->setOpacity(0.5);
-            _gridGroupItems->addToGroup(item);
+            _project->viewer()->addItem(item);
         }
     }
 }

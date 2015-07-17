@@ -28,6 +28,8 @@ void StaticNodes::decorateEdges(mvtime time, IGraph *graph)
         bool isStaticNode = false;
         if(_nodes.contains(n.id()))
             isStaticNode = true;
+
+        // check whether the static node is enabled
         if(isStaticNode && !_nodes.value(n.id())->isEnabled())
             continue;
 
@@ -35,6 +37,7 @@ void StaticNodes::decorateEdges(mvtime time, IGraph *graph)
         double y = n.properties().value(Y).toDouble();
         QVector2D p1(x,y);
 
+        // add edges for the nodes within the distance of each static node
         for(auto it = _nodes.begin(); it != _nodes.end() ;++it) {
             StaticNode * staticNode = it.value();
             if(!staticNode->isEnabled())
@@ -118,6 +121,8 @@ void StaticNodes::onMousePressed(QGraphicsSceneMouseEvent * event)
 //        _project->viewer()->removeItem();
     }
 }
+
+
 
 void StaticNodes::setCommunicationRange(int range)
 {

@@ -37,6 +37,13 @@ public:
         _pen = p;
     }
 
+    enum { Type = UserType + 2 };
+    int type() const
+    {
+        // Enable the use of qgraphicsitem_cast with this item.
+        return Type;
+    }
+
 private:
     QPen _pen;
     QPointF _position;

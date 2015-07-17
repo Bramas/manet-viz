@@ -24,11 +24,16 @@ public:
 
 public slots:
     void setLoadProgress(qreal);
+    void increaseZoom();
+    void decreaseZoom();
+    void resetZoom();
 
 private:
     Ui::ControlWidget *ui;
     Viewer * _viewer;
     Project * _project;
+
+    QPointF getWeightedCenter();
 };
 
 #endif // CONTROLWIDGET_H

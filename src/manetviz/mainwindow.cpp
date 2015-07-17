@@ -92,7 +92,6 @@ void MainWindow::openGTFS()
     setCentralWidget(v);
     this->addDockWidget(Qt::LeftDockWidgetArea, controlWidget);
     _gtfsLoader->load();
-
 }
 
 MainWindow::~MainWindow()

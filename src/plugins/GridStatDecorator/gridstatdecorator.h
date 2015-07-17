@@ -20,15 +20,18 @@ class GraphicsCellItem: public QGraphicsRectItem
 public:
     GraphicsCellItem():
         QGraphicsRectItem() {}
-    GraphicsCellItem(qreal x, qreal y, qreal w, qreal h, QGraphicsItem *parent = 0):
-        QGraphicsRectItem(x, y, w, h, parent) { }
+    GraphicsCellItem(qreal x, qreal y, qreal w, qreal h, int count = 0):
+        QGraphicsRectItem(x, y, w, h), _count(count) { }
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event)
     {
-        event->ignore();
-        qDebug() << "Custom item clicked.";
+        event->accept();
+        qDebug() << this->rect() << _count;
     }
+
+private:
+    int _count;
 };
 
 class ContactInfo
