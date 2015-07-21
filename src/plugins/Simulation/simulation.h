@@ -28,6 +28,9 @@ signals:
 private:
     Ui::Control *ui;
     QTimer _playTimer;
+    int _updateCount;
+    qreal _updateDuration;
+    QElapsedTimer _playTimerElapsed;
     bool _isPlaying;
 
     void play();
@@ -38,6 +41,7 @@ private slots:
     void emitTimeChanged();
     void onPlayTimerTimeout();
     void onSpeedSliderChange();
+    void modelUpdated(mvtime);
 
 };
 

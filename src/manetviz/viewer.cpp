@@ -19,8 +19,6 @@ Viewer::Viewer()
 {
     _isRequestPending = false;
     _layout = 0;
-    //setMouseTracking(true);
-    _timeSinceLastFrame.start();
     connect(&_futureGraphWatcher, &QFutureWatcher<IGraph*>::finished, this, &Viewer::updateLayers);
 }
 
@@ -144,6 +142,7 @@ void Viewer::updateLayers()
         layer->paint(graph);
     }
     update();
+    emit updated(_time);
     delete graph;
 
     if(_isRequestPending)

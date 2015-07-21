@@ -8,14 +8,14 @@ GridStatDecorator::GridStatDecorator():
     ui(new Ui::Control)
 {
     _gridCount = QHash<QPoint,QLinkedList<QPair<mvtime,int> > >();
-    _contactCount = QHash<QPoint,int>();
-    _contacts = QMap<QPair<int,int>,ContactInfo*>();
+    _contactCount = QHash<QPoint,GraphicsCellItem *>();
+    _contacts = QMap<QPair<int,int>,ContactInfo>();
     _timeWindow = 60*60; // 60 minutes
     _minContactDuration = 0; // 0 1/10 seconds
     _showGrid = true;
     _cellSize = 200;
+    _isUpdating = false;
     _communicationRange = 100;
-    _gridGroupItems = new QGraphicsItemGroup();
 }
 
 void GridStatDecorator::setProject(Project * project)
@@ -23,33 +23,25 @@ void GridStatDecorator::setProject(Project * project)
     _project = project;
 }
 
-void GridStatDecorator::setCommunicationRange(int com)
-{
-    _communicationRange = com;
-    _cellSize = 2*com;
-    _contactCount.clear();
-    emit requestUpdate();
-}
-
 void GridStatDecorator::paint(IGraph *graph)
 {
     // Display the cell counts
     for(auto cellIt = _contactCount.begin(); cellIt != _contactCount.end(); ++cellIt) {
-        int contactSum = cellIt.value();
+        GraphicsCellItem * item = cellIt.value();
 
-        if(contactSum > 0) {
-            GraphicsCellItem * item = new GraphicsCellItem(_cellSize*cellIt.key().x(), _cellSize*cellIt.key().y(), _cellSize, _cellSize, contactSum);
-            item->setBrush(QBrush(selectCellColor(contactSum)));
+        if(item->getCount() > 0) {
+            item->setBrush(QBrush(selectCellColor(item->getCount())));
             item->setPen(Qt::NoPen);
             item->setOpacity(0.5);
-            _project->viewer()->addItem(item);
+            if(!_project->viewer()->items().contains(item))
+                _project->viewer()->addItem(item);
         }
     }
 }
 
 void GridStatDecorator::decorateEdges(mvtime time, IGraph *graph)
 {
-    if(_showGrid) {
+    if(_showGrid && !_isUpdating) {
         // update the grid count hash by deleting the obsolete cells
         deleteObsoleteCells(time);
 
@@ -67,13 +59,13 @@ void GridStatDecorator::decorateEdges(mvtime time, IGraph *graph)
                     examinedContacts.insert(nodes);
 
                     if(_contacts.contains(nodes)) {
-                        ContactInfo * ci = _contacts.value(nodes);
+                        ContactInfo ci = _contacts.value(nodes);
 
                         // increment the contact duration
-                        ci->setEndTime(time);
+                        ci.setEndTime(time);
 
                         // display on the grid if the duration is greater than the minimum contact duration
-                        if(ci->getDuration() >= _minContactDuration) {
+                        if(ci.getDuration() >= _minContactDuration) {
                             QPoint gc2((int)qFloor(graph->nodes().value(n2).properties().value(X).toDouble() / _cellSize), (int)qFloor(graph->nodes().value(n2).properties().value(Y).toDouble() / _cellSize));
                             // increase the contact count for the grid cells
                             increaseCellCount(gc1, time);
@@ -82,18 +74,18 @@ void GridStatDecorator::decorateEdges(mvtime time, IGraph *graph)
                         }
                     } else {
                         // add the contact to the hash
-                        _contacts.insert(nodes,new ContactInfo(n1.id(),n2,time));
+                        _contacts.insert(nodes, ContactInfo(n1.id(),n2,time));
                     }
                 }
             }
         }
 
         // delete all the contacts that have not been examined
-        QSet<QPair<int,int> > contactsToRemove = _contacts.uniqueKeys().toSet().subtract(examinedContacts);
-        for(auto it = contactsToRemove.begin(); it != contactsToRemove.end(); ++it) {
-            ContactInfo *ci = _contacts.value(*it);
-            if(_contacts.remove(*it))
-                delete ci;
+        if(_contacts.size() > 0) {
+            QSet<QPair<int,int> > contactsToRemove = _contacts.uniqueKeys().toSet().subtract(examinedContacts);
+            for(auto it = contactsToRemove.begin(); it != contactsToRemove.end(); ++it) {
+                 _contacts.remove(*it);
+            }
         }
     }
 }
@@ -129,9 +121,10 @@ void GridStatDecorator::increaseCellCount(QPoint cell, mvtime time)
     }
     if(!_contactCount.contains(cell))
     {
-        _contactCount.insert(cell, 0);
+        _contactCount.insert(cell, new GraphicsCellItem(_cellSize*cell.x(), _cellSize*cell.y(), _cellSize, _cellSize));
     }
-    _contactCount[cell]++;
+    _contactCount[cell]->incCount();
+
     if(_gridCount.value(cell).isEmpty() || !_gridCount.value(cell).back().first != time) {
         _gridCount[cell].append(QPair<mvtime, int>(time, 1));
     } else {
@@ -144,13 +137,17 @@ void GridStatDecorator::deleteObsoleteCells(mvtime time)
     //_contactCount.clear();
     for(auto cellIt = _gridCount.begin(); cellIt != _gridCount.end(); ) {
 
-        while(!cellIt.value().isEmpty() && cellIt.value().front().first < time - _timeWindow)
+        while(!cellIt.value().isEmpty() && cellIt.value().front().first < (time - _timeWindow))
         {
-            _contactCount[cellIt.key()] -= cellIt.value().front().second;
+            _contactCount[cellIt.key()]->decCount(cellIt.value().front().second);
             cellIt.value().pop_front();
         }
         if(cellIt.value().isEmpty())
         {
+            GraphicsCellItem * item = _contactCount[cellIt.key()];
+            _project->viewer()->removeItem(item);
+            delete item;
+
             _contactCount.remove(cellIt.key());
             cellIt = _gridCount.erase(cellIt);
         }
@@ -165,7 +162,11 @@ QColor GridStatDecorator::selectCellColor(int cellCount)
 {
     // use quartiles
     // TODO: use natural jenks
-    QList<int> l(_contactCount.values());
+
+    QList<int> l;
+    for(auto it = _contactCount.begin(); it != _contactCount.end(); ++it) {
+        l.append(it.value()->getCount());
+    }
     std::sort(l.begin(), l.end());
     if(cellCount == 0 || l.isEmpty())
     {
@@ -181,6 +182,7 @@ QColor GridStatDecorator::selectCellColor(int cellCount)
     else if(cellCount > q12) return QColor(226,225,239);
     else return QColor(233,233,243);*/
 }
+
 
 QList<double> GridStatDecorator::getJenksBreaks(QList<double> sListDouble, int sClassCount)
 {
@@ -253,25 +255,7 @@ QList<double> GridStatDecorator::getJenksBreaks(QList<double> sListDouble, int s
 void GridStatDecorator::setShowGrid(bool show)
 {
     _showGrid = show;
-    _contactCount.clear();
-    emit requestUpdate();
-}
-
-void GridStatDecorator::setTimeWindow(int timeWindow)
-{
-    _timeWindow = timeWindow*60;
-    ui->labelTimeWindow->setText(QString::number(timeWindow));
     update();
-}
-
-void GridStatDecorator::update()
-{
-    // delete all the contacts
-    qDeleteAll(_contacts);
-    _contacts.clear();
-    // delete all the contact counts
-    _contactCount.clear();
-    emit requestUpdate();
 }
 
 void GridStatDecorator::setMinContactDuration(int value)
@@ -281,6 +265,40 @@ void GridStatDecorator::setMinContactDuration(int value)
     update();
 }
 
+void GridStatDecorator::setTimeWindow(int timeWindow)
+{
+    _timeWindow = timeWindow*60;
+    ui->labelTimeWindow->setText(QString::number(timeWindow));
+    update();
+}
+
+void GridStatDecorator::setCommunicationRange(int com)
+{
+    _communicationRange = com;
+    _cellSize = 2*com;
+    update();
+}
+
+void GridStatDecorator::update()
+{
+    // delete all the contacts
+    _isUpdating = true;
+    _contacts.clear();
+    _gridCount.clear();
+
+    // delete all the contact counts
+    for(auto it = _contactCount.begin(); it != _contactCount.end(); ++it){
+        if(it.value()->scene() != NULL) {
+            _project->viewer()->removeItem(it.value());
+        }
+    }
+    qDeleteAll(_contactCount);
+    _contactCount.clear();
+
+    // request an update of the view
+    _isUpdating = false;
+    emit requestUpdate();
+}
 
 /**
  * qHash implementations

@@ -20,14 +20,25 @@ class GraphicsCellItem: public QGraphicsRectItem
 public:
     GraphicsCellItem():
         QGraphicsRectItem() {}
-    GraphicsCellItem(qreal x, qreal y, qreal w, qreal h, int count = 0):
-        QGraphicsRectItem(x, y, w, h), _count(count) { }
+    GraphicsCellItem(qreal x, qreal y, qreal w, qreal h):
+        QGraphicsRectItem(x, y, w, h), _count(0) { }
+
+    void setCount(int count) { _count = count; }
+    int getCount() const { return _count; }
+    void incCount() { _count++; }
+    void incCount(int count) { _count += count; }
+    void decCount() { _count--; }
+    void decCount(int count) { _count -= count; }
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event)
     {
-        event->accept();
-        qDebug() << this->rect() << _count;
+        if(event->button() == Qt::LeftButton) {
+            event->accept();
+            qDebug() << this->rect() << _count;
+        } else {
+            event->ignore();
+        }
     }
 
 private:
@@ -39,6 +50,8 @@ class ContactInfo
 public:
     ContactInfo(int id1, int id2, mvtime t):
         _id1(id1), _id2(id2), _startTime(t), _endTime(t) { }
+    ContactInfo():
+        _id1(-1), _id2(-1), _startTime(-1), _endTime(-1) { }
 
     void setEndTime(mvtime endTime) { _endTime = endTime; }
     mvtime getDuration() const { return _endTime - _startTime; }
@@ -88,12 +101,12 @@ private:
     int _cellSize;
     bool _showGrid;
     QHash<QPoint,QLinkedList<QPair<mvtime,int> > > _gridCount;
-    QHash<QPoint,int> _contactCount;
-    QMap<QPair<int,int>, ContactInfo*> _contacts;
+    QHash<QPoint,GraphicsCellItem *> _contactCount;
+    QMap<QPair<int,int>, ContactInfo> _contacts;
     mvtime _timeWindow;
     mvtime _minContactDuration;
-    QGraphicsItemGroup * _gridGroupItems;
     int _communicationRange;
+    bool _isUpdating;
 
     QObject * _wirelessCommunicationPlugin;
 

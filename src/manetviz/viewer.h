@@ -34,6 +34,7 @@ public:
 
 signals:
     void mousePressedEvent(QGraphicsSceneMouseEvent *);
+    void updated(mvtime);
 
 public slots:
     void setTime(mvtime time);
@@ -62,8 +63,6 @@ private:
     QFutureWatcher<IGraph*> _futureGraphWatcher;
     IGraphLayout * _layout;
     mvtime _time;
-    QPoint _lastMousePos;
-    QElapsedTimer _timeSinceLastFrame;
     Project * _project;
     QGraphicsItemGroup * _items;
     bool _isRequestPending;
