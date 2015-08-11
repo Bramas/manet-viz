@@ -1,0 +1,6 @@
+{
+"name" : "contactexporter",
+"version" : "0.0.1",
+"dependencies" : ["InterpolationDecorator", "WComDecorator", "GridStatDecorator", "SenseArea"],
+"active" : "true"
+}

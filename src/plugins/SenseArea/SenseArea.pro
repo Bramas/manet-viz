@@ -4,7 +4,10 @@
 #
 #-------------------------------------------------
 
-QT       += widgets
+QT       += widgets concurrent
+
+INCLUDEPATH    += ../../manetviz
+DESTDIR         = ../../manetviz/plugins
 
 TARGET = SenseArea
 TEMPLATE = lib
@@ -20,3 +23,6 @@ unix {
     target.path = /usr/lib
     INSTALLS += target
 }
+
+DISTFILES += \
+    sensearea.json
