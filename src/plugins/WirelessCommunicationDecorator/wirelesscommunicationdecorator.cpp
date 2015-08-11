@@ -23,7 +23,7 @@ void WirelessCommunicationDecorator::decorateEdges(mvtime time, IGraph *graph)
     {
         foreach(const Node& n2, graph->nodes())
         {
-            if(n1.id() != n2.id())
+            if(n1.id() < n2.id())
             {
                 QVector2D p1(n1.properties().value(X).toDouble(), n1.properties().value(Y).toDouble());
                 QVector2D p2(n2.properties().value(X).toDouble(), n2.properties().value(Y).toDouble());

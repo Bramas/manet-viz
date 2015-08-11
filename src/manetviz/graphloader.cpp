@@ -90,6 +90,7 @@ bool GraphLoader::concurrentLoad(QFile * file)
         {
             if(file->atEnd())
                 break;
+
             processLine(QString(file->readLine()).split(QRegExp("[\r\n]"), QString::SkipEmptyParts).at(0));
         }
         _loadProgress = 1.0 - file->bytesAvailable() / (qreal)file->size();
@@ -124,6 +125,8 @@ QDateTime GraphLoader::toDateTime(QString dateTime, QString format)
         dt = QDateTime::fromTime_t(dateTime.toUInt());
     } else if(format == "t") {
         dt = QDateTime::fromMSecsSinceEpoch(dateTime.toLongLong());
+    } else if(format == "tt") {
+        dt = QDateTime::fromMSecsSinceEpoch(dateTime.toLongLong() / 1000);
     } else {
         dt = QDateTime::fromString(dateTime, format);
     }

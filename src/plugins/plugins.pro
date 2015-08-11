@@ -10,4 +10,6 @@ SUBDIRS	    = graphlayer \
     ShapeLoader \
     StaticNodes \
     Simulation \
-    Player
+    Player \
+    ContactExporter \
+    SenseArea

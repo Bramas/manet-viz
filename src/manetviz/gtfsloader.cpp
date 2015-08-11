@@ -252,7 +252,6 @@ void GTFSLoader::parseTrips()
 
         qDebug() << "trajectories " << _trajectories.count();
     }
-
 }
 
 mvtime GTFSLoader::toSeconds(QString time)

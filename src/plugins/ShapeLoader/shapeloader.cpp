@@ -129,6 +129,52 @@ void ShapeLoader::loadGTFSShapes()
     // create the map of shape linestring
     QMap<QString, OGRLineString*> shapes;
 
+    const char *pszDriverName = "ESRI Shapefile";
+    OGRSFDriver *poDriver;
+
+    OGRRegisterAll();
+
+    poDriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(
+                    pszDriverName );
+    if( poDriver == NULL )
+    {
+        printf( "%s driver not available.\n", pszDriverName );
+        exit( 1 );
+    }
+
+    OGRDataSource *poDS;
+
+    poDS = poDriver->CreateDataSource( "/Users/ben/Desktop/ls_out1.shp", NULL );
+    if( poDS == NULL )
+    {
+        qWarning() << "Creation of output file failed.";
+    }
+
+    OGRLayer *poLayer;
+
+    poLayer = poDS->CreateLayer( "ls_out", NULL, wkbLineString, NULL );
+    if( poLayer == NULL )
+    {
+        qWarning() << "Layer creation failed.";
+    }
+
+    OGRFieldDefn oField1( "Name", OFTString );
+
+    oField1.SetWidth(32);
+
+    if( poLayer->CreateField( &oField1 ) != OGRERR_NONE )
+    {
+        qWarning() <<  "Creating Name field failed.";
+    }
+
+    OGRFieldDefn oField2( "Trip", OFTInteger );
+    oField1.SetWidth(32);
+
+    if( poLayer->CreateField( &oField2 ) != OGRERR_NONE )
+    {
+        qWarning() << "Creating Trips field failed.";
+    }
+
     for(auto it = _shapesMap.begin(); it != _shapesMap.end(); ++it) {
         QString shapeId = it.key();
         if(! _shapesToTrips.contains(shapeId)) continue;
@@ -145,6 +191,42 @@ void ShapeLoader::loadGTFSShapes()
 
         // Add the linestring to the list of geometries to draw
         _shapestoDraw.append(qMakePair(ls, new GeometryAttribute(width,QColor(255,0,0))));
+        OGRFeature *poFeature;
+        poFeature = OGRFeature::CreateFeature( poLayer->GetLayerDefn() );
+        poFeature->SetField( "Name", shapeId.toLatin1().data() );
+        poFeature->SetField( "Trip", count );
+        poFeature->SetGeometry( ls );
+        qDebug() << "we have:" << poFeature->GetFieldCount() << poFeature->GetFieldAsString("Name");
+
+        if( poLayer->CreateFeature( poFeature ) != OGRERR_NONE )
+        {
+           qWarning() << "Failed to create feature in shapefile.";
+        }
+        OGRFeature::DestroyFeature( poFeature );
+    }
+    OGRDataSource::DestroyDataSource( poDS );
+
+    // Create the shapefile of intersection points
+    poDS = poDriver->CreateDataSource( "/Users/ben/Desktop/pt_out1.shp", NULL );
+    if( poDS == NULL )
+    {
+        qWarning() << "Creation of output file failed.";
+    }
+
+    poLayer = poDS->CreateLayer( "pt_out", NULL, wkbPoint, NULL );
+    if( poLayer == NULL )
+    {
+        qWarning() << "Layer creation failed.";
+    }
+
+    if( poLayer->CreateField( &oField1 ) != OGRERR_NONE )
+    {
+        qWarning() <<  "Creating Name field failed.";
+    }
+
+    if( poLayer->CreateField( &oField2 ) != OGRERR_NONE )
+    {
+        qWarning() << "Creating Trips field failed.";
     }
 
     qDebug() << "shapes" << shapes.count();
@@ -167,6 +249,20 @@ void ShapeLoader::loadGTFSShapes()
                         OGRGeometry * mGeom = mPt->getGeometryRef(i);
                         if(wkbFlatten(mGeom->getGeometryType()) == wkbPoint) {
                             OGRPoint * pt  = (OGRPoint *) mGeom->clone();
+                            OGRFeature *poFeature;
+                            poFeature = OGRFeature::CreateFeature( poLayer->GetLayerDefn() );
+                            QString name = it.key() + "-" + jt.key() + "-" + QString::number(i);
+                            poFeature->SetField( "Name", name.toLatin1().data() );
+                            poFeature->SetField( "Trip", count1 * count2 );
+                            poFeature->SetGeometry( pt );
+                            qDebug() << "we have:" << poFeature->GetFieldCount() << poFeature->GetFieldAsString("Name");
+
+                            if( poLayer->CreateFeature( poFeature ) != OGRERR_NONE )
+                            {
+                               qWarning() << "Failed to create feature in shapefile.";
+                            }
+                            OGRFeature::DestroyFeature( poFeature );
+
                             _shapestoDraw.append(qMakePair(pt, new GeometryAttribute(size,QColor(0,0,255))));
                         }
                     }
@@ -174,6 +270,7 @@ void ShapeLoader::loadGTFSShapes()
             }
         }
     }
+    OGRDataSource::DestroyDataSource( poDS );
 
     qDebug() << "loaded shapefile with" << _shapestoDraw.count() << "features";
 }
@@ -203,7 +300,12 @@ void ShapeLoader::loadShapeFile(QString filename)
 
        poLayer->ResetReading();
        OGRFeatureDefn *poFDefn = poLayer->GetLayerDefn();
-       int hwIdx = poFDefn->GetFieldIndex("highway");
+       int hwIdx = poFDefn->GetFieldIndex("type");
+       if(hwIdx == -1)
+           hwIdx = poFDefn->GetFieldIndex("highway");
+
+
+       qDebug() << "highway field index" << hwIdx;
        while( (poFeature = poLayer->GetNextFeature()) != NULL )
        {
            QString HWFieldStr = QString::fromStdString(poFeature->GetFieldAsString(hwIdx));
@@ -243,7 +345,7 @@ QWidget *ShapeLoader::createControlWidget() const
 QMenu * ShapeLoader::createMenu() const
 {
     QMenu * menu = new QMenu();
-    menu->setTitle("ShapeFile");
+    menu->setTitle("Shapefile");
     QAction * menuActionOpen = menu->addAction("Open Shapefile");
     connect(menuActionOpen, SIGNAL(triggered()), this, SLOT(openShapeFile()));
     return menu;

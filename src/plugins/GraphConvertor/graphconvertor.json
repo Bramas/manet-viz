@@ -2,5 +2,5 @@
 "name" : "GraphConvertor",
 "version" : "0.0.1",
 "dependencies" : ["InterpolationDecorator"],
-"active" : "true"
+"active" : "false"
 }

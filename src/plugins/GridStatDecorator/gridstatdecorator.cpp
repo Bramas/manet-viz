@@ -30,7 +30,7 @@ void GridStatDecorator::paint(IGraph *graph)
         GraphicsCellItem * item = cellIt.value();
 
         if(item->getCount() > 0) {
-            item->setBrush(QBrush(selectCellColor(item->getCount())));
+            item->setBrush(QBrush(selectColorForLocalStat(computeLocalStat(cellIt.key()))));
             item->setPen(Qt::NoPen);
             item->setOpacity(0.5);
             if(!_project->viewer()->items().contains(item))
@@ -158,6 +158,15 @@ void GridStatDecorator::deleteObsoleteCells(mvtime time)
     }
 }
 
+QColor GridStatDecorator::selectColorForLocalStat(qreal zScore)
+{
+    if(zScore >= 3.291) return QColor("#720206");
+    else if(zScore >= 2.576) return QColor("#f33f1c");
+    else if(zScore >= 1.960) return QColor("#f37b22");
+    else if(zScore >= 1.645) return QColor("#fffe38");
+    else return QColor("#ffffff");
+}
+
 QColor GridStatDecorator::selectCellColor(int cellCount)
 {
     // use quartiles
@@ -183,6 +192,24 @@ QColor GridStatDecorator::selectCellColor(int cellCount)
     else return QColor(233,233,243);*/
 }
 
+qreal GridStatDecorator::computeLocalStat(QPoint cell_i) {
+    qreal sum1 = 0.0, sum2 = 0.0, sum3 = 0.0, sum4 = 0.0, sum5 = 0.0;
+    int n = _contactCount.size();
+    for(auto it = _contactCount.begin(); it != _contactCount.end(); ++it) {
+        int count_j = it.value()->getCount();
+        QPoint cell_j = it.key();
+        int weight = 1.0 / (0.01 + (qreal) qSqrt(qPow(cell_i.x() - cell_j.x(), 2) + qPow(cell_i.y() - cell_j.y(), 2)));
+        sum1 += weight * count_j;
+        sum2 += weight;
+        sum3 += qPow(weight,2);
+        sum4 += count_j;
+        sum5 += qPow(count_j,2);
+    }
+
+    qreal mean = sum4 / n;
+    qreal S = qSqrt(sum5 / n - qPow(mean, 2));
+    return (sum1 - mean * sum2) / (S * qSqrt((n * sum3 - qPow(sum2,2)) / (n-1)));
+}
 
 QList<double> GridStatDecorator::getJenksBreaks(QList<double> sListDouble, int sClassCount)
 {
@@ -262,6 +289,7 @@ void GridStatDecorator::setMinContactDuration(int value)
 {
     _minContactDuration = value;
     ui->labelContactDuration->setText(QString::number(value)+"s");
+    emit minContactDurationChanged(value);
     update();
 }
 
@@ -287,11 +315,6 @@ void GridStatDecorator::update()
     _gridCount.clear();
 
     // delete all the contact counts
-    for(auto it = _contactCount.begin(); it != _contactCount.end(); ++it){
-        if(it.value()->scene() != NULL) {
-            _project->viewer()->removeItem(it.value());
-        }
-    }
     qDeleteAll(_contactCount);
     _contactCount.clear();
 

@@ -6,8 +6,8 @@
 
 QT       += core gui concurrent opengl
 
-QMAKE_CXXFLAGS += -I/usr/local/Cellar/geos/3.4.2/include -I/Library/Frameworks/PROJ.framework/Versions/4/unix/include
-QMAKE_LFLAGS += -L/usr/local/Cellar/geos/3.4.2/lib -lgeos -L/Library/Frameworks/PROJ.framework/Versions/4/unix/lib -lproj
+QMAKE_CXXFLAGS += -I/usr/local/Cellar/geos/3.4.2/include -I/Library/Frameworks/PROJ.framework/Versions/4/unix/include # -I/usr/local/Cellar/gdal/1.11.2_1/include
+QMAKE_LFLAGS += -L/usr/local/Cellar/geos/3.4.2/lib -lgeos -L/Library/Frameworks/PROJ.framework/Versions/4/unix/lib -lproj # -L/usr/local/Cellar/gdal/1.11.2_1/lib -lgdal.1
 
 #LIBS += -L/usr/local/lib -lproj -lgeos
 #INCLUDEPATH += /usr/local/include

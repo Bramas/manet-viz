@@ -85,6 +85,7 @@ public:
 
 signals:
     void requestUpdate();
+    void minContactDurationChanged(int);
 
 public slots:
     void setCommunicationRange(int);
@@ -94,8 +95,10 @@ private:
     void increaseCellCount(QPoint cell, mvtime time);
     void deleteObsoleteCells(mvtime time);
     QColor selectCellColor(int cellCount);
+    QColor selectColorForLocalStat(qreal zScore);
     QList<double> getJenksBreaks(QList<double> sListDouble, int sClassCount);
     void update();
+    qreal computeLocalStat(QPoint cell);
 
     Ui::Control *ui;
     int _cellSize;

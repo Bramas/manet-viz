@@ -31,6 +31,7 @@ ImportDialog::ImportDialog(QString filename, QWidget *parent) :
     ui->lineEditTrace->setText((new QFileInfo(filename))->fileName());
     ui->checkBoxHeading->setChecked(false);
     ui->checkBoxMobility->setChecked(true);
+    ui->comboBoxTimeFormat->setCompleter(0);
 
     // Add the stored regexps in the combolist
     QSettings settings;
@@ -305,6 +306,8 @@ bool ImportDialog::isTimeFormatValid(QString format)
             dt = QDateTime::fromTime_t(timeSample.toUInt());
         } else if(format == "t") {
             dt = QDateTime::fromMSecsSinceEpoch(timeSample.toLongLong());
+        } else if(format == "tt") {
+            dt = QDateTime::fromMSecsSinceEpoch(timeSample.toLongLong() / 1000);
         } else {
             dt = QDateTime::fromString(timeSample, format);
         }

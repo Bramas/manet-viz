@@ -1,0 +1,12 @@
+#ifndef SENSEAREA_GLOBAL_H
+#define SENSEAREA_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(SENSEAREA_LIBRARY)
+#  define SENSEAREASHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define SENSEAREASHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // SENSEAREA_GLOBAL_H
