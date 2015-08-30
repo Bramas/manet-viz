@@ -152,7 +152,6 @@ void Viewer::updateLayers()
     }
 }
 
-
 void Viewer::onPluginsChanged()
 {
     foreach(IGraphLayout * layout, PluginManager::getObjects<IGraphLayout>())

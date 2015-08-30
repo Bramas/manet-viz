@@ -47,6 +47,25 @@ private:
     QMap<mvtime, QPair<QPointF,QPointF> > _recordedPositions;
 };
 
+class GridCell: public QRectF
+{
+public:
+    GridCell():
+        QRectF() {}
+    GridCell(qreal x, qreal y, qreal w, qreal h):
+        QRectF(x, y, w, h), _count(0) { }
+
+    void setCount(int count) { _count = count; }
+    int getCount() const { return _count; }
+    void incCount() { _count++; }
+    void incCount(int count) { _count += count; }
+    void decCount() { _count--; }
+    void decCount(int count) { _count -= count; }
+
+private:
+    int _count;
+};
+
 class ContactArea
 {
 public:
@@ -161,7 +180,9 @@ private:
     SenseArea * _senseAreaPlugin;
     mvtime _minContactDuration;
     mvtime _lastContactTime;
+    int _cellSize;
     QMap<QPair<int,int>, ContactInfo *> _contacts;
+    QHash<QPoint,GridCell *> _contactCount;
     QMap<int,ContactArea*> _contactAreas;
     QVector<int> _interContactDistribution;
     QVector<int> _contactDistribution;

@@ -35,6 +35,7 @@ public:
 signals:
     void loaded();
     void onLoadProgressChanged(qreal);
+
 public slots:
     bool load();
 

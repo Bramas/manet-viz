@@ -14,6 +14,7 @@ ContactExporter::ContactExporter()
 {
     _minContactDuration = 0;
     _lastContactTime = -1;
+    _cellSize = 200;
 }
 
 void ContactExporter::addDependancy(QObject *plugin)
@@ -86,22 +87,12 @@ void ContactExporter::exportContactDistributions()
     if (!original.completeSuffix().isEmpty())
         filename_inter_distr += "." + original.completeSuffix();
 
+    QString shapefilename = original.canonicalPath() + QDir::separator();
+
     qDebug()<<"export contact distributions => " << filename_distr;
     qDebug()<<"export contact inter distributions => " << filename_inter_distr;
+    qDebug()<<"export grid" << shapefilename;
 
-    QFile file_distr(filename_distr);
-    if(!file_distr.open(QFile::WriteOnly))
-    {
-        qDebug() << "Unable to write in file "<<filename_distr;
-        return;
-    }
-
-    QFile file_inter_distr(filename_inter_distr);
-    if(!file_inter_distr.open(QFile::WriteOnly))
-    {
-        qDebug() << "Unable to write in file "<<filename_inter_distr;
-        return;
-    }
 
     // Create the contact areas
     qDebug() << "Number of sense areas" << _senseAreaPlugin->getAreas().keys();
@@ -115,7 +106,7 @@ void ContactExporter::exportContactDistributions()
 
     qDebug() << "------\n" << _contactAreas.size() << "contact areas created";
 
-    for(mvtime i = evg->beginTime(); i < evg->beginTime() + 10000; ++i)
+    for(mvtime i = evg->beginTime(); i < evg->endTime(); ++i)
     {
         QSet<QPair<int,int> > examinedContacts;
         IGraph * snapshot = _project->constructSnapshot(i);
@@ -145,6 +136,9 @@ void ContactExporter::exportContactDistributions()
                         // record the contact
                         _contacts.insert(nodes, ci);
                     }
+
+                    // record the point position
+                    ci->addPosition(i, p1.x(), p1.y(), p2.x(), p2.y());
 
                     // loop through all the contactAreas
                     for(auto it = _contactAreas.begin(); it != _contactAreas.end(); ++it) {
@@ -206,6 +200,28 @@ void ContactExporter::exportContactDistributions()
                     }
                 }
 
+                // update the grid
+                if(contactDuration >= _minContactDuration) {
+                    QMap<mvtime, QPair<QPointF,QPointF> > positions = ci->getRecordedPositions();
+                    for(auto it = positions.begin(); it != positions.end(); ++it) {
+
+                        QPoint gc1((int)qFloor(it.value().first.x() / _cellSize), (int)qFloor(it.value().first.y() / _cellSize));
+                        QPoint gc2((int)qFloor(it.value().second.x() / _cellSize), (int)qFloor(it.value().second.y() / _cellSize));
+
+                        if(!_contactCount.contains(gc1)) {
+                            _contactCount.insert(gc1,
+                                                 new GridCell(_cellSize*gc1.x(), _cellSize*gc1.y(), _cellSize, _cellSize));
+                        }
+                        _contactCount[gc1]->incCount();
+
+                        if(!_contactCount.contains(gc2)) {
+                            _contactCount.insert(gc2,
+                                                 new GridCell(_cellSize*gc2.x(), _cellSize*gc2.y(), _cellSize, _cellSize));
+                        }
+                        _contactCount[gc2]->incCount();
+                    }
+                }
+
                 // update the contact duration distribution
                 int idx = (int) qFloor(contactDuration / 10.0);
                 if (idx >= _contactDistribution.size()) {
@@ -242,6 +258,20 @@ void ContactExporter::exportContactDistributions()
     qDebug() << "[Writing] output distributions in files";
     qDebug() << "[INFO]" << _contactDistribution.size() << _interContactDistribution.size();
 
+    QFile file_distr(filename_distr);
+    if(!file_distr.open(QFile::WriteOnly))
+    {
+        qDebug() << "Unable to write in file "<<filename_distr;
+        return;
+    }
+
+    QFile file_inter_distr(filename_inter_distr);
+    if(!file_inter_distr.open(QFile::WriteOnly))
+    {
+        qDebug() << "Unable to write in file "<<filename_inter_distr;
+        return;
+    }
+
     QTextStream out_distr(&file_distr);
     QTextStream out_inter_distr(&file_inter_distr);
     for(int i = 0; i < _contactDistribution.size(); ++i) {
@@ -263,7 +293,75 @@ void ContactExporter::exportContactDistributions()
         }
     }
 
+    file_distr.close();
+    file_inter_distr.close();
+
+    qDebug() << "[Writting] output grid cells";
+
+    const char *pszDriverName = "ESRI Shapefile";
+    OGRSFDriver *poDriver;
+
+    OGRRegisterAll();
+    OGRDataSource *poDS;
+
+    poDriver = OGRSFDriverRegistrar::GetRegistrar()->GetDriverByName(
+                    pszDriverName );
+    if( poDriver == NULL )
+    {
+        printf( "%s driver not available.\n", pszDriverName );
+        exit( 1 );
+    }
+
+    poDS = poDriver->CreateDataSource( shapefilename.toLatin1().data(), NULL );
+    if( poDS == NULL )
+    {
+        qWarning() << "Creation of output file failed.";
+    }
+
+    OGRSpatialReference *srs = new OGRSpatialReference();
+    srs->importFromProj4(_project->loader()->getOutputProj());
+
+    OGRLayer *poLayerGrid;
+    poLayerGrid = poDS->CreateLayer( "grid", srs, wkbPolygon, NULL );
+    if( poLayerGrid == NULL )
+    {
+        qWarning() << "Grid Layer creation failed.";
+    }
+
+    OGRFieldDefn oFieldCount( "Count", OFTInteger );
+    oFieldCount.SetWidth(32);
+    if( poLayerGrid->CreateField( &oFieldCount ) != OGRERR_NONE )
+    {
+        qWarning() <<  "Creating Count field failed.";
+    }
+
+    for(auto it = _contactCount.begin(); it != _contactCount.end(); ++it) {
+        GridCell * gc = it.value();
+        OGRFeature *poFeature = OGRFeature::CreateFeature( poLayerGrid->GetLayerDefn() );
+
+        poFeature->SetField( "Count", gc->getCount() );
+        OGRLinearRing  oRing;
+        OGRPolygon oPoly;
+
+        oRing.addPoint(gc->bottomLeft().x(), gc->bottomLeft().y());
+        oRing.addPoint(gc->bottomRight().x(), gc->bottomRight().y());
+        oRing.addPoint(gc->topRight().x(), gc->topRight().y());
+        oRing.addPoint(gc->topLeft().x(), gc->topLeft().y());
+        oRing.addPoint(gc->bottomLeft().x(), gc->bottomLeft().y());
+
+        oPoly.addRing( &oRing );
+
+        poFeature->SetGeometry( &oPoly );
+
+        if( poLayerGrid->CreateFeature( poFeature ) != OGRERR_NONE )
+        {
+           qWarning() << "Failed to create feature in shapefile.";
+        }
+        OGRFeature::DestroyFeature( poFeature );
+    }
+
     qDebug() << "[Writing] DONE";
+    OGRDataSource::DestroyDataSource( poDS );
 }
 
 void ContactExporter::convert()
@@ -281,12 +379,6 @@ void ContactExporter::convert()
         return;
 
     qDebug()<<"export contacts => "<<filename;
-//    QFile file(filename);
-//    if(!file.open(QFile::WriteOnly))
-//    {
-//        qDebug() << "Unable to write in file "<<filename;
-//        return;
-//    }
 
     const char *pszDriverName = "FileGDB";
     OGRSFDriver *poDriver;
@@ -315,7 +407,7 @@ void ContactExporter::convert()
     poLayer = poDS->CreateLayer( "contacts", srs, wkbPoint, NULL );
     if( poLayer == NULL )
     {
-        qWarning() << "Layer creation failed.";
+        qWarning() << "Contact Layer creation failed.";
     }
 
     OGRFieldDefn oFieldTimeStamp( "Timestamp", OFTDateTime );
@@ -342,11 +434,6 @@ void ContactExporter::convert()
     {
         qWarning() << "Creating NodeId2 field failed.";
     }
-
-    OGRSpatialReference *poTarget = new OGRSpatialReference();
-    poTarget->importFromProj4(_project->loader()->getOutputProj());
-
-//    QTextStream out(&file);
 
     qDebug()<<evg->beginTime()<<" "<<evg->endTime();
     for(mvtime i = evg->beginTime(); i < evg->endTime(); ++i)
@@ -412,7 +499,7 @@ void ContactExporter::convert()
 
                         if( poLayer->CreateFeature( poFeature ) != OGRERR_NONE )
                         {
-                           qWarning() << "Failed to create feature in shapefile.";
+                           qWarning() << "Failed to create feature in geodatabase.";
                         }
                         OGRFeature::DestroyFeature( poFeature );
 //                        out << it.key() << ";" << ci->getNodes().first << ";" << ci->getNodes().second << ";" << mid.x() << ";" << mid.y() << ";" << p1.x() << ";" << p1.y() << ";" << p2.x() << ";" << p2.y() << "\n";
@@ -436,5 +523,16 @@ void ContactExporter::convert()
 void ContactExporter::setMinContactDuration(int value)
 {
     _minContactDuration = value;
+}
+
+inline uint qHash(const QPoint &key)
+{
+    return qHash(key.x()) ^ qHash(key.y());
+}
+
+inline uint qHash(const ContactInfo &key)
+{
+    QPair<int,int> nodes = key.getNodes();
+    return qHash(nodes.first) ^ qHash(nodes.second);
 }
 

@@ -7,9 +7,6 @@
 GridStatDecorator::GridStatDecorator():
     ui(new Ui::Control)
 {
-    _gridCount = QHash<QPoint,QLinkedList<QPair<mvtime,int> > >();
-    _contactCount = QHash<QPoint,GraphicsCellItem *>();
-    _contacts = QMap<QPair<int,int>,ContactInfo>();
     _timeWindow = 60*60; // 60 minutes
     _minContactDuration = 0; // 0 1/10 seconds
     _showGrid = true;
